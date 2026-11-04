@@ -50,6 +50,13 @@ No hay framework de tests configurado todavía.
 - Cada cambio de tablas va acompañado de su migración.
 - Código en inglés; comentarios en español solo cuando aporten valor.
 
+## UI / Frontend
+
+- Al implementar pantallas o componentes nuevos (incluido dentro de `/spec-impl`), cargar el skill `frontend-design:frontend-design` antes de escribir código de UI.
+- Los mockups de `references/pantallas/*.dc.html` son la fuente de verdad: layout, colores, tipografía y copy se toman del mockup. El skill solo complementa lo que el mockup no define (estados vacíos/error/carga, responsive, foco de teclado, accesibilidad, reduced motion).
+- Ante un conflicto entre el skill y el mockup, gana el mockup. Si el mockup no cubre algo relevante, detenerse y preguntar.
+- Ajustes menores de UI (textos, un color, bugs de estilo) no requieren el skill.
+
 ## Flujo de trabajo: Spec Driven Design (SDD)
 
 Ninguna feature se implementa sin una spec aprobada.
