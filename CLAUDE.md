@@ -1,0 +1,71 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+@AGENTS.md
+
+## Proyecto
+
+ElderlyDayCare: app para una guardería de adultos mayores. El staff publica en un feed (comidas, siestas, actividades, logros, anuncios) y los familiares ven lo de sus adultos mayores. Roles: `admin`, `staff`, `relative`.
+
+Estado actual: scaffold de Create Next App. Aún no existe el código de dominio; la especificación vive en `references/`.
+
+## Comandos
+
+```bash
+npm run dev     # servidor de desarrollo en http://localhost:3000
+npm run build
+npm run lint    # ESLint 9 (eslint-config-next core-web-vitals + typescript)
+```
+
+No hay framework de tests configurado todavía.
+
+## Stack y configuración relevante
+
+- Next.js 16.4.5 (App Router) + React 19.3 + TypeScript strict. Alias `@/*` → raíz del repo.
+- Tailwind CSS v4 cargado vía loader de Turbopack (`@tailwindcss/turbopack` en `next.config.ts`), no vía PostCSS.
+- `next.config.ts` activa `cacheComponents`, `partialPrefetching` y `experimental.agentFeedback`. Consultar `node_modules/next/dist/docs/` antes de usar APIs de caché/rendering.
+- En Next 16 `middleware.ts` se llama `proxy.ts`.
+- Backend previsto: Supabase (Postgres + Auth + Storage) con `@supabase/ssr`; correos con Resend.
+
+## Documentos de referencia (fuente de verdad)
+
+- `references/documents/database-schema.md`: tablas, enums, policies RLS, bucket `post-photos` y cómo probar las policies.
+- `references/documents/flujos-de-procesos.md`: flujos de creación/gestión de cuentas y publicaciones.
+- `references/pantallas/*.dc.html`: mockups de cada pantalla (abrir en navegador; `support.js` es un runtime generado, no editar).
+
+## Reglas de dominio clave (detalle en los documentos de referencia)
+
+- Todo lo persistido en DB va en inglés (enums, códigos); las etiquetas en español se traducen en la UI.
+- RLS activado en todas las tablas; policies solo `to authenticated`, nombradas `<tabla>_<acción>_<quién>`, con helpers `SECURITY DEFINER STABLE` envueltos en `(select ...)`.
+- Solo usuarios con `status = active` tienen acceso.
+- La regla de visibilidad del feed (según `audience`, nunca `type`) se implementa en un solo lugar y la reusan `posts`, `post_elderly`, `post_photos`, `reactions`, `comments` y Storage.
+- Signup público desactivado. La creación de cuentas va en Server Actions con el cliente `service_role`, solo después de verificar permisos del que llama. `role` y `daycare_id` los fija siempre el servidor.
+- El cliente `service_role` se usa solo para los casos listados en el esquema (crear cuentas, aceptar invitaciones, activar/archivar usuarios, cron del resumen diario).
+- Consentimiento de fotos: siempre gana el "no"; un familiar nunca puede pasarlo de `false` a `true`.
+
+## Convenciones
+
+- Screaming Architecture: organizar por feature de dominio (ej. `auth/`, `elderly/`, `feed/`), no por tipo técnico.
+- Cada cambio de tablas va acompañado de su migración.
+- Código en inglés; comentarios en español solo cuando aporten valor.
+
+## Flujo de trabajo: Spec Driven Design (SDD)
+
+Ninguna feature se implementa sin una spec aprobada.
+
+1. `/spec <descripción>`: diseña la spec por preguntas y la guarda en `specs/NN-slug.md` (sin código).
+2. Revisar la spec y cambiar su estado a `Aprobado`.
+3. `/spec-impl NN-slug`: crea la rama `spec-NN-slug` (según `AutoCreateBranch` en `specs/.spec-config.yml`) e implementa el plan paso a paso, con pausa para revisar el diff después de cada paso.
+4. Verificar los criterios de aceptación, marcar la spec como `Implementado` y hacer commit/merge (solo el usuario decide los commits).
+
+Reglas:
+- La spec es el contrato: implementar lo que dice. Si algo debe cambiar, se cambia primero en la spec.
+- Ante una ambigüedad no resuelta por la spec, detenerse y preguntar con opciones concretas.
+- Lo que esté fuera del alcance de la spec se anota para una spec futura; no se implementa en la rama actual.
+- Las specs deben respetar `references/documents/` (esquema y flujos) y estar escritas en español, siguiendo el formato de las existentes.
+
+## MCPs
+
+- Playwright Screenshots y cualquier cosa relacionada a Playwright tienen que estar en la carpeta .playwright-mcp
+- Context7 usaremos este mcp para traer la documentación actualizada del framework
