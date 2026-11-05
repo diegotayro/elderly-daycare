@@ -11,13 +11,14 @@ export type NavItem = {
   key: NavKey;
   label: string;
   href: string;
+  activePath: "/" | "/elderly" | null; // ruta que marca la opción como activa
   icon: ComponentType<IconProps>;
 };
 
-// Todos apuntan a "/" hasta que existan las pantallas respectivas.
+// "Avisos" y "Mi cuenta" apuntan a "/" hasta que existan, sin marcarse activos.
 export const navItems: NavItem[] = [
-  { key: "feed", label: "Feed", href: "/", icon: HomeIcon },
-  { key: "elderly", label: "Adultos mayores", href: "/", icon: PeopleIcon },
-  { key: "notices", label: "Avisos", href: "/", icon: BellIcon },
-  { key: "account", label: "Mi cuenta", href: "/", icon: UserIcon },
+  { key: "feed", label: "Feed", href: "/", activePath: "/", icon: HomeIcon },
+  { key: "elderly", label: "Adultos mayores", href: "/elderly", activePath: "/elderly", icon: PeopleIcon },
+  { key: "notices", label: "Avisos", href: "/", activePath: null, icon: BellIcon },
+  { key: "account", label: "Mi cuenta", href: "/", activePath: null, icon: UserIcon },
 ];

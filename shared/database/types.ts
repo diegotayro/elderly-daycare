@@ -77,3 +77,30 @@ export type PostPhoto = {
   position: number;
   created_at: string;
 };
+
+export type RelationshipType = "son" | "daughter" | "guardian";
+export type InvitationStatus = "pending" | "accepted" | "expired" | "cancelled";
+
+export type GuardianElderly = {
+  id: string;
+  relative_id: string;
+  elderly_id: string;
+  relationship: RelationshipType;
+  created_at: string;
+};
+
+export type Invitation = {
+  id: string;
+  elderly_id: string;
+  invited_by: string;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  email: string;
+  relationship: RelationshipType;
+  code: string;
+  status: InvitationStatus;
+  expires_at: string;
+  accepted_at: string | null;
+  created_at: string;
+};
