@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Avatar } from "../Avatar";
 import { LogoutIcon } from "../icons/LogoutIcon";
 import { PlusIcon } from "../icons/PlusIcon";
-import { SunIcon } from "../icons/SunIcon";
+import { BrandLink } from "./BrandLink";
 import { navItems, type NavKey } from "./nav-items";
 
 type SidebarProps = {
@@ -20,17 +20,7 @@ export function Sidebar({
 }: SidebarProps) {
   return (
     <aside className="sticky top-0 hidden h-screen w-62 flex-none flex-col border-r border-line bg-surface px-4 py-6 lg:flex">
-      <Link href="/" className="flex items-center gap-[11px] px-2 pt-1 pb-[22px]">
-        <div className="flex size-[38px] flex-none items-center justify-center rounded-xl bg-linear-155 from-[#F8C3A8] to-coral text-white">
-          <SunIcon size={21} />
-        </div>
-        <div>
-          <div className="font-display text-[17px] leading-none font-semibold text-ink">
-            {daycareName}
-          </div>
-          <div className="mt-0.5 text-[11.5px] text-muted">Personal</div>
-        </div>
-      </Link>
+      <BrandLink daycareName={daycareName} className="px-2 pt-1 pb-[22px]" />
 
       <Link
         href="/"

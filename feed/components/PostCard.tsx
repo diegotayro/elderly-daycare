@@ -39,7 +39,7 @@ export function PostCard({ post }: PostCardProps) {
       {post.photoCaption && (
         <Link
           href="/"
-          className="mt-3.5 flex h-[200px] flex-col items-center justify-center gap-2 rounded-2xl border-[1.5px] border-dashed border-photo-line bg-photo text-photo-ink"
+          className="mt-3.5 flex h-40 lg:h-[200px] flex-col items-center justify-center gap-2 rounded-2xl border-[1.5px] border-dashed border-photo-line bg-photo text-photo-ink"
         >
           <ImageIcon size={30} />
           <span className="text-[13.5px]">{post.photoCaption}</span>

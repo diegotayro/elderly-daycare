@@ -13,7 +13,7 @@ export function FeedView({ source }: FeedViewProps) {
   const posts = buildFeed(source);
 
   return (
-    <div className="mx-auto w-full max-w-[760px] px-10 pt-[34px] pb-20">
+    <div className="mx-auto w-full max-w-[760px] px-4 pt-5 pb-8 lg:px-10 lg:pt-[34px] lg:pb-20">
       <FeedHeader
         daycareName={daycare.name}
         userFirstName={currentUser.first_name}
