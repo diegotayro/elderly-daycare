@@ -1,6 +1,6 @@
 # SPEC 02 — Adultos mayores: listado y perfil con datos mock
 
-> **Estado:** Approved
+> **Estado:** Implementado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-11-04
 > **Objetivo:** Implementar las pantallas `/elderly` (listado con buscador) y `/elderly/[id]` (perfil) como réplica de `adultos-mayores.dc.html` y `perfil-adulto-mayor.dc.html`, alimentadas por datos mock tipados según el esquema y con un layout de navegación común al feed.
@@ -244,27 +244,27 @@ Solo `NavLink.tsx` y `ElderlySearchList.tsx` son Client Components.
 
 ## Criterios de aceptación
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] La consola del navegador no muestra errores ni warnings de hidratación en `/`, `/elderly` y `/elderly/<id>`.
-- [ ] A 1440×900, `/elderly` y `adultos-mayores.dc.html` no muestran diferencias visibles de layout, colores, tipografía, textos ni íconos al compararlas lado a lado.
-- [ ] A 1440×900, `/elderly/<id de Luis>` y `perfil-adulto-mayor.dc.html` no muestran diferencias visibles al compararlas lado a lado.
-- [ ] `/` se ve igual que al cierre de SPEC 01.
-- [ ] El sidebar existe una sola vez, en `app/(app)/layout.tsx`.
-- [ ] En `/` está activo "Feed"; en `/elderly` y `/elderly/<id>` está activo "Adultos mayores" (sidebar y barra inferior).
-- [ ] Los tipos nuevos de `shared/database/types.ts` tienen las mismas columnas y valores de enum que `database-schema.md`.
-- [ ] Nombres, edades, textos de familiares, indicadores, notas, fechas y familiares salen de `mock-elderly.ts` vía los builders, no del JSX.
-- [ ] Un adulto mayor con `status = archived` en el mock no aparece en el listado ni en el conteo.
-- [ ] Un adulto mayor con alergia y sin familiares muestra la alergia, no VINCULAR.
-- [ ] Una invitación `cancelled` o `expired` no cuenta como familiar ni aparece en el perfil.
-- [ ] Escribir "mendez" muestra solo a Rosa Méndez y el conteo dice "1 adulto mayor".
-- [ ] Escribir un texto sin coincidencias muestra el estado vacío y ninguna tarjeta.
-- [ ] Cada tarjeta enlaza a `/elderly/<su id>` y el perfil muestra los datos de ese adulto mayor.
-- [ ] Un adulto mayor con `medical_notes = null` no muestra el bloque "Alergias y notas".
-- [ ] `/elderly/no-existe` muestra la página not-found con enlace al listado.
-- [ ] "Agregar adulto mayor", "Editar", "Resumen del día" y "Vincular otro familiar/tutor" son `<Link href="/">`.
-- [ ] Solo `NavLink.tsx` y `ElderlySearchList.tsx` tienen `"use client"`.
-- [ ] A 390×844 no hay scroll horizontal en `/elderly` ni en el perfil, y el contenido queda por encima de la barra inferior.
-- [ ] Las capturas de verificación están en `.playwright-mcp/`.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] La consola del navegador no muestra errores ni warnings de hidratación en `/`, `/elderly` y `/elderly/<id>`.
+- [x] A 1440×900, `/elderly` y `adultos-mayores.dc.html` no muestran diferencias visibles de layout, colores, tipografía, textos ni íconos al compararlas lado a lado.
+- [x] A 1440×900, `/elderly/<id de Luis>` y `perfil-adulto-mayor.dc.html` no muestran diferencias visibles al compararlas lado a lado.
+- [x] `/` se ve igual que al cierre de SPEC 01.
+- [x] El sidebar existe una sola vez, en `app/(app)/layout.tsx`.
+- [x] En `/` está activo "Feed"; en `/elderly` y `/elderly/<id>` está activo "Adultos mayores" (sidebar y barra inferior).
+- [x] Los tipos nuevos de `shared/database/types.ts` tienen las mismas columnas y valores de enum que `database-schema.md`.
+- [x] Nombres, edades, textos de familiares, indicadores, notas, fechas y familiares salen de `mock-elderly.ts` vía los builders, no del JSX.
+- [x] Un adulto mayor con `status = archived` en el mock no aparece en el listado ni en el conteo.
+- [x] Un adulto mayor con alergia y sin familiares muestra la alergia, no VINCULAR.
+- [x] Una invitación `cancelled` o `expired` no cuenta como familiar ni aparece en el perfil.
+- [x] Escribir "mendez" muestra solo a Rosa Méndez y el conteo dice "1 adulto mayor".
+- [x] Escribir un texto sin coincidencias muestra el estado vacío y ninguna tarjeta.
+- [x] Cada tarjeta enlaza a `/elderly/<su id>` y el perfil muestra los datos de ese adulto mayor.
+- [x] Un adulto mayor con `medical_notes = null` no muestra el bloque "Alergias y notas".
+- [x] `/elderly/no-existe` muestra la página not-found con enlace al listado.
+- [x] "Agregar adulto mayor", "Editar", "Resumen del día" y "Vincular otro familiar/tutor" son `<Link href="/">`.
+- [x] Solo `NavLink.tsx` y `ElderlySearchList.tsx` tienen `"use client"`.
+- [x] A 390×844 no hay scroll horizontal en `/elderly` ni en el perfil, y el contenido queda por encima de la barra inferior.
+- [x] Las capturas de verificación están en `.playwright-mcp/`.
 
 ---
 
