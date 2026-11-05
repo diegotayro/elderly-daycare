@@ -33,6 +33,7 @@ body {
   background: var(--color-cream);
   color: var(--color-ink);
   font-family: var(--font-sans);
+  line-height: normal; /* el mockup no define line-height; Tailwind usa 1.5 por defecto */
   -webkit-font-smoothing: antialiased;
 }
 
