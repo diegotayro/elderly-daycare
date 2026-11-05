@@ -225,18 +225,18 @@ Todos son Server Components.
 ## Criterios de aceptación
 
 - [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] La consola del navegador no muestra errores ni warnings de hidratación en `/`.
-- [ ] A 1440×900, la captura de `/` y la de `feed.dc.html` no muestran diferencias visibles de layout, colores, tipografía, textos ni íconos al compararlas lado a lado.
-- [ ] Los tipos de `shared/database/types.ts` tienen las mismas columnas y valores de enum que `database-schema.md` para las tablas que incluyen.
-- [ ] Los textos, horas, contadores (3/1, 5/2, 8/0) y destinatarios de las 3 tarjetas salen de `feed/mock-feed.ts` vía `buildFeed`, no del JSX.
-- [ ] Las etiquetas "LOGRO", "ACTIVIDAD", "ANUNCIO" se obtienen de `post-type-styles.ts` a partir de `achievement`, `activity`, `announcement`.
-- [ ] "Cuidador/a" sale de `user-role-labels.ts` a partir de `role = "staff"`; cambiar el `role` del usuario mock a `admin` muestra "Administrador/a" sin tocar componentes.
-- [ ] Cambiar un texto en `mock-feed.ts` cambia la UI sin tocar componentes.
-- [ ] Todos los enlaces de la página son `<Link>` con `href="/"`.
-- [ ] A ≥1024px se ve el sidebar y no la topbar ni la barra inferior; a <1024px ocurre lo contrario.
-- [ ] A 390×844 no hay scroll horizontal y la última tarjeta queda visible por encima de la barra inferior.
-- [ ] No existe `"use client"` en ningún archivo de esta feature.
-- [ ] Las capturas de verificación están en `.playwright-mcp/`.
+- [x] La consola del navegador no muestra errores ni warnings de hidratación en `/`.
+- [x] A 1440×900, la captura de `/` y la de `feed.dc.html` no muestran diferencias visibles de layout, colores, tipografía, textos ni íconos al compararlas lado a lado.
+- [x] Los tipos de `shared/database/types.ts` tienen las mismas columnas y valores de enum que `database-schema.md` para las tablas que incluyen.
+- [x] Los textos, horas, contadores (3/1, 5/2, 8/0) y destinatarios de las 3 tarjetas salen de `feed/mock-feed.ts` vía `buildFeed`, no del JSX.
+- [x] Las etiquetas "LOGRO", "ACTIVIDAD", "ANUNCIO" se obtienen de `post-type-styles.ts` a partir de `achievement`, `activity`, `announcement`.
+- [x] "Cuidador/a" sale de `user-role-labels.ts` a partir de `role = "staff"`; cambiar el `role` del usuario mock a `admin` muestra "Administrador/a" sin tocar componentes.
+- [x] Cambiar un texto en `mock-feed.ts` cambia la UI sin tocar componentes.
+- [x] Todos los enlaces de la página son `<Link>` con `href="/"`.
+- [x] A ≥1024px se ve el sidebar y no la topbar ni la barra inferior; a <1024px ocurre lo contrario.
+- [x] A 390×844 no hay scroll horizontal y la última tarjeta queda visible por encima de la barra inferior.
+- [x] No existe `"use client"` en ningún archivo de esta feature.
+- [x] Las capturas de verificación están en `.playwright-mcp/`.
 
 ---
 
