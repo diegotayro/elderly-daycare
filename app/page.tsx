@@ -1,3 +1,4 @@
+import { FeedView } from "@/feed/components/FeedView";
 import { mockFeed } from "@/feed/mock-feed";
 import { Sidebar } from "@/shared/components/navigation/Sidebar";
 import { userRoleLabels } from "@/users/user-role-labels";
@@ -14,7 +15,7 @@ export default function Home() {
         activeKey="feed"
       />
       <main className="min-w-0 flex-1">
-        <h1 className="p-8 font-display text-3xl font-semibold">Casa Nogal</h1>
+        <FeedView source={mockFeed} />
       </main>
     </div>
   );
