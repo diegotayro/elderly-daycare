@@ -1,33 +1,19 @@
+import { mockSession } from "@/shared/session/mock-session";
 import type { FeedSource } from "./types";
 
-const DAYCARE_ID = "daycare-1";
-const CARO_ID = "user-caro";
+const CARO_ID = mockSession.currentUser.id;
 const ROOM_ID = "room-roble";
 const LUIS_ID = "elderly-luis";
 const CREATED_AT = "2025-06-01T00:00:00Z";
 
 export const mockFeed: FeedSource = {
-  daycare: { id: DAYCARE_ID, name: "Casa Nogal", created_at: CREATED_AT },
-  currentUser: {
-    id: CARO_ID,
-    daycare_id: DAYCARE_ID,
-    role: "staff",
-    status: "active",
-    first_name: "Caro",
-    last_name: "Giménez",
-    full_name: "Caro Giménez",
-    avatar_url: null,
-    notify_on_post: true,
-    daily_summary_enabled: true,
-    created_at: CREATED_AT,
-    updated_at: CREATED_AT,
-  },
+  ...mockSession,
   elderlyCount: 12,
   todayLabel: "martes 17 jun",
   rooms: [
     {
       id: ROOM_ID,
-      daycare_id: DAYCARE_ID,
+      daycare_id: mockSession.daycare.id,
       is_default: false,
       name: "Roble",
       created_at: CREATED_AT,
