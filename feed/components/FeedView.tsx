@@ -1,4 +1,6 @@
+import { buildFeed } from "../build-feed";
 import { FeedHeader } from "./FeedHeader";
+import { PostCard } from "./PostCard";
 import { PostComposerLink } from "./PostComposerLink";
 import type { FeedSource } from "../types";
 
@@ -8,6 +10,7 @@ type FeedViewProps = {
 
 export function FeedView({ source }: FeedViewProps) {
   const { daycare, currentUser, elderlyCount, todayLabel } = source;
+  const posts = buildFeed(source);
 
   return (
     <div className="mx-auto w-full max-w-[760px] px-10 pt-[34px] pb-20">
@@ -23,6 +26,11 @@ export function FeedView({ source }: FeedViewProps) {
           PUBLICADO HOY
         </span>
         <span className="h-px flex-1 bg-divider" />
+      </div>
+      <div className="flex flex-col gap-4">
+        {posts.map((post) => (
+          <PostCard key={post.id} post={post} />
+        ))}
       </div>
     </div>
   );
