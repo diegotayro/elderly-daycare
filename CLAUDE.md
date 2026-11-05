@@ -50,6 +50,13 @@ No hay framework de tests configurado todavía.
 - Cada cambio de tablas va acompañado de su migración.
 - Código en inglés; comentarios en español solo cuando aporten valor.
 
+## UI / Frontend
+
+- Al implementar pantallas o componentes nuevos (incluido dentro de `/spec-impl`), cargar el skill `frontend-design:frontend-design` antes de escribir código de UI.
+- Los mockups de `references/pantallas/*.dc.html` son la fuente de verdad: layout, colores, tipografía y copy se toman del mockup. El skill solo complementa lo que el mockup no define (estados vacíos/error/carga, responsive, foco de teclado, accesibilidad, reduced motion).
+- Ante un conflicto entre el skill y el mockup, gana el mockup. Si el mockup no cubre algo relevante, detenerse y preguntar.
+- Ajustes menores de UI (textos, un color, bugs de estilo) no requieren el skill.
+
 ## Flujo de trabajo: Spec Driven Design (SDD)
 
 Ninguna feature se implementa sin una spec aprobada.
@@ -57,13 +64,18 @@ Ninguna feature se implementa sin una spec aprobada.
 1. `/spec <descripción>`: diseña la spec por preguntas y la guarda en `specs/NN-slug.md` (sin código).
 2. Revisar la spec y cambiar su estado a `Aprobado`.
 3. `/spec-impl NN-slug`: crea la rama `spec-NN-slug` (según `AutoCreateBranch` en `specs/.spec-config.yml`) e implementa el plan paso a paso, con pausa para revisar el diff después de cada paso.
-4. Verificar los criterios de aceptación, marcar la spec como `Implementado` y hacer commit/merge (solo el usuario decide los commits).
+4. Verificar los criterios de aceptación con el agente `spec-verifier` (ver abajo), marcar la spec como `Implementado` y hacer commit/merge (solo el usuario decide los commits).
 
 Reglas:
 - La spec es el contrato: implementar lo que dice. Si algo debe cambiar, se cambia primero en la spec.
 - Ante una ambigüedad no resuelta por la spec, detenerse y preguntar con opciones concretas.
 - Lo que esté fuera del alcance de la spec se anota para una spec futura; no se implementa en la rama actual.
 - Las specs deben respetar `references/documents/` (esquema y flujos) y estar escritas en español, siguiendo el formato de las existentes.
+
+## Agentes
+
+- `spec-verifier` (`.claude/agents/spec-verifier.md`): verifica los criterios de aceptación de una spec (recibe el nombre o número), revisa el código y la UI con Playwright, corrige lo que falle y marca los checks. No cambia el estado de la spec ni hace commits.
+- Solo se lanza cuando el usuario lo pide explícitamente (ej. `@"spec-verifier (agent)" 01-slug`).
 
 ## MCPs
 
