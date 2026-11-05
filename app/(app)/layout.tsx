@@ -13,11 +13,10 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
         daycareName={daycare.name}
         userName={currentUser.full_name}
         userRoleLabel={userRoleLabels[currentUser.role]}
-        activeKey="feed"
       />
       <MobileTopBar daycareName={daycare.name} />
       <main className="min-w-0 flex-1 pb-16 lg:pb-0">{children}</main>
-      <MobileBottomNav activeKey="feed" />
+      <MobileBottomNav />
     </div>
   );
 }

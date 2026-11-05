@@ -3,20 +3,19 @@ import { Avatar } from "../Avatar";
 import { LogoutIcon } from "../icons/LogoutIcon";
 import { PlusIcon } from "../icons/PlusIcon";
 import { BrandLink } from "./BrandLink";
-import { navItems, type NavKey } from "./nav-items";
+import { navItems } from "./nav-items";
+import { NavLink } from "./NavLink";
 
 type SidebarProps = {
   daycareName: string;
   userName: string;
   userRoleLabel: string;
-  activeKey: NavKey;
 };
 
 export function Sidebar({
   daycareName,
   userName,
   userRoleLabel,
-  activeKey,
 }: SidebarProps) {
   return (
     <aside className="sticky top-0 hidden h-screen w-62 flex-none flex-col border-r border-line bg-surface px-4 py-6 lg:flex">
@@ -31,19 +30,18 @@ export function Sidebar({
       </Link>
 
       <nav className="flex flex-1 flex-col gap-1">
-        {navItems.map(({ key, label, href, icon: Icon }) => (
-          <Link
+        {navItems.map(({ key, label, href, activePath, icon: Icon }) => (
+          <NavLink
             key={key}
             href={href}
-            className={
-              key === activeKey
-                ? "flex items-center gap-3 rounded-xl bg-coral-soft px-3 py-[11px] text-[14.5px] font-extrabold text-coral-strong"
-                : "flex items-center gap-3 rounded-xl px-3 py-[11px] text-[14.5px] font-semibold text-nav"
-            }
+            activePath={activePath}
+            baseClassName="flex items-center gap-3 rounded-xl px-3 py-[11px] text-[14.5px]"
+            activeClassName="bg-coral-soft font-extrabold text-coral-strong"
+            inactiveClassName="font-semibold text-nav"
           >
             <Icon size={19} />
             {label}
-          </Link>
+          </NavLink>
         ))}
       </nav>
 

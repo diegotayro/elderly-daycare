@@ -1,26 +1,21 @@
-import Link from "next/link";
-import { navItems, type NavKey } from "./nav-items";
+import { navItems } from "./nav-items";
+import { NavLink } from "./NavLink";
 
-type MobileBottomNavProps = {
-  activeKey: NavKey;
-};
-
-export function MobileBottomNav({ activeKey }: MobileBottomNavProps) {
+export function MobileBottomNav() {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-10 flex h-16 border-t border-line bg-surface lg:hidden">
-      {navItems.map(({ key, label, href, icon: Icon }) => (
-        <Link
+      {navItems.map(({ key, label, href, activePath, icon: Icon }) => (
+        <NavLink
           key={key}
           href={href}
-          className={`flex flex-1 flex-col items-center justify-center gap-0.5 text-[11px] ${
-            key === activeKey
-              ? "font-extrabold text-coral-strong"
-              : "font-semibold text-nav"
-          }`}
+          activePath={activePath}
+          baseClassName="flex flex-1 flex-col items-center justify-center gap-0.5 text-[11px]"
+          activeClassName="font-extrabold text-coral-strong"
+          inactiveClassName="font-semibold text-nav"
         >
           <Icon size={22} />
           {label}
-        </Link>
+        </NavLink>
       ))}
     </nav>
   );
