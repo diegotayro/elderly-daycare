@@ -1,6 +1,6 @@
 # SPEC 01 — Home del admin y staff: feed estático con datos mock
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** —
 > **Fecha:** 2026-11-04
 > **Objetivo:** Reemplazar la home `/` del scaffold por una réplica visual del mockup `references/pantallas/feed.dc.html` (feed del admin y del staff), alimentada por datos mock tipados según el esquema de base de datos y adaptada a móvil.
