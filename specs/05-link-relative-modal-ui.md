@@ -1,6 +1,6 @@
 # SPEC 05 — Modal "Vincular familiar/tutor": UI con validación
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02, SPEC 04
 > **Fecha:** 2026-11-06
 > **Objetivo:** Abrir desde "Vincular otro familiar/tutor" del perfil `/elderly/[id]` un modal nativo que replica `vincular-tutor.dc.html` y valida el formulario al tocar "Enviar invitación", sin persistir nada.
