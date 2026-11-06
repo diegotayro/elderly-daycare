@@ -1,7 +1,9 @@
 "use client";
 
 import type { FormEvent } from "react";
+import { ChevronDownIcon } from "@/shared/components/icons/ChevronDownIcon";
 import type { RoomOption } from "../types";
+import { FormField, fieldControlClassName } from "./FormField";
 
 type AddElderlyFormProps = {
   rooms: RoomOption[];
@@ -10,7 +12,12 @@ type AddElderlyFormProps = {
   onCancel: () => void;
 };
 
-export function AddElderlyForm({ titleId, onCancel }: AddElderlyFormProps) {
+export function AddElderlyForm({
+  rooms,
+  today,
+  titleId,
+  onCancel,
+}: AddElderlyFormProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
   }
@@ -38,7 +45,77 @@ export function AddElderlyForm({ titleId, onCancel }: AddElderlyFormProps) {
           Guardar
         </button>
       </header>
-      <div className="min-h-0 overflow-y-auto px-[26px] py-6" />
+      <div className="flex min-h-0 flex-col gap-[18px] overflow-y-auto px-[26px] py-6">
+        <FormField id="firstName" label="NOMBRES">
+          <input
+            id="firstName"
+            name="firstName"
+            placeholder="Ej. Rosa"
+            className={fieldControlClassName}
+          />
+        </FormField>
+        <FormField id="lastName" label="APELLIDOS">
+          <input
+            id="lastName"
+            name="lastName"
+            placeholder="Ej. Méndez Paredes"
+            className={fieldControlClassName}
+          />
+        </FormField>
+        <FormField id="birthDate" label="FECHA DE NACIMIENTO">
+          <input
+            id="birthDate"
+            name="birthDate"
+            type="date"
+            max={today}
+            className={fieldControlClassName}
+          />
+        </FormField>
+        <FormField id="enrolledAt" label="FECHA DE INGRESO">
+          <input
+            id="enrolledAt"
+            name="enrolledAt"
+            type="date"
+            className={fieldControlClassName}
+          />
+        </FormField>
+        <FormField id="roomId" label="HABITACIÓN">
+          <div className="relative">
+            <select
+              id="roomId"
+              name="roomId"
+              defaultValue={rooms[0]?.id}
+              className={`${fieldControlClassName} cursor-pointer appearance-none pr-11 font-bold`}
+            >
+              {rooms.map((room) => (
+                <option key={room.id} value={room.id}>
+                  {room.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDownIcon
+              size={16}
+              className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-photo-ink"
+            />
+          </div>
+        </FormField>
+        <FormField id="allergies" label="ALERGIAS (ETIQUETAS)">
+          <input
+            id="allergies"
+            name="allergies"
+            placeholder="Ej. Maní, Lactosa"
+            className={fieldControlClassName}
+          />
+        </FormField>
+        <FormField id="medicalNotes" label="NOTAS MÉDICAS">
+          <textarea
+            id="medicalNotes"
+            name="medicalNotes"
+            placeholder="Indicaciones, medicación, contactos…"
+            className={`${fieldControlClassName} min-h-[90px] resize-y leading-normal`}
+          />
+        </FormField>
+      </div>
     </form>
   );
 }
