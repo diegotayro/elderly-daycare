@@ -27,6 +27,13 @@
   --color-photo-ink: #b0a290;
   --color-elderly-bg: #a9d9e8;
   --color-elderly-ink: #1f7a93;
+  --color-auth-bg: #fbf4ec;
+  --color-field-line: #eadfd0;
+  --color-field-focus: #f2a78e;
+  --color-placeholder: #b6a99b;
+  --color-consent-bg: #fbf1d6;
+  --color-consent-ink: #8a7234;
+  --color-consent-check: #5fb97e;
 }
 
 body {
