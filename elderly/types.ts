@@ -45,6 +45,7 @@ export type LinkedRelative = {
 export type ElderlyProfile = {
   id: string;
   fullName: string;
+  firstName: string; // "Luis", para el aviso del modal de vincular
   initial: string;
   tone: AvatarTone;
   subtitle: string; // "78 años · Habitación Roble"
@@ -53,6 +54,7 @@ export type ElderlyProfile = {
   roomName: string; // "Roble"
   enrolledAtLabel: string; // "feb 2025"
   relatives: LinkedRelative[];
+  pendingInvitationEmails: string[]; // invitaciones pending de este adulto mayor
 };
 
 export type RoomOption = { id: string; name: string };
@@ -70,3 +72,16 @@ export type NewElderlyInput = {
 
 export type NewElderlyField = keyof NewElderlyInput;
 export type NewElderlyErrors = Partial<Record<NewElderlyField, string>>;
+
+// Valores del formulario de invitación tal como llegan del FormData
+export type RelativeInvitationInput = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  relationship: string; // valor crudo del FormData
+};
+
+export type RelativeInvitationField = keyof RelativeInvitationInput;
+export type RelativeInvitationErrors = Partial<
+  Record<RelativeInvitationField, string>
+>;

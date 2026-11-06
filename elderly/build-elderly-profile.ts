@@ -17,6 +17,7 @@ export function buildElderlyProfile(
   return {
     id: elderly.id,
     fullName: elderly.full_name,
+    firstName: elderly.first_name,
     initial: elderly.first_name[0],
     tone: source.avatarTones[elderly.id] ?? "blue",
     subtitle: `${formatAge(elderly.birth_date, source.referenceDate)} · Habitación ${room.name}`,
@@ -25,5 +26,12 @@ export function buildElderlyProfile(
     roomName: room.name,
     enrolledAtLabel: formatEnrolledAt(elderly.enrolled_at),
     relatives: getLinkedRelatives(source, elderly.id),
+    pendingInvitationEmails: source.invitations
+      .filter(
+        (invitation) =>
+          invitation.elderly_id === elderly.id &&
+          invitation.status === "pending",
+      )
+      .map((invitation) => invitation.email),
   };
 }
