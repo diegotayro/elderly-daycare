@@ -117,22 +117,22 @@ Ningún archivo nuevo es Client Component.
 
 ## Criterios de aceptación
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] La consola del navegador no muestra errores ni warnings de hidratación en `/login` y `/activate-account`.
-- [ ] A 1440×900, `/login` y `login.dc.html` no muestran diferencias visibles, salvo que no existe "INGRESO COMO" ni los botones "Personal"/"Familia".
-- [ ] A 1440×900, `/activate-account?code=7K4P9` y `activar-cuenta.dc.html` no muestran diferencias visibles, salvo el email precargado (`diego.fernandez@example.com`) y la contraseña vacía.
-- [ ] `/login` y `/activate-account` no muestran el sidebar ni la barra inferior.
-- [ ] El EMAIL del login está vacío y muestra el placeholder `tu@correo.com`.
-- [ ] `/activate-account?code=7k4p9` (minúsculas) muestra la tarjeta de Luis Fernández · Habitación Roble.
-- [ ] `/activate-account`, `?code=NOEXISTE`, `?code=EXP01` y `?code=CAN01` muestran el formulario sin tarjeta y con código y email vacíos.
-- [ ] El checkbox de consentimiento aparece marcado y se puede desmarcar con clic y con teclado (Espacio).
-- [ ] Cada label enfoca su input al hacer clic; los inputs muestran el borde `#F2A78E` al enfocarse.
-- [ ] Los enlaces van a: "Iniciar sesión" → `/`, "Activar mi cuenta" → `/`, "¿Olvidaste tu contraseña?" → `/`, "Activa tu cuenta" → `/activate-account`, "Iniciar sesión" (activar) → `/login`.
-- [ ] Los títulos de pestaña son "Iniciar sesión · Casa Nogal" y "Activar cuenta · Casa Nogal".
-- [ ] `/elderly` y el perfil de Rosa Méndez siguen igual que al cierre de SPEC 02.
-- [ ] Ningún archivo de `auth/` ni de `app/(auth)/` tiene `"use client"`.
-- [ ] A 390×844 el login no muestra el panel coral, muestra el logo sobre el formulario y no hay scroll horizontal; activar cuenta tampoco tiene scroll horizontal.
-- [ ] Las capturas de verificación están en `.playwright-mcp/`.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] La consola del navegador no muestra errores ni warnings de hidratación en `/login` y `/activate-account`.
+- [x] A 1440×900, `/login` y `login.dc.html` no muestran diferencias visibles, salvo que no existe "INGRESO COMO" ni los botones "Personal"/"Familia".
+- [x] A 1440×900, `/activate-account?code=7K4P9` y `activar-cuenta.dc.html` no muestran diferencias visibles, salvo el email precargado (`diego.fernandez@example.com`) y la contraseña vacía.
+- [x] `/login` y `/activate-account` no muestran el sidebar ni la barra inferior.
+- [x] El EMAIL del login está vacío y muestra el placeholder `tu@correo.com`.
+- [x] `/activate-account?code=7k4p9` (minúsculas) muestra la tarjeta de Luis Fernández · Habitación Roble.
+- [x] `/activate-account`, `?code=NOEXISTE`, `?code=EXP01` y `?code=CAN01` muestran el formulario sin tarjeta y con código y email vacíos.
+- [x] El checkbox de consentimiento aparece marcado y se puede desmarcar con clic y con teclado (Espacio).
+- [x] Cada label enfoca su input al hacer clic; los inputs muestran el borde `#F2A78E` al enfocarse.
+- [x] Los enlaces van a: "Iniciar sesión" → `/`, "Activar mi cuenta" → `/`, "¿Olvidaste tu contraseña?" → `/`, "Activa tu cuenta" → `/activate-account`, "Iniciar sesión" (activar) → `/login`.
+- [x] Los títulos de pestaña son "Iniciar sesión · Casa Nogal" y "Activar cuenta · Casa Nogal".
+- [x] `/elderly` y el perfil de Rosa Méndez siguen igual que al cierre de SPEC 02.
+- [x] Ningún archivo de `auth/` ni de `app/(auth)/` tiene `"use client"`.
+- [x] A 390×844 el login no muestra el panel coral, muestra el logo sobre el formulario y no hay scroll horizontal; activar cuenta tampoco tiene scroll horizontal.
+- [x] Las capturas de verificación están en `.playwright-mcp/`.
 
 ---
 
