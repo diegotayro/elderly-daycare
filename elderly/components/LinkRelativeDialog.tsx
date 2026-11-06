@@ -20,11 +20,17 @@ export function LinkRelativeDialog({
   // Cambiar la key remonta el formulario: valores por defecto y sin errores
   const [formKey, setFormKey] = useState(0);
 
+  function openDialog() {
+    const dialog = dialogRef.current;
+    dialog?.showModal();
+    dialog?.querySelector<HTMLInputElement>('[name="firstName"]')?.focus();
+  }
+
   return (
     <>
       <button
         type="button"
-        onClick={() => dialogRef.current?.showModal()}
+        onClick={openDialog}
         className="flex cursor-pointer items-center gap-3 pt-2 text-left"
       >
         <span className="flex size-10 flex-none items-center justify-center rounded-full border-[1.5px] border-dashed border-[#D8CBBA] text-photo-ink">
