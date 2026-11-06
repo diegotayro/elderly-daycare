@@ -37,7 +37,12 @@ export function ElderlyProfileView({ profile }: ElderlyProfileViewProps) {
             <SunIcon size={18} strokeWidth={2} />
             Resumen del día
           </Link>
-          <LinkedRelativesCard relatives={profile.relatives} />
+          <LinkedRelativesCard
+            relatives={profile.relatives}
+            elderlyFullName={profile.fullName}
+            elderlyFirstName={profile.firstName}
+            pendingInvitationEmails={profile.pendingInvitationEmails}
+          />
         </div>
       </div>
     </div>
