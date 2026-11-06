@@ -81,3 +81,5 @@ Reglas:
 
 - Playwright Screenshots y cualquier cosa relacionada a Playwright tienen que estar en la carpeta .playwright-mcp
 - Context7 usaremos este mcp para traer la documentación actualizada del framework
+  - Consultar el ID sin versión (ej. `/vercel/next.js`), no un snapshot (`/vercel/next.js/v16.2.9`), salvo que se necesite una versión concreta.
+  - Contrastar siempre con la documentación local de la versión instalada (ej. `node_modules/next/dist/docs/`). Si no coinciden, gana la local.

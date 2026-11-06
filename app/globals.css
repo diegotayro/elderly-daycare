@@ -34,6 +34,7 @@
   --color-consent-bg: #fbf1d6;
   --color-consent-ink: #8a7234;
   --color-consent-check: #5fb97e;
+  --color-error: #c5413a;
 }
 
 body {
@@ -53,4 +54,9 @@ body {
   border-radius: 8px;
   border: 3px solid transparent;
   background-clip: content-box;
+}
+
+/* Bloquea el scroll de la página de fondo mientras hay un modal abierto */
+html:has(dialog[open]) {
+  overflow: hidden;
 }

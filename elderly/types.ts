@@ -54,3 +54,19 @@ export type ElderlyProfile = {
   enrolledAtLabel: string; // "feb 2025"
   relatives: LinkedRelative[];
 };
+
+export type RoomOption = { id: string; name: string };
+
+// Valores del formulario tal como llegan del FormData
+export type NewElderlyInput = {
+  firstName: string;
+  lastName: string;
+  birthDate: string; // "1947-03-12" o "" si está vacío o incompleto
+  enrolledAt: string; // ídem
+  roomId: string;
+  allergies: string; // texto libre
+  medicalNotes: string;
+};
+
+export type NewElderlyField = keyof NewElderlyInput;
+export type NewElderlyErrors = Partial<Record<NewElderlyField, string>>;
