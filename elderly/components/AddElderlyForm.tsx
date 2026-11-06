@@ -83,7 +83,7 @@ export function AddElderlyForm({
       noValidate
       onSubmit={handleSubmit}
       onChange={clearFieldError}
-      className="flex min-h-0 flex-col"
+      className="flex min-h-0 flex-1 flex-col"
     >
       <header className="flex shrink-0 items-center justify-between border-b border-line px-[26px] py-5">
         <button
