@@ -106,7 +106,7 @@ export function LinkRelativeForm({
         </button>
       </header>
       <div className="flex min-h-0 flex-col gap-[18px] overflow-y-auto px-[26px] py-[22px]">
-        <div className="flex gap-[11px] rounded-[14px] bg-notice-bg px-4 py-[13px] text-notice-ink">
+        <div className="mb-0.5 flex gap-[11px] rounded-[14px] bg-notice-bg px-4 py-[13px] text-notice-ink">
           <InfoIcon size={20} className="mt-px flex-none text-notice-icon" />
           <p className="m-0 text-[13.5px] leading-[1.45]">
             Le enviaremos un correo con un código para que active su cuenta.
@@ -135,8 +135,12 @@ export function LinkRelativeForm({
             className={fieldControlClassName}
           />
         </FormField>
-        <RelationshipPicker defaultValue="son" />
-        <InvitationCodePreview />
+        <div className="mb-0.5">
+          <RelationshipPicker defaultValue="son" />
+        </div>
+        <div className="mb-0.5">
+          <InvitationCodePreview />
+        </div>
         <button
           type="submit"
           className="flex w-full cursor-pointer items-center justify-center gap-[9px] rounded-[14px] bg-linear-to-b from-[#F4977E] to-[#EE8164] p-3.5 text-[15.5px] font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)]"
