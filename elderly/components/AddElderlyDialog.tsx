@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef } from "react";
+import { useId, useRef, useState } from "react";
 import { PlusIcon } from "@/shared/components/icons/PlusIcon";
 import type { RoomOption } from "../types";
 import { AddElderlyForm } from "./AddElderlyForm";
@@ -13,6 +13,8 @@ type AddElderlyDialogProps = {
 export function AddElderlyDialog({ rooms, today }: AddElderlyDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+  // Cambiar la key remonta el formulario: valores por defecto y sin errores
+  const [formKey, setFormKey] = useState(0);
 
   function openDialog() {
     const dialog = dialogRef.current;
@@ -33,9 +35,11 @@ export function AddElderlyDialog({ rooms, today }: AddElderlyDialogProps) {
       <dialog
         ref={dialogRef}
         aria-labelledby={titleId}
+        onClose={() => setFormKey((key) => key + 1)}
         className="m-0 w-full max-w-[520px] overflow-hidden border border-line bg-auth-bg p-0 text-ink backdrop:bg-ink/40 open:flex open:flex-col sm:mx-auto sm:mt-10 sm:mb-auto sm:max-h-[calc(100dvh-80px)] sm:rounded-3xl sm:shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]"
       >
         <AddElderlyForm
+          key={formKey}
           rooms={rooms}
           today={today}
           titleId={titleId}
