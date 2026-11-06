@@ -1,11 +1,36 @@
 "use client";
 
+import { useState, type FormEvent } from "react";
 import { CloseIcon } from "@/shared/components/icons/CloseIcon";
 import { InfoIcon } from "@/shared/components/icons/InfoIcon";
 import { SendIcon } from "@/shared/components/icons/SendIcon";
-import { FormField, fieldControlClassName } from "./FormField";
+import type {
+  RelativeInvitationErrors,
+  RelativeInvitationField,
+  RelativeInvitationInput,
+} from "../types";
+import { validateRelativeInvitation } from "../validate-relative-invitation";
+import { FormField, fieldControlClassName, getFieldErrorId } from "./FormField";
 import { InvitationCodePreview } from "./InvitationCodePreview";
 import { RelationshipPicker } from "./RelationshipPicker";
+
+const FIELD_ORDER: RelativeInvitationField[] = [
+  "firstName",
+  "lastName",
+  "email",
+  "relationship",
+];
+
+function readInput(formData: FormData): RelativeInvitationInput {
+  const read = (field: RelativeInvitationField) =>
+    String(formData.get(field) ?? "");
+  return {
+    firstName: read("firstName"),
+    lastName: read("lastName"),
+    email: read("email"),
+    relationship: read("relationship"),
+  };
+}
 
 type LinkRelativeFormProps = {
   titleId: string;
@@ -19,10 +44,48 @@ export function LinkRelativeForm({
   titleId,
   elderlyFullName,
   elderlyFirstName,
+  pendingInvitationEmails,
   onClose,
 }: LinkRelativeFormProps) {
+  const [errors, setErrors] = useState<RelativeInvitationErrors>({});
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const nextErrors = validateRelativeInvitation(
+      readInput(new FormData(form)),
+      { pendingEmails: pendingInvitationEmails },
+    );
+    setErrors(nextErrors);
+
+    const firstInvalidField = FIELD_ORDER.find((field) => nextErrors[field]);
+    if (firstInvalidField) {
+      form.querySelector<HTMLElement>(`[name="${firstInvalidField}"]`)?.focus();
+    }
+  }
+
+  function clearFieldError(event: FormEvent<HTMLFormElement>) {
+    const field = (event.target as HTMLInputElement)
+      .name as RelativeInvitationField;
+    setErrors((current) => ({ ...current, [field]: undefined }));
+  }
+
+  function controlProps(field: RelativeInvitationField) {
+    return {
+      id: field,
+      name: field,
+      "aria-invalid": errors[field] ? true : undefined,
+      "aria-describedby": errors[field] ? getFieldErrorId(field) : undefined,
+    };
+  }
+
   return (
-    <form noValidate className="flex min-h-0 flex-1 flex-col">
+    <form
+      noValidate
+      onSubmit={handleSubmit}
+      onChange={clearFieldError}
+      className="flex min-h-0 flex-1 flex-col"
+    >
       <header className="flex shrink-0 items-center justify-between border-b border-line px-[26px] py-5">
         <div>
           <h2
@@ -50,26 +113,23 @@ export function LinkRelativeForm({
             Solo verá las publicaciones de {elderlyFirstName}.
           </p>
         </div>
-        <FormField id="firstName" label="NOMBRES">
+        <FormField id="firstName" error={errors.firstName} label="NOMBRES">
           <input
-            id="firstName"
-            name="firstName"
+            {...controlProps("firstName")}
             placeholder="Ej. Diego"
             className={fieldControlClassName}
           />
         </FormField>
-        <FormField id="lastName" label="APELLIDOS">
+        <FormField id="lastName" error={errors.lastName} label="APELLIDOS">
           <input
-            id="lastName"
-            name="lastName"
+            {...controlProps("lastName")}
             placeholder="Ej. Fernández Ruiz"
             className={fieldControlClassName}
           />
         </FormField>
-        <FormField id="email" label="EMAIL">
+        <FormField id="email" error={errors.email} label="EMAIL">
           <input
-            id="email"
-            name="email"
+            {...controlProps("email")}
             type="email"
             placeholder="correo@ejemplo.com"
             className={fieldControlClassName}
