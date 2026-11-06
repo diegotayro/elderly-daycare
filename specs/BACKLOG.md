@@ -21,3 +21,14 @@ Formato de cada entrada:
   - Opciones: envolver el acceso en `<Suspense>` o `loading.tsx` con un esqueleto de carga, o declarar `export const instant = false` (ruta bloqueante).
   - Con streaming, un id inexistente pasaría de 404 a 200: definir cómo se manejan los ids que no existen.
   - Definir también la estrategia de caché (`use cache`) cuando los ids ya no se conozcan en el build.
+
+---
+
+## Pérdida de lo escrito en `/activate-account` durante el streaming
+
+- **Qué:** la página lee `searchParams` dentro de `<Suspense>` y el fallback es el mismo formulario sin invitación. Si el usuario escribe antes de que termine el streaming, lo escrito se pierde al reemplazarse por el formulario real.
+- **Origen:** SPEC 03 (`03-login-and-activate-account-ui`), `app/(auth)/activate-account/page.tsx`.
+- **Se resuelve en:** la spec de integración con Supabase.
+- **Notas:**
+  - Con datos mock el streaming es inmediato, así que hoy no afecta al usuario. Riesgo aceptado en la spec.
+  - Con consultas reales el tiempo de espera crece. Evaluar mostrar un esqueleto de carga en vez del formulario, o deshabilitar los campos hasta que llegue la invitación.
