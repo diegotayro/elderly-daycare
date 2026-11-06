@@ -34,6 +34,7 @@
   --color-consent-bg: #fbf1d6;
   --color-consent-ink: #8a7234;
   --color-consent-check: #5fb97e;
+  --color-error: #c5413a;
 }
 
 body {
