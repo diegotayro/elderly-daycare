@@ -1,6 +1,6 @@
 # SPEC 04 — Modal "Agregar adulto mayor": UI con validación
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02
 > **Fecha:** 2026-11-05
 > **Objetivo:** Abrir desde el botón "Agregar adulto mayor" de `/elderly` un modal nativo que replica `agregar-adulto-mayor.dc.html` y valida el formulario al tocar "Guardar", sin persistir nada.
@@ -132,30 +132,30 @@ app/
 
 ## Criterios de aceptación
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] La consola no muestra errores ni warnings de hidratación en `/elderly`, ni al abrir y cerrar el modal.
-- [ ] Hacer clic en "Agregar adulto mayor" abre el modal y la URL sigue siendo `/elderly`.
-- [ ] El botón "Agregar adulto mayor" se ve igual que al cierre de SPEC 02.
-- [ ] A 1440×900, el modal abierto y `agregar-adulto-mayor.dc.html` no muestran diferencias visibles en la tarjeta (textos, placeholders, colores, tipografía, bordes y orden de los campos).
-- [ ] El modal es un `<dialog>` abierto con `showModal()` y tiene `aria-labelledby` apuntando al título.
-- [ ] Al abrir, el foco está en NOMBRES. Al cerrar, vuelve al botón "Agregar adulto mayor".
-- [ ] "Cancelar" y Esc cierran el modal. Hacer clic en el fondo no lo cierra.
-- [ ] Con el modal abierto no se puede hacer scroll en el listado de fondo.
-- [ ] HABITACIÓN es un `<select>` con las habitaciones del mock, en orden, y Roble seleccionada por defecto.
-- [ ] FECHA DE NACIMIENTO y FECHA DE INGRESO son `type="date"`, y nacimiento tiene `max="2025-06-17"`.
-- [ ] Guardar con el formulario vacío muestra los errores de Nombres, Apellidos, Fecha de nacimiento y Fecha de ingreso, y pone el foco en NOMBRES.
-- [ ] Nombres con solo espacios muestra "Ingresa los nombres.".
-- [ ] Nacimiento `2030-01-01` muestra "La fecha de nacimiento no puede ser futura.".
-- [ ] Nacimiento `1950-05-10` con ingreso `1950-05-10` o anterior muestra "La fecha de ingreso debe ser posterior a la de nacimiento.".
-- [ ] Alergias y Notas médicas vacías no muestran error.
-- [ ] Cada campo con error tiene borde `#C5413A`, `aria-invalid="true"` y `aria-describedby` apuntando a su mensaje.
-- [ ] Editar un campo con error quita su mensaje.
-- [ ] Guardar con todos los campos válidos no muestra errores, no cierra el modal y no cambia el listado.
-- [ ] Cerrar y reabrir el modal lo muestra vacío, sin errores y con Roble seleccionada.
-- [ ] `validateNewElderly` y `buildRoomOptions` son funciones puras sin imports de React.
-- [ ] Los únicos `"use client"` nuevos están en `AddElderlyDialog.tsx` y `AddElderlyForm.tsx`, y `ElderlyListView.tsx` sigue siendo Server Component.
-- [ ] A 390×844 el modal ocupa toda la pantalla, sin scroll horizontal, con Cancelar/Guardar visibles mientras se hace scroll en el formulario.
-- [ ] Las capturas de verificación están en `.playwright-mcp/`.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] La consola no muestra errores ni warnings de hidratación en `/elderly`, ni al abrir y cerrar el modal.
+- [x] Hacer clic en "Agregar adulto mayor" abre el modal y la URL sigue siendo `/elderly`.
+- [x] El botón "Agregar adulto mayor" se ve igual que al cierre de SPEC 02.
+- [x] A 1440×900, el modal abierto y `agregar-adulto-mayor.dc.html` no muestran diferencias visibles en la tarjeta (textos, placeholders, colores, tipografía, bordes y orden de los campos).
+- [x] El modal es un `<dialog>` abierto con `showModal()` y tiene `aria-labelledby` apuntando al título.
+- [x] Al abrir, el foco está en NOMBRES. Al cerrar, vuelve al botón "Agregar adulto mayor".
+- [x] "Cancelar" y Esc cierran el modal. Hacer clic en el fondo no lo cierra.
+- [x] Con el modal abierto no se puede hacer scroll en el listado de fondo.
+- [x] HABITACIÓN es un `<select>` con las habitaciones del mock, en orden, y Roble seleccionada por defecto.
+- [x] FECHA DE NACIMIENTO y FECHA DE INGRESO son `type="date"`, y nacimiento tiene `max="2025-06-17"`.
+- [x] Guardar con el formulario vacío muestra los errores de Nombres, Apellidos, Fecha de nacimiento y Fecha de ingreso, y pone el foco en NOMBRES.
+- [x] Nombres con solo espacios muestra "Ingresa los nombres.".
+- [x] Nacimiento `2030-01-01` muestra "La fecha de nacimiento no puede ser futura.".
+- [x] Nacimiento `1950-05-10` con ingreso `1950-05-10` o anterior muestra "La fecha de ingreso debe ser posterior a la de nacimiento.".
+- [x] Alergias y Notas médicas vacías no muestran error.
+- [x] Cada campo con error tiene borde `#C5413A`, `aria-invalid="true"` y `aria-describedby` apuntando a su mensaje.
+- [x] Editar un campo con error quita su mensaje.
+- [x] Guardar con todos los campos válidos no muestra errores, no cierra el modal y no cambia el listado.
+- [x] Cerrar y reabrir el modal lo muestra vacío, sin errores y con Roble seleccionada.
+- [x] `validateNewElderly` y `buildRoomOptions` son funciones puras sin imports de React.
+- [x] Los únicos `"use client"` nuevos están en `AddElderlyDialog.tsx` y `AddElderlyForm.tsx`, y `ElderlyListView.tsx` sigue siendo Server Component.
+- [x] A 390×844 el modal ocupa toda la pantalla, sin scroll horizontal, con Cancelar/Guardar visibles mientras se hace scroll en el formulario.
+- [x] Las capturas de verificación están en `.playwright-mcp/`.
 
 ---
 
