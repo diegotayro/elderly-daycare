@@ -55,3 +55,8 @@ body {
   border: 3px solid transparent;
   background-clip: content-box;
 }
+
+/* Bloquea el scroll de la página de fondo mientras hay un modal abierto */
+html:has(dialog[open]) {
+  overflow: hidden;
+}

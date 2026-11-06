@@ -1,7 +1,7 @@
-import Link from "next/link";
-import { PlusIcon } from "@/shared/components/icons/PlusIcon";
 import { buildElderlyList } from "../build-elderly-list";
+import { buildRoomOptions } from "../build-room-options";
 import type { ElderlySource } from "../types";
+import { AddElderlyDialog } from "./AddElderlyDialog";
 import { ElderlySearchList } from "./ElderlySearchList";
 
 type ElderlyListViewProps = {
@@ -22,13 +22,10 @@ export function ElderlyListView({ source }: ElderlyListViewProps) {
             Adultos mayores
           </h1>
         </div>
-        <Link
-          href="/"
-          className="flex items-center gap-2 whitespace-nowrap rounded-[14px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-[18px] py-[11px] text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.7)]"
-        >
-          <PlusIcon size={17} />
-          Agregar adulto mayor
-        </Link>
+        <AddElderlyDialog
+          rooms={buildRoomOptions(source)}
+          today={source.referenceDate}
+        />
       </header>
       <ElderlySearchList items={items} />
     </div>
