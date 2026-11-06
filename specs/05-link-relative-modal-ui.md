@@ -150,7 +150,7 @@ app/
 - [ ] A 1440×900, el modal abierto en el perfil de Luis y `vincular-tutor.dc.html` no muestran diferencias visibles en la tarjeta (textos, placeholders, colores, tipografía, bordes y orden).
 - [ ] El subtítulo muestra "a {nombre completo}" y el aviso termina en "de {nombre de pila}." del adulto mayor del perfil (ej. "a Carmen Ruiz" y "de Carmen." en el de Carmen).
 - [ ] El bloque del código muestra `7K4P9` y "Vence en 7 días".
-- [ ] El modal es un `<dialog>` abierto con `showModal()` con `aria-labelledby` apuntando al título.
+- [x] El modal es un `<dialog>` abierto con `showModal()` con `aria-labelledby` apuntando al título.
 - [ ] Al abrir, el foco está en NOMBRES. Al cerrar, vuelve al botón "Vincular otro familiar/tutor".
 - [ ] La X y Esc cierran el modal. Hacer clic en el fondo no lo cierra. La X tiene `aria-label="Cerrar"`.
 - [ ] Con el modal abierto no se puede hacer scroll en el perfil de fondo.
@@ -163,8 +163,8 @@ app/
 - [ ] Editar un campo con error quita su mensaje.
 - [ ] Enviar con todo válido no muestra errores, no cierra el modal y no cambia la lista de familiares.
 - [ ] Cerrar y reabrir el modal lo muestra vacío, sin errores y con Hijo marcado.
-- [ ] `validateRelativeInvitation` es una función pura sin imports de React.
-- [ ] Los únicos `"use client"` nuevos están en `LinkRelativeDialog.tsx` y `LinkRelativeForm.tsx`.
+- [x] `validateRelativeInvitation` es una función pura sin imports de React.
+- [x] Los únicos `"use client"` nuevos están en `LinkRelativeDialog.tsx` y `LinkRelativeForm.tsx`.
 - [ ] A 390×844 el modal ocupa toda la pantalla, sin scroll horizontal, con el encabezado visible mientras se hace scroll.
 - [ ] Las capturas de verificación están en `.playwright-mcp/`.
 
