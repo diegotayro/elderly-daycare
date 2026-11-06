@@ -1,6 +1,6 @@
 # SPEC 05 — Modal "Vincular familiar/tutor": UI con validación
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02, SPEC 04
 > **Fecha:** 2026-11-06
 > **Objetivo:** Abrir desde "Vincular otro familiar/tutor" del perfil `/elderly/[id]` un modal nativo que replica `vincular-tutor.dc.html` y valida el formulario al tocar "Enviar invitación", sin persistir nada.
@@ -143,29 +143,29 @@ app/
 
 ## Criterios de aceptación
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] La consola no muestra errores ni warnings de hidratación nuevos en `/elderly/[id]` al abrir y cerrar el modal.
-- [ ] Hacer clic en "Vincular otro familiar/tutor" abre el modal y la URL no cambia.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] La consola no muestra errores ni warnings de hidratación nuevos en `/elderly/[id]` al abrir y cerrar el modal.
+- [x] Hacer clic en "Vincular otro familiar/tutor" abre el modal y la URL no cambia.
 - [ ] El botón "Vincular otro familiar/tutor" se ve igual que al cierre de SPEC 02.
 - [ ] A 1440×900, el modal abierto en el perfil de Luis y `vincular-tutor.dc.html` no muestran diferencias visibles en la tarjeta (textos, placeholders, colores, tipografía, bordes y orden).
-- [ ] El subtítulo muestra "a {nombre completo}" y el aviso termina en "de {nombre de pila}." del adulto mayor del perfil (ej. "a Carmen Ruiz" y "de Carmen." en el de Carmen).
-- [ ] El bloque del código muestra `7K4P9` y "Vence en 7 días".
+- [x] El subtítulo muestra "a {nombre completo}" y el aviso termina en "de {nombre de pila}." del adulto mayor del perfil (ej. "a Carmen Ruiz" y "de Carmen." en el de Carmen).
+- [x] El bloque del código muestra `7K4P9` y "Vence en 7 días".
 - [x] El modal es un `<dialog>` abierto con `showModal()` con `aria-labelledby` apuntando al título.
-- [ ] Al abrir, el foco está en NOMBRES. Al cerrar, vuelve al botón "Vincular otro familiar/tutor".
+- [x] Al abrir, el foco está en NOMBRES. Al cerrar, vuelve al botón "Vincular otro familiar/tutor".
 - [ ] La X y Esc cierran el modal. Hacer clic en el fondo no lo cierra. La X tiene `aria-label="Cerrar"`.
-- [ ] Con el modal abierto no se puede hacer scroll en el perfil de fondo.
+- [x] Con el modal abierto no se puede hacer scroll en el perfil de fondo.
 - [ ] PARENTESCO es un `fieldset` con 3 radios (Hijo, Hija, Tutor), con Hijo marcado por defecto, y se navega con las flechas del teclado.
-- [ ] Enviar con el formulario vacío muestra los errores de Nombres, Apellidos y Email, y pone el foco en NOMBRES.
-- [ ] Nombres con solo espacios muestra "Ingresa los nombres.".
-- [ ] Email `diego@` muestra "Ingresa un email válido.".
-- [ ] En el perfil de Luis, email ` Diego.Fernandez@example.com ` muestra "Ya hay una invitación pendiente con este email.".
-- [ ] Cada campo con error tiene borde `#C5413A`, `aria-invalid="true"` y `aria-describedby` apuntando a su mensaje.
-- [ ] Editar un campo con error quita su mensaje.
-- [ ] Enviar con todo válido no muestra errores, no cierra el modal y no cambia la lista de familiares.
-- [ ] Cerrar y reabrir el modal lo muestra vacío, sin errores y con Hijo marcado.
+- [x] Enviar con el formulario vacío muestra los errores de Nombres, Apellidos y Email, y pone el foco en NOMBRES.
+- [x] Nombres con solo espacios muestra "Ingresa los nombres.".
+- [x] Email `diego@` muestra "Ingresa un email válido.".
+- [x] En el perfil de Luis, email ` Diego.Fernandez@example.com ` muestra "Ya hay una invitación pendiente con este email.".
+- [x] Cada campo con error tiene borde `#C5413A`, `aria-invalid="true"` y `aria-describedby` apuntando a su mensaje.
+- [x] Editar un campo con error quita su mensaje.
+- [x] Enviar con todo válido no muestra errores, no cierra el modal y no cambia la lista de familiares.
+- [x] Cerrar y reabrir el modal lo muestra vacío, sin errores y con Hijo marcado.
 - [x] `validateRelativeInvitation` es una función pura sin imports de React.
 - [x] Los únicos `"use client"` nuevos están en `LinkRelativeDialog.tsx` y `LinkRelativeForm.tsx`.
-- [ ] A 390×844 el modal ocupa toda la pantalla, sin scroll horizontal, con el encabezado visible mientras se hace scroll.
+- [x] A 390×844 el modal ocupa toda la pantalla, sin scroll horizontal, con el encabezado visible mientras se hace scroll.
 - [ ] Las capturas de verificación están en `.playwright-mcp/`.
 
 ---
