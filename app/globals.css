@@ -35,6 +35,13 @@
   --color-consent-ink: #8a7234;
   --color-consent-check: #5fb97e;
   --color-error: #c5413a;
+  --color-notice-bg: #e3ecfb;
+  --color-notice-icon: #4e72c8;
+  --color-notice-ink: #3f5694;
+  --color-pill-selected-bg: #ccd8f4;
+  --color-pill-selected-line: #9fb8ec;
+  --color-code-line: #e6d08a;
+  --color-code-ink: #a88526;
 }
 
 body {
