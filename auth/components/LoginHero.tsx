@@ -2,7 +2,7 @@ import { SunIcon } from "@/shared/components/icons/SunIcon";
 
 export function LoginHero() {
   return (
-    <div className="relative flex flex-col justify-between overflow-hidden bg-linear-155 from-[#F6A98E] via-coral via-45% to-[#EC7E62] px-[60px] py-14 text-white">
+    <div className="relative hidden flex-col justify-between overflow-hidden lg:flex bg-linear-155 from-[#F6A98E] via-coral via-45% to-[#EC7E62] px-[60px] py-14 text-white">
       <div className="absolute -top-[140px] -right-[120px] size-[420px] rounded-full bg-white/12" />
       <div className="absolute -bottom-[110px] -left-20 size-[300px] rounded-full bg-white/10" />
 

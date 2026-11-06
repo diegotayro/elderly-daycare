@@ -7,7 +7,7 @@ type ActivateAccountViewProps = {
 
 export function ActivateAccountView({ children }: ActivateAccountViewProps) {
   return (
-    <div className="flex min-h-screen items-center justify-center p-10">
+    <div className="flex min-h-screen items-center justify-center p-4 lg:p-10">
       <div className="w-full max-w-[440px]">
         <AuthBrandMark className="mb-[22px]" />
         <h1 className="mb-2 font-display text-[32px] leading-[1.15] font-semibold text-ink">
