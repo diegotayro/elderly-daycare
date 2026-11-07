@@ -15,6 +15,10 @@ export default function AccountPage() {
       fullName={currentUser.full_name}
       email={email}
       roleLabel={userRoleLabels[currentUser.role]}
+      notificationValues={{
+        notify_on_post: currentUser.notify_on_post,
+        daily_summary_enabled: currentUser.daily_summary_enabled,
+      }}
     />
   );
 }
