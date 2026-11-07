@@ -32,3 +32,15 @@ Formato de cada entrada:
 - **Notas:**
   - Con datos mock el streaming es inmediato, así que hoy no afecta al usuario. Riesgo aceptado en la spec.
   - Con consultas reales el tiempo de espera crece. Evaluar mostrar un esqueleto de carga en vez del formulario, o deshabilitar los campos hasta que llegue la invitación.
+
+---
+
+## Notificaciones de "Mi cuenta": copy del mockup distinto de los campos de la DB
+
+- **Qué:** el mockup staff dice "Nuevos comentarios de familias" y "Recordatorio de resumen (17:00)", pero los campos de `users` son `notify_on_post` (nuevas publicaciones) y `daily_summary_enabled` (resumen a las 19:00).
+- **Origen:** SPEC 08 (`08-account-screen-mock`), `account/notification-preferences.ts`.
+- **Se resuelve en:** la spec de integración con Supabase.
+- **Notas:**
+  - La pantalla usa el copy del mockup con los valores iniciales de esos dos campos; las etiquetas viven solo en `notification-preferences.ts`.
+  - Decidir si se cambia el copy del mockup o los campos/horario de la DB (17:00 vs. 19:00, comentarios vs. publicaciones).
+  - Los toggles hoy solo tienen estado local: persistirlos con `update` de `users` en esa misma spec.

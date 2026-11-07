@@ -51,7 +51,7 @@ export function Sidebar({
             <div className="text-xs text-muted">{userRoleLabel}</div>
           </div>
           <Link
-            href="/"
+            href="/login"
             title="Cerrar sesión"
             className="flex size-8 flex-none items-center justify-center rounded-[10px] bg-cream text-muted-strong"
           >
