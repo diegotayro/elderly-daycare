@@ -1,6 +1,6 @@
 # SPEC 07 — Pantalla "Avisos": lista estática con datos mock
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 02
 > **Fecha:** 2026-11-06
 > **Objetivo:** Crear la ruta `/notices` que replica `avisos.dc.html` con una lista de avisos mock tipados, conectada al menú "Avisos" y adaptada a móvil.
@@ -125,19 +125,19 @@ Todos son Server Components; no hay `"use client"` nuevos. Se reutilizan `Avatar
 
 ## Criterios de aceptación
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] La consola no muestra errores ni warnings de hidratación en `/notices`.
-- [ ] `/notices` tiene el título "Avisos · Casa Nogal".
-- [ ] "Avisos" del sidebar y del `MobileBottomNav` lleva a `/notices` y se marca activo solo en esa ruta. "Feed" y "Adultos mayores" no se marcan activos ahí.
-- [ ] A 1440×900, `/notices` y `avisos.dc.html` no muestran diferencias visibles en el contenido (textos, colores, tipografía, bordes, espaciado y orden).
-- [ ] Se ven los 4 avisos en el orden del mockup, con el nombre en negrita, su círculo (avatar "L" lila, check verde, corazón coral relleno, campana amarilla) y su tiempo.
-- [ ] Los avisos de comentario y reacción son enlaces a `/` con foco visible al navegar con teclado. Los de cuenta activada y recordatorio no son enlaces.
-- [ ] Con una lista vacía se ve una tarjeta con "No tienes avisos por ahora.".
-- [ ] A 390×844 no hay scroll horizontal, los paddings coinciden con el feed y el texto de los avisos hace wrap.
-- [ ] No hay `"use client"` nuevos.
-- [ ] No hay cambios en `references/documents/database-schema.md` ni migraciones.
-- [ ] El punto 1 de `references/documents/pantallas-pendientes.md` está marcado.
-- [ ] Las capturas de verificación están en `.playwright-mcp/`.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] La consola no muestra errores ni warnings de hidratación en `/notices`.
+- [x] `/notices` tiene el título "Avisos · Casa Nogal".
+- [x] "Avisos" del sidebar y del `MobileBottomNav` lleva a `/notices` y se marca activo solo en esa ruta. "Feed" y "Adultos mayores" no se marcan activos ahí.
+- [x] A 1440×900, `/notices` y `avisos.dc.html` no muestran diferencias visibles en el contenido (textos, colores, tipografía, bordes, espaciado y orden).
+- [x] Se ven los 4 avisos en el orden del mockup, con el nombre en negrita, su círculo (avatar "L" lila, check verde, corazón coral relleno, campana amarilla) y su tiempo.
+- [x] Los avisos de comentario y reacción son enlaces a `/` con foco visible al navegar con teclado. Los de cuenta activada y recordatorio no son enlaces.
+- [x] Con una lista vacía se ve una tarjeta con "No tienes avisos por ahora.".
+- [x] A 390×844 no hay scroll horizontal, los paddings coinciden con el feed y el texto de los avisos hace wrap.
+- [x] No hay `"use client"` nuevos.
+- [x] No hay cambios en `references/documents/database-schema.md` ni migraciones.
+- [x] El punto 1 de `references/documents/pantallas-pendientes.md` está marcado.
+- [x] Las capturas de verificación están en `.playwright-mcp/`.
 
 ---
 

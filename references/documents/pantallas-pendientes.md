@@ -8,7 +8,7 @@ Lista de pantallas, modales y componentes que faltan. Marcar cada uno al termina
 
 ### Staff/Admin
 
-- [ ] **1. Avisos** (`avisos.dc.html`): lista de actividad (comentarios, reacciones, cuentas activadas, recordatorios). En el menú el enlace apunta a `/`.
+- [x] **1. Avisos** (`avisos.dc.html`): lista de actividad (comentarios, reacciones, cuentas activadas, recordatorios). Ruta `/notices` (SPEC 07, datos mock).
 - [ ] **2. Mi cuenta (staff)** (`mi-cuenta.dc.html`): perfil, notificaciones, cambiar contraseña, ayuda y cerrar sesión. El enlace también apunta a `/`.
 
 ### Familiar (relative)
