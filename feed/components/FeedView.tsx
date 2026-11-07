@@ -1,7 +1,7 @@
 import { buildFeed } from "../build-feed";
 import { FeedHeader } from "./FeedHeader";
 import { PostCard } from "./PostCard";
-import { PostComposerLink } from "./PostComposerLink";
+import { PostComposerButton } from "./PostComposerButton";
 import type { FeedSource } from "../types";
 
 type FeedViewProps = {
@@ -20,7 +20,7 @@ export function FeedView({ source }: FeedViewProps) {
         elderlyCount={elderlyCount}
         todayLabel={todayLabel}
       />
-      <PostComposerLink userInitial={currentUser.first_name[0]} />
+      <PostComposerButton userInitial={currentUser.first_name[0]} />
       <div className="mb-3.5 flex items-center gap-3.5">
         <span className="text-[12.5px] font-extrabold tracking-[0.8px] text-label">
           PUBLICADO HOY
