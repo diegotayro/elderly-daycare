@@ -11,11 +11,15 @@ export function ProfileCard({ fullName, email, roleLabel }: ProfileCardProps) {
     <section className="mb-[18px] flex items-center gap-[18px] rounded-[18px] border border-line bg-surface px-[22px] py-5">
       <Avatar initial={fullName[0]} size={64} fontSize={26} />
       <div className="min-w-0 flex-1">
-        <div className="font-display text-xl font-semibold text-ink">
+        <div className="font-display text-xl leading-[normal] font-semibold text-ink">
           {fullName}
         </div>
-        <div className="text-sm break-words text-muted-strong">{email}</div>
-        <div className="mt-0.5 text-[13px] text-muted">{roleLabel}</div>
+        <div className="text-sm leading-[normal] break-words text-muted-strong">
+          {email}
+        </div>
+        <div className="mt-0.5 text-[13px] leading-[normal] text-muted">
+          {roleLabel}
+        </div>
       </div>
       <button
         type="button"
