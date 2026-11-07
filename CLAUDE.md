@@ -57,6 +57,11 @@ No hay framework de tests configurado todavía.
 - Ante un conflicto entre el skill y el mockup, gana el mockup. Si el mockup no cubre algo relevante, detenerse y preguntar.
 - Ajustes menores de UI (textos, un color, bugs de estilo) no requieren el skill.
 
+## Supabase
+
+- Antes de usar el MCP de Supabase, o de escribir migraciones, políticas RLS, funciones, triggers o cualquier SQL, cargar los skills `supabase` y `supabase-postgres-best-practices`.
+- Ante un conflicto entre los skills y `references/documents/`, gana `references/documents/`.
+
 ## Flujo de trabajo: Spec Driven Design (SDD)
 
 Ninguna feature se implementa sin una spec aprobada.
