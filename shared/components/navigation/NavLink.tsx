@@ -15,7 +15,6 @@ type NavLinkProps = {
 };
 
 function isActivePath(pathname: string, activePath: NavItem["activePath"]) {
-  if (activePath === null) return false;
   if (activePath === "/") return pathname === "/";
   return pathname === activePath || pathname.startsWith(`${activePath}/`);
 }
