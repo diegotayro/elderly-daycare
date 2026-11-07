@@ -1,6 +1,10 @@
 "use client";
 
-import type { NewPostOptions } from "../types";
+import { useId, useState } from "react";
+import { toggleAudience } from "../toggle-audience";
+import type { AudienceSelection, NewPostOptions } from "../types";
+import { AudiencePicker } from "./AudiencePicker";
+import { PostTypePicker } from "./PostTypePicker";
 
 type NewPostFormProps = {
   options: NewPostOptions;
@@ -8,7 +12,11 @@ type NewPostFormProps = {
   onCancel: () => void;
 };
 
-export function NewPostForm({ titleId, onCancel }: NewPostFormProps) {
+export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
+  const audienceLabelId = useId();
+  const [audience, setAudience] = useState<AudienceSelection>({ kind: "none" });
+  const defaultRoomId = options.rooms[0]?.id ?? "";
+
   return (
     <form noValidate className="flex min-h-0 flex-1 flex-col">
       <header className="flex shrink-0 items-center justify-between border-b border-line px-[26px] py-5">
@@ -32,6 +40,21 @@ export function NewPostForm({ titleId, onCancel }: NewPostFormProps) {
           Publicar
         </button>
       </header>
+      <div className="flex min-h-0 flex-col gap-[22px] overflow-y-auto px-[26px] py-6">
+        <AudiencePicker
+          labelId={audienceLabelId}
+          elderly={options.elderly}
+          rooms={options.rooms}
+          selection={audience}
+          onToggle={(chip) =>
+            setAudience((current) =>
+              toggleAudience(current, chip, defaultRoomId),
+            )
+          }
+          onRoomChange={(roomId) => setAudience({ kind: "room", roomId })}
+        />
+        <PostTypePicker />
+      </div>
     </form>
   );
 }

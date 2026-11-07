@@ -20,7 +20,9 @@ const NewPostDialogContext = createContext<NewPostDialogContextValue | null>(
 export function useNewPostDialog(): NewPostDialogContextValue {
   const context = useContext(NewPostDialogContext);
   if (!context) {
-    throw new Error("useNewPostDialog must be used inside NewPostDialogProvider");
+    throw new Error(
+      "useNewPostDialog must be used inside NewPostDialogProvider",
+    );
   }
   return context;
 }
@@ -39,10 +41,14 @@ export function NewPostDialogProvider({
   // Cambiar la key remonta el formulario: queda vacío y sin errores
   const [formKey, setFormKey] = useState(0);
 
-  const contextValue = { open: () => dialogRef.current?.showModal() };
+  function open() {
+    const dialog = dialogRef.current;
+    dialog?.showModal();
+    dialog?.querySelector<HTMLElement>("[data-audience-chip]")?.focus();
+  }
 
   return (
-    <NewPostDialogContext value={contextValue}>
+    <NewPostDialogContext value={{ open }}>
       {children}
       <dialog
         ref={dialogRef}
