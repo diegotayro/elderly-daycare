@@ -113,22 +113,22 @@ Solo `NotificationToggle` es `"use client"`. Se reutilizan `Avatar`, `ChevronRig
 
 ## Criterios de aceptación
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] La consola no muestra errores ni warnings de hidratación en `/account`.
-- [ ] `/account` tiene el título "Mi cuenta · Casa Nogal".
-- [ ] "Mi cuenta" del sidebar y del `MobileBottomNav` lleva a `/account` y se marca activo solo en esa ruta.
-- [ ] A 1440×900, `/account` y `mi-cuenta.dc.html` no muestran diferencias visibles en el contenido (textos, colores, tipografía, bordes, espaciado y orden).
-- [ ] La tarjeta de perfil muestra avatar "C", "Caro Giménez", "caro@casanogal.pe" y "Cuidador/a", tomados de `mockSession`.
-- [ ] Los toggles empiezan según `notify_on_post` y `daily_summary_enabled`, tienen `role="switch"` con `aria-checked` y nombre accesible, y alternan con clic y teclado (verde/derecha ↔ beige `#E4D6C4`/izquierda).
-- [ ] Con `prefers-reduced-motion: reduce` el toggle cambia sin transición.
-- [ ] "Editar", "Cambiar contraseña" y "Ayuda y soporte" son botones sin acción con foco visible.
-- [ ] "Cerrar sesión" de la pantalla y el logout del sidebar llevan a `/login`.
-- [ ] A 390×844 no hay scroll horizontal y los paddings coinciden con el feed.
-- [ ] Solo `NotificationToggle` tiene `"use client"`.
-- [ ] El tipo `User` no cambia; no hay cambios en `database-schema.md` ni migraciones.
-- [ ] `specs/BACKLOG.md` tiene la entrada de la inconsistencia de notificaciones.
-- [ ] El punto 2 de `references/documents/pantallas-pendientes.md` está marcado.
-- [ ] Las capturas de verificación están en `.playwright-mcp/`.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] La consola no muestra errores ni warnings de hidratación en `/account`.
+- [x] `/account` tiene el título "Mi cuenta · Casa Nogal".
+- [x] "Mi cuenta" del sidebar y del `MobileBottomNav` lleva a `/account` y se marca activo solo en esa ruta.
+- [x] A 1440×900, `/account` y `mi-cuenta.dc.html` no muestran diferencias visibles en el contenido (textos, colores, tipografía, bordes, espaciado y orden).
+- [x] La tarjeta de perfil muestra avatar "C", "Caro Giménez", "caro@casanogal.pe" y "Cuidador/a", tomados de `mockSession`.
+- [x] Los toggles empiezan según `notify_on_post` y `daily_summary_enabled`, tienen `role="switch"` con `aria-checked` y nombre accesible, y alternan con clic y teclado (verde/derecha ↔ beige `#E4D6C4`/izquierda).
+- [x] Con `prefers-reduced-motion: reduce` el toggle cambia sin transición.
+- [x] "Editar", "Cambiar contraseña" y "Ayuda y soporte" son botones sin acción con foco visible.
+- [x] "Cerrar sesión" de la pantalla y el logout del sidebar llevan a `/login`.
+- [x] A 390×844 no hay scroll horizontal y los paddings coinciden con el feed.
+- [x] Solo `NotificationToggle` tiene `"use client"`.
+- [x] El tipo `User` no cambia; no hay cambios en `database-schema.md` ni migraciones.
+- [x] `specs/BACKLOG.md` tiene la entrada de la inconsistencia de notificaciones.
+- [x] El punto 2 de `references/documents/pantallas-pendientes.md` está marcado.
+- [x] Las capturas de verificación están en `.playwright-mcp/`.
 
 ---
 
