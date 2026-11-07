@@ -1,10 +1,11 @@
 import type { Notice } from "../types";
+import { NoticeCard } from "./NoticeCard";
 
 type NoticesViewProps = {
   notices: Notice[];
 };
 
-export function NoticesView(_props: NoticesViewProps) {
+export function NoticesView({ notices }: NoticesViewProps) {
   return (
     <div className="mx-auto w-full max-w-[680px] px-4 pt-5 pb-8 lg:px-10 lg:pt-[34px] lg:pb-20">
       <header className="mb-[22px]">
@@ -15,6 +16,11 @@ export function NoticesView(_props: NoticesViewProps) {
           Avisos
         </h1>
       </header>
+      <div className="flex flex-col gap-3">
+        {notices.map((notice) => (
+          <NoticeCard key={notice.id} notice={notice} />
+        ))}
+      </div>
     </div>
   );
 }
