@@ -1,5 +1,6 @@
 import type { Notice } from "../types";
 import { NoticeCard } from "./NoticeCard";
+import { NoticesEmptyState } from "./NoticesEmptyState";
 
 type NoticesViewProps = {
   notices: Notice[];
@@ -16,11 +17,15 @@ export function NoticesView({ notices }: NoticesViewProps) {
           Avisos
         </h1>
       </header>
-      <div className="flex flex-col gap-3">
-        {notices.map((notice) => (
-          <NoticeCard key={notice.id} notice={notice} />
-        ))}
-      </div>
+      {notices.length === 0 ? (
+        <NoticesEmptyState />
+      ) : (
+        <div className="flex flex-col gap-3">
+          {notices.map((notice) => (
+            <NoticeCard key={notice.id} notice={notice} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
