@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NewPostTrigger } from "@/feed/components/NewPostTrigger";
 import { Avatar } from "../Avatar";
 import { LogoutIcon } from "../icons/LogoutIcon";
 import { PlusIcon } from "../icons/PlusIcon";
@@ -21,13 +22,10 @@ export function Sidebar({
     <aside className="sticky top-0 hidden h-screen w-62 flex-none flex-col border-r border-line bg-surface px-4 py-6 lg:flex">
       <BrandLink daycareName={daycareName} className="px-2 pt-1 pb-[22px]" />
 
-      <Link
-        href="/"
-        className="mb-[18px] flex w-full items-center justify-center gap-2 rounded-[14px] bg-linear-to-b from-[#F4977E] to-[#EE8164] p-3 text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.75)]"
-      >
+      <NewPostTrigger className="mb-[18px] flex w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] bg-linear-to-b from-[#F4977E] to-[#EE8164] p-3 text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.75)]">
         <PlusIcon size={17} />
         Nueva publicación
-      </Link>
+      </NewPostTrigger>
 
       <nav className="flex flex-1 flex-col gap-1">
         {navItems.map(({ key, label, href, activePath, icon: Icon }) => (

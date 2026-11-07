@@ -18,10 +18,7 @@ export function PostCard({ post }: PostCardProps) {
   return (
     <article className="rounded-[20px] border border-line bg-surface px-[22px] py-5 shadow-[0_4px_16px_-12px_rgba(120,90,60,0.5)]">
       <div className="mb-3.5 flex items-center gap-3">
-        <PostAuthorAvatar
-          avatarInitial={post.avatarInitial}
-          type={post.type}
-        />
+        <PostAuthorAvatar avatarInitial={post.avatarInitial} type={post.type} />
         <div className="flex-1">
           <div className="font-display text-[16.5px] font-semibold text-ink">
             {post.heading}
