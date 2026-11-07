@@ -1,6 +1,6 @@
 # SPEC 06 — Modal "Nueva publicación": UI con validación
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 02, SPEC 04
 > **Fecha:** 2026-11-06
 > **Objetivo:** Abrir desde los tres botones de "Nueva publicación" un único modal nativo que replica `crear-publicacion.dc.html`, permite elegir audiencia, tipo, descripción y fotos, y valida al tocar "Publicar", sin persistir nada.
@@ -191,34 +191,34 @@ Se reutilizan desde `elderly/`: `FormField`, `fieldControlClassName` y `getField
 
 ## Criterios de aceptación
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] La consola no muestra errores ni warnings de hidratación en `/`, `/elderly` y `/elderly/elderly-luis`, ni al abrir y cerrar el modal.
-- [ ] "Nueva publicación" del sidebar, el "+" del `MobileTopBar` y "Comparte un momento…" abren el mismo modal, y la URL no cambia.
-- [ ] Los tres botones se ven igual que antes de esta spec.
-- [ ] Hay un solo `<dialog>` de nueva publicación en el DOM, abierto con `showModal()` y con `aria-labelledby` apuntando al título.
-- [ ] Con Luis, Actividad, el texto del mockup y una foto, a 1440×900 el modal y `crear-publicacion.dc.html` no muestran diferencias visibles en la tarjeta (textos, colores, tipografía, bordes y orden), salvo el contenido de la miniatura.
-- [ ] PARA lista los 8 adultos mayores de `mockElderly` en orden, con su inicial y tono, seguidos de "Toda la habitación" y "Toda la guardería". Al abrir no hay ninguna chip marcada.
-- [ ] Se pueden marcar varios adultos mayores a la vez, y cada chip refleja su estado con `aria-pressed`.
-- [ ] Marcar "Toda la habitación" o "Toda la guardería" desmarca todo lo demás; marcar un adulto mayor desmarca esas dos.
-- [ ] Con "Toda la habitación" aparece el select HABITACIÓN con Roble y Cedro, y Roble elegida. Al cambiar de audiencia desaparece.
-- [ ] TIPO son radios con `name="type"`, sin ninguno elegido al abrir. El elegido tiene fondo del color `fg` del tipo y texto blanco.
-- [ ] DESCRIPCIÓN tiene el placeholder del mockup y `maxlength="2000"`.
-- [ ] "Agregar" abre el selector de archivos con `accept="image/*"` y `multiple`. Cada foto elegida aparece como miniatura con su botón "Quitar foto N".
-- [ ] Elegir 6 imágenes deja 5 miniaturas, oculta "Agregar" y muestra "Puedes agregar hasta 5 fotos.".
-- [ ] Un archivo que no es imagen se descarta con "Solo puedes agregar imágenes.", y uno de más de 10 MB con "Cada foto puede pesar hasta 10 MB.".
-- [ ] Publicar con el formulario vacío muestra los errores de PARA, TIPO y DESCRIPCIÓN, y pone el foco en la primera chip de PARA.
-- [ ] Descripción con solo espacios muestra "Escribe una descripción.".
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] La consola no muestra errores ni warnings de hidratación en `/`, `/elderly` y `/elderly/elderly-luis`, ni al abrir y cerrar el modal.
+- [x] "Nueva publicación" del sidebar, el "+" del `MobileTopBar` y "Comparte un momento…" abren el mismo modal, y la URL no cambia.
+- [x] Los tres botones se ven igual que antes de esta spec.
+- [x] Hay un solo `<dialog>` de nueva publicación en el DOM, abierto con `showModal()` y con `aria-labelledby` apuntando al título.
+- [x] Con Luis, Actividad, el texto del mockup y una foto, a 1440×900 el modal y `crear-publicacion.dc.html` no muestran diferencias visibles en la tarjeta (textos, colores, tipografía, bordes y orden), salvo el contenido de la miniatura.
+- [x] PARA lista los 8 adultos mayores de `mockElderly` en orden, con su inicial y tono, seguidos de "Toda la habitación" y "Toda la guardería". Al abrir no hay ninguna chip marcada.
+- [x] Se pueden marcar varios adultos mayores a la vez, y cada chip refleja su estado con `aria-pressed`.
+- [x] Marcar "Toda la habitación" o "Toda la guardería" desmarca todo lo demás; marcar un adulto mayor desmarca esas dos.
+- [x] Con "Toda la habitación" aparece el select HABITACIÓN con Roble y Cedro, y Roble elegida. Al cambiar de audiencia desaparece.
+- [x] TIPO son radios con `name="type"`, sin ninguno elegido al abrir. El elegido tiene fondo del color `fg` del tipo y texto blanco.
+- [x] DESCRIPCIÓN tiene el placeholder del mockup y `maxlength="2000"`.
+- [x] "Agregar" abre el selector de archivos con `accept="image/*"` y `multiple`. Cada foto elegida aparece como miniatura con su botón "Quitar foto N".
+- [x] Elegir 6 imágenes deja 5 miniaturas, oculta "Agregar" y muestra "Puedes agregar hasta 5 fotos.".
+- [x] Un archivo que no es imagen se descarta con "Solo puedes agregar imágenes.", y uno de más de 10 MB con "Cada foto puede pesar hasta 10 MB.".
+- [x] Publicar con el formulario vacío muestra los errores de PARA, TIPO y DESCRIPCIÓN, y pone el foco en la primera chip de PARA.
+- [x] Descripción con solo espacios muestra "Escribe una descripción.".
 - [ ] Cada bloque con error muestra el mensaje en `--color-error` y su control tiene `aria-invalid="true"` y `aria-describedby` apuntando al mensaje.
-- [ ] Cambiar un bloque con error quita su mensaje.
-- [ ] Publicar con todo válido (con o sin fotos) no muestra errores, no cierra el modal y no cambia el feed.
-- [ ] "Cancelar" y Esc cierran el modal. Hacer clic en el fondo no lo cierra.
-- [ ] Al cerrar, el foco vuelve al botón que lo abrió.
-- [ ] Cerrar y reabrir muestra el modal vacío: sin chips marcadas, sin tipo, sin texto, sin fotos y sin errores.
-- [ ] Con el modal abierto no se puede hacer scroll en la página de fondo.
-- [ ] `buildNewPostOptions`, `toggleAudience`, `validateNewPost` y `selectPhotos` son funciones puras sin imports de React.
-- [ ] Los únicos `"use client"` nuevos están en `NewPostDialogProvider.tsx`, `NewPostTrigger.tsx`, `NewPostForm.tsx` y `PhotoPicker.tsx`. `Sidebar`, `MobileTopBar`, `FeedView` y `app/(app)/layout.tsx` siguen siendo Server Components.
-- [ ] A 390×844 el modal ocupa toda la pantalla, sin scroll horizontal, con Cancelar/Publicar visibles mientras se hace scroll.
-- [ ] Las capturas de verificación están en `.playwright-mcp/`.
+- [x] Cambiar un bloque con error quita su mensaje.
+- [x] Publicar con todo válido (con o sin fotos) no muestra errores, no cierra el modal y no cambia el feed.
+- [x] "Cancelar" y Esc cierran el modal. Hacer clic en el fondo no lo cierra.
+- [x] Al cerrar, el foco vuelve al botón que lo abrió.
+- [x] Cerrar y reabrir muestra el modal vacío: sin chips marcadas, sin tipo, sin texto, sin fotos y sin errores.
+- [x] Con el modal abierto no se puede hacer scroll en la página de fondo.
+- [x] `buildNewPostOptions`, `toggleAudience`, `validateNewPost` y `selectPhotos` son funciones puras sin imports de React.
+- [x] Los únicos `"use client"` nuevos están en `NewPostDialogProvider.tsx`, `NewPostTrigger.tsx`, `NewPostForm.tsx` y `PhotoPicker.tsx`. `Sidebar`, `MobileTopBar`, `FeedView` y `app/(app)/layout.tsx` siguen siendo Server Components.
+- [x] A 390×844 el modal ocupa toda la pantalla, sin scroll horizontal, con Cancelar/Publicar visibles mientras se hace scroll.
+- [x] Las capturas de verificación están en `.playwright-mcp/`.
 
 ---
 
