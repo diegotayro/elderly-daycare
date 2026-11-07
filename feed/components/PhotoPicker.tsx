@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, type ChangeEvent } from "react";
-import { getFieldErrorId } from "@/elderly/components/FormField";
 import { CloseIcon } from "@/shared/components/icons/CloseIcon";
 import { PlusIcon } from "@/shared/components/icons/PlusIcon";
 import { MAX_PHOTOS } from "../new-post-limits";
+import { FieldError } from "./FieldError";
 
 type PhotoThumbnailProps = {
   file: File;
@@ -91,14 +91,7 @@ export function PhotoPicker({
         hidden
         onChange={handleChange}
       />
-      {error && (
-        <p
-          id={getFieldErrorId("photos")}
-          className="mt-1.5 text-[13px] font-bold text-error"
-        >
-          {error}
-        </p>
-      )}
+      <FieldError fieldId="photos" message={error} />
     </div>
   );
 }

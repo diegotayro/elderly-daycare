@@ -1,6 +1,8 @@
 import type { CSSProperties } from "react";
 import type { PostType } from "@/shared/database/types";
+import { getFieldErrorId } from "@/elderly/components/FormField";
 import { postTypeStyles } from "../post-type-styles";
+import { FieldError } from "./FieldError";
 
 const POST_TYPE_ORDER: PostType[] = [
   "meal",
@@ -10,9 +12,17 @@ const POST_TYPE_ORDER: PostType[] = [
   "announcement",
 ];
 
-export function PostTypePicker() {
+type PostTypePickerProps = {
+  error?: string;
+};
+
+export function PostTypePicker({ error }: PostTypePickerProps) {
   return (
-    <fieldset className="m-0 min-w-0 border-0 p-0">
+    <fieldset
+      aria-invalid={error ? true : undefined}
+      aria-describedby={error ? getFieldErrorId("type") : undefined}
+      className="m-0 min-w-0 border-0 p-0"
+    >
       <legend className="mb-2.5 p-0 text-xs font-extrabold tracking-[0.7px] text-muted-strong">
         TIPO
       </legend>
@@ -36,6 +46,7 @@ export function PostTypePicker() {
           );
         })}
       </div>
+      <FieldError fieldId="type" message={error} />
     </fieldset>
   );
 }

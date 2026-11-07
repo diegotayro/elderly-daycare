@@ -1,7 +1,11 @@
 import { avatarTones } from "@/elderly/avatar-tones";
 import { ChevronDownIcon } from "@/shared/components/icons/ChevronDownIcon";
 import type { RoomOption } from "@/elderly/types";
-import { fieldControlClassName } from "@/elderly/components/FormField";
+import {
+  fieldControlClassName,
+  getFieldErrorId,
+} from "@/elderly/components/FormField";
+import { FieldError } from "./FieldError";
 import type {
   AudienceChip,
   AudienceElderlyOption,
@@ -13,6 +17,7 @@ const CHIP_BASE_CLASS_NAME =
 
 type AudiencePickerProps = {
   labelId: string;
+  error?: string;
   elderly: AudienceElderlyOption[];
   rooms: RoomOption[];
   selection: AudienceSelection;
@@ -22,6 +27,7 @@ type AudiencePickerProps = {
 
 export function AudiencePicker({
   labelId,
+  error,
   elderly,
   rooms,
   selection,
@@ -42,6 +48,7 @@ export function AudiencePicker({
       <div
         role="group"
         aria-labelledby={labelId}
+        aria-describedby={error ? getFieldErrorId("audience") : undefined}
         className="flex flex-wrap gap-[9px]"
       >
         {elderly.map((option) => (
@@ -84,6 +91,7 @@ export function AudiencePicker({
           Toda la guardería
         </button>
       </div>
+      <FieldError fieldId="audience" message={error} />
       {selection.kind === "room" && (
         <div className="mt-4">
           <label
