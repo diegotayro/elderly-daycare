@@ -1,4 +1,12 @@
-export function AccountView() {
+import { ProfileCard } from "./ProfileCard";
+
+type AccountViewProps = {
+  fullName: string;
+  email: string;
+  roleLabel: string;
+};
+
+export function AccountView({ fullName, email, roleLabel }: AccountViewProps) {
   return (
     <div className="mx-auto w-full max-w-[680px] px-4 pt-5 pb-8 lg:px-10 lg:pt-[34px] lg:pb-20">
       <header className="mb-[22px]">
@@ -9,6 +17,7 @@ export function AccountView() {
           Mi cuenta
         </h1>
       </header>
+      <ProfileCard fullName={fullName} email={email} roleLabel={roleLabel} />
     </div>
   );
 }
