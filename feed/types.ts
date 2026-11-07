@@ -8,6 +8,8 @@ import type {
   Room,
   User,
 } from "@/shared/database/types";
+import type { AvatarTone } from "@/elderly/avatar-tones";
+import type { RoomOption } from "@/elderly/types";
 
 // Lo que devolvería la consulta del feed: filas + agregados (conteos).
 export type FeedSource = {
@@ -36,4 +38,41 @@ export type FeedPost = {
   photoCaption: string | null; // "Foto · taller de pintura"
   reactionCount: number;
   commentCount: number;
+};
+
+export type AudienceElderlyOption = {
+  id: string;
+  firstName: string; // "Luis"
+  initial: string; // "L"
+  tone: AvatarTone;
+};
+
+export type NewPostOptions = {
+  elderly: AudienceElderlyOption[];
+  rooms: RoomOption[];
+};
+
+export type AudienceSelection =
+  | { kind: "none" }
+  | { kind: "elderly"; elderlyIds: string[] }
+  | { kind: "room"; roomId: string }
+  | { kind: "daycare" };
+
+export type AudienceChip =
+  | { kind: "elderly"; elderlyId: string }
+  | { kind: "room" }
+  | { kind: "daycare" };
+
+export type NewPostInput = {
+  audience: AudienceSelection;
+  type: string; // valor crudo del FormData
+  body: string;
+};
+
+export type NewPostField = "audience" | "type" | "body";
+export type NewPostErrors = Partial<Record<NewPostField, string>>;
+
+export type PhotoSelectionResult = {
+  accepted: File[];
+  error: string | null;
 };
