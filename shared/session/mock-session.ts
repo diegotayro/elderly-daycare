@@ -3,7 +3,11 @@ import type { Daycare, User } from "@/shared/database/types";
 const DAYCARE_ID = "daycare-1";
 const CREATED_AT = "2025-06-01T00:00:00Z";
 
-export const mockSession: { daycare: Daycare; currentUser: User } = {
+export const mockSession: {
+  daycare: Daycare;
+  currentUser: User;
+  email: string;
+} = {
   daycare: { id: DAYCARE_ID, name: "Casa Nogal", created_at: CREATED_AT },
   currentUser: {
     id: "user-caro",
@@ -19,4 +23,5 @@ export const mockSession: { daycare: Daycare; currentUser: User } = {
     created_at: CREATED_AT,
     updated_at: CREATED_AT,
   },
+  email: "caro@casanogal.pe",
 };
