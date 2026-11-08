@@ -65,7 +65,7 @@ create index users_daycare_id_idx on public.users (daycare_id);
 `AFTER INSERT` en `auth.users`, `security definer`, `search_path` fijo.
 
 - Lee `daycare_id`, `role`, `first_name` y `last_name` de `raw_user_meta_data`. Si falta alguno → `raise exception` y no se crea la cuenta.
-- `role = 'admin'` solo se acepta si `current_user = 'postgres'` (SQL Editor / `execute_sql`). Desde Auth (`supabase_auth_admin`: signup, `inviteUserByEmail`, `createUser`) solo se acepta `staff` o `relative`.
+- `role = 'admin'` solo se acepta si `session_user = 'postgres'` (SQL Editor / `execute_sql`). Se usa `session_user` y no `current_user` porque dentro de una función `SECURITY DEFINER` `current_user` es siempre el dueño de la función. Desde Auth (`supabase_auth_admin`: signup, `inviteUserByEmail`, `createUser`) solo se acepta `staff` o `relative`.
 - `status` inicial: `staff` → `pending`; `relative` y `admin` → `active`.
 
 ### Trigger de protección de columnas
@@ -135,33 +135,33 @@ specs/BACKLOG.md                           # - policies de daycares; + selects p
 
 ## Criterios de aceptación
 
-- [ ] Existe `supabase/migrations/<version>_create_users.sql` y su versión coincide con la de `list_migrations`.
-- [ ] Los enums `user_role` y `user_status` existen con los valores del esquema.
-- [ ] `public.users` tiene las columnas, FKs, `full_name` generada e índice en `daycare_id`; RLS activado.
-- [ ] Insertar en `auth.users` con metadata `staff` crea una fila `pending`; con `relative`, una fila `active`.
-- [ ] Insertar en `auth.users` sin `daycare_id`, `role`, `first_name` o `last_name` en la metadata falla.
+- [x] Existe `supabase/migrations/<version>_create_users.sql` y su versión coincide con la de `list_migrations`.
+- [x] Los enums `user_role` y `user_status` existen con los valores del esquema.
+- [x] `public.users` tiene las columnas, FKs, `full_name` generada e índice en `daycare_id`; RLS activado.
+- [x] Insertar en `auth.users` con metadata `staff` crea una fila `pending`; con `relative`, una fila `active`.
+- [x] Insertar en `auth.users` sin `daycare_id`, `role`, `first_name` o `last_name` en la metadata falla.
 - [ ] Insertar con `role = 'admin'` como `supabase_auth_admin` falla; como `postgres` funciona.
-- [ ] Borrar el usuario de `auth.users` borra su fila en `users` (cascade).
-- [ ] `updated_at` cambia al actualizar una fila de `users`.
-- [ ] Como staff o relative: cambiar su `role`, `daycare_id`, `first_name` o `status` falla; cambiar `avatar_url`, `notify_on_post` y `daily_summary_enabled` funciona.
-- [ ] Como admin: cambiar el `role` de un staff falla; cambiar el `status` de otro admin o el suyo falla; cambiar `status` y nombres de un staff funciona.
-- [ ] Como admin: `select` en `users` devuelve solo usuarios de su guardería; en `daycares`, solo la suya; puede renombrarla y no puede cambiar su `id`.
-- [ ] Como staff o relative: `select` en `users` devuelve su fila más staff/admin de su guardería, sin relatives ajenos; en `daycares`, solo la suya; un `update` en `daycares` no afecta filas.
-- [ ] Usuario `pending` o `archived` con sesión: `select` en `users` y `daycares` devuelve vacío y sus updates no afectan filas.
-- [ ] Como `anon`: `select` en `users` y `daycares` devuelve vacío.
+- [x] Borrar el usuario de `auth.users` borra su fila en `users` (cascade).
+- [x] `updated_at` cambia al actualizar una fila de `users`.
+- [x] Como staff o relative: cambiar su `role`, `daycare_id`, `first_name` o `status` falla; cambiar `avatar_url`, `notify_on_post` y `daily_summary_enabled` funciona.
+- [x] Como admin: cambiar el `role` de un staff falla; cambiar el `status` de otro admin o el suyo falla; cambiar `status` y nombres de un staff funciona.
+- [x] Como admin: `select` en `users` devuelve solo usuarios de su guardería; en `daycares`, solo la suya; puede renombrarla y no puede cambiar su `id`.
+- [x] Como staff o relative: `select` en `users` devuelve su fila más staff/admin de su guardería, sin relatives ajenos; en `daycares`, solo la suya; un `update` en `daycares` no afecta filas.
+- [x] Usuario `pending` o `archived` con sesión: `select` en `users` y `daycares` devuelve vacío y sus updates no afectan filas.
+- [x] Como `anon`: `select` en `users` y `daycares` devuelve vacío.
 - [ ] El admin de prueba existe en `public.users` (Casa Nogal, `admin`, `active`) y puede iniciar sesión con email y contraseña.
-- [ ] Ni la spec, ni las migraciones, ni el seed contienen el email o la contraseña del admin.
+- [x] Ni la spec, ni las migraciones, ni el seed contienen el email o la contraseña del admin.
 - [ ] El usuario confirmó que el signup público está desactivado.
-- [ ] `get_advisors` no muestra avisos nuevos salvo los de `rls_auto_enable()` ya registrados en BACKLOG, y desaparece `rls_enabled_no_policy` de `daycares`.
-- [ ] `database-schema.md` y `BACKLOG.md` están actualizados.
-- [ ] No hay cambios en código de la app (`shared/database/types.ts`, `mockSession`, `package.json`).
+- [x] `get_advisors` no muestra avisos nuevos salvo los registrados en BACKLOG como aceptados (`rls_auto_enable()`, helpers `SECURITY DEFINER` ejecutables por `authenticated`, `multiple_permissive_policies` en `users` y `auth_leaked_password_protection`), y desaparece `rls_enabled_no_policy` de `daycares`.
+- [x] `database-schema.md` y `BACKLOG.md` están actualizados.
+- [x] No hay cambios en código de la app (`shared/database/types.ts`, `mockSession`, `package.json`).
 
 ---
 
 ## Decisiones
 
 - **Sí:** RLS parcial en `users` + policies de `daycares`. Lo que depende de tablas futuras va a BACKLOG.
-- **Sí:** admin solo desde SQL (`current_user = 'postgres'` en el trigger). Defensa extra por si el signup público se reactiva.
+- **Sí:** admin solo desde SQL (`session_user = 'postgres'` en el trigger). Defensa extra por si el signup público se reactiva.
 - **No:** confiar solo en el signup desactivado.
 - **Sí:** admin de prueba creado directo en `auth.users` con `execute_sql`, fuera del repo. Pedido del usuario.
 - **No:** admin en `seed.sql`. Dejaría credenciales en el repo.
