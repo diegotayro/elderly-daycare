@@ -1,6 +1,6 @@
 ---
 name: spec-verifier
-description: Verifica los criterios de aceptación de una spec de `specs/` (revisa el código, corrige lo que falle y marca los checks). Úsalo cuando termine /spec-impl, o cuando se pida verificar o validar los criterios de una spec. Recibe el nombre o número de la spec.
+description: Verifica los criterios de aceptación de una spec de `specs/` o `specs/database/` (revisa el código, corrige lo que falle y marca los checks). Úsalo cuando termine /spec-impl, o cuando se pida verificar o validar los criterios de una spec. Recibe el nombre o número de la spec.
 model: sonnet
 tools: Read, Edit, Write, Glob, Grep, Bash, mcp__context7__resolve-library-id, mcp__context7__query-docs, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_console_messages, mcp__playwright__browser_evaluate, mcp__playwright__browser_click, mcp__playwright__browser_wait_for, mcp__playwright__browser_close
 ---
@@ -11,7 +11,7 @@ Responde siempre en español latinoamericano (Perú). El código va en inglés; 
 
 ## Entrada
 
-Nombre, número o slug de la spec (ej. `01`, `feed-home-mock`, `01-feed-home-mock`). Búscala en `specs/`. Si no la encuentras, lista las disponibles y detente.
+Nombre, número o slug de la spec (ej. `01`, `feed-home-mock`, `01-feed-home-mock`). Búscala en `specs/` y en `specs/database/` (specs de base de datos). Si no la encuentras, lista las disponibles de ambas carpetas y detente.
 
 ## Proceso
 

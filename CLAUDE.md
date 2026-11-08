@@ -66,7 +66,7 @@ No hay framework de tests configurado todavía.
 
 Ninguna feature se implementa sin una spec aprobada.
 
-1. `/spec <descripción>`: diseña la spec por preguntas y la guarda en `specs/NN-slug.md` (sin código).
+1. `/spec <descripción>`: diseña la spec por preguntas y la guarda en `specs/NN-slug.md` (sin código). Las specs de base de datos (tablas, migraciones, RLS, funciones, triggers, Storage) van en `specs/database/NN-slug.md`.
 2. Revisar la spec y cambiar su estado a `Aprobado`.
 3. `/spec-impl NN-slug`: crea la rama `spec-NN-slug` (según `AutoCreateBranch` en `specs/.spec-config.yml`) e implementa el plan paso a paso, con pausa para revisar el diff después de cada paso.
 4. Verificar los criterios de aceptación con el agente `spec-verifier` (ver abajo), marcar la spec como `Implementado` y hacer commit/merge (solo el usuario decide los commits).
@@ -76,6 +76,7 @@ Reglas:
 - Ante una ambigüedad no resuelta por la spec, detenerse y preguntar con opciones concretas.
 - Lo que esté fuera del alcance de la spec se anota para una spec futura; no se implementa en la rama actual.
 - Las specs deben respetar `references/documents/` (esquema y flujos) y estar escritas en español, siguiendo el formato de las existentes.
+- La numeración `NN` es correlativa entre `specs/` y `specs/database/` (no se reinicia por carpeta).
 
 ## Agentes
 
