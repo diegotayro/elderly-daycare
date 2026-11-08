@@ -26,7 +26,7 @@ No hay framework de tests configurado todavía.
 - Tailwind CSS v4 cargado vía loader de Turbopack (`@tailwindcss/turbopack` en `next.config.ts`), no vía PostCSS.
 - `next.config.ts` activa `cacheComponents`, `partialPrefetching` y `experimental.agentFeedback`. Consultar `node_modules/next/dist/docs/` antes de usar APIs de caché/rendering.
 - En Next 16 `middleware.ts` se llama `proxy.ts`.
-- Backend previsto: Supabase (Postgres + Auth + Storage) con `@supabase/ssr`; correos con Resend.
+- Backend: Supabase (Postgres + Auth + Storage) con `@supabase/ssr` y `@supabase/supabase-js`; correos con Resend (previsto).
 
 ## Documentos de referencia (fuente de verdad)
 
@@ -61,6 +61,12 @@ No hay framework de tests configurado todavía.
 
 - Antes de usar el MCP de Supabase, o de escribir migraciones, políticas RLS, funciones, triggers o cualquier SQL, cargar los skills `supabase` y `supabase-postgres-best-practices`.
 - Ante un conflicto entre los skills y `references/documents/`, gana `references/documents/`.
+- La app interactúa con la base de datos solo mediante los paquetes oficiales de Supabase para Next.js: `@supabase/ssr` sobre `@supabase/supabase-js`. No usar ORMs ni conexiones directas a Postgres desde la app.
+- Usar los clientes con sesión de `shared/supabase/`, sin crear otros equivalentes:
+  - `server.ts`: Server Components, Server Actions y Route Handlers.
+  - `client.ts`: Client Components.
+  - `proxy.ts`: lo usa solo `proxy.ts` de la raíz para refrescar la sesión.
+- La única excepción es el cliente `service_role`, solo para los casos listados en el esquema. Aún no existe.
 
 ## Flujo de trabajo: Spec Driven Design (SDD)
 
