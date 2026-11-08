@@ -80,7 +80,7 @@ La guardería como entidad raíz.
 |Campo|Tipo|Notas|
 |---|---|---|
 |`id`|`uuid` PK||
-|`name`|`text`|Ej. "Guardería A1".|
+|`name`|`text`|Ej. "Guardería A1". `not null`, no vacío ni solo espacios (`daycares_name_not_blank`) y único (`daycares_name_key`, distingue mayúsculas).|
 |`created_at`|`timestamptz`||
 
 ### RLS
