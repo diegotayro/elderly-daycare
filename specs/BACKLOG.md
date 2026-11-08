@@ -44,3 +44,25 @@ Formato de cada entrada:
   - La pantalla usa el copy del mockup con los valores iniciales de esos dos campos; las etiquetas viven solo en `notification-preferences.ts`.
   - Decidir si se cambia el copy del mockup o los campos/horario de la DB (17:00 vs. 19:00, comentarios vs. publicaciones).
   - Los toggles hoy solo tienen estado local: persistirlos con `update` de `users` en esa misma spec.
+
+---
+
+## Policies RLS de `daycares` pendientes
+
+- **Qué:** `daycares` tiene RLS activado y ninguna policy, así que `anon` y `authenticated` no ven filas. Faltan el select de su propia guardería y el update del admin, con sus helpers `SECURITY DEFINER STABLE`.
+- **Origen:** SPEC 09 (`09-daycares-table`), `supabase/migrations/20261108010057_create_daycares.sql`.
+- **Se resuelve en:** la spec de `users`.
+- **Notas:**
+  - Dependen de `users` para saber a qué guardería pertenece el que llama.
+  - El aviso `rls_enabled_no_policy` de `daycares` desaparece al crear las policies.
+
+---
+
+## Avisos del linter por `rls_auto_enable()` ejecutable por `anon` y `authenticated`
+
+- **Qué:** `get_advisors` (security) marca `public.rls_auto_enable()` como `SECURITY DEFINER` ejecutable vía `/rest/v1/rpc/rls_auto_enable` por `anon` y `authenticated`.
+- **Origen:** SPEC 09 (`09-daycares-table`); función preexistente del proyecto, usada por el event trigger `ensure_rls`.
+- **Se resuelve en:** una spec de endurecimiento de seguridad (o la de `users`).
+- **Notas:**
+  - Riesgo bajo: devuelve `event_trigger`, y Postgres solo permite invocarla desde un event trigger; una llamada RPC directa falla.
+  - Solución prevista: `revoke execute on function public.rls_auto_enable() from public, anon, authenticated;` en una migración. Verificar antes que el event trigger sigue funcionando.
