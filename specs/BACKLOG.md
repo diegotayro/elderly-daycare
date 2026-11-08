@@ -47,17 +47,6 @@ Formato de cada entrada:
 
 ---
 
-## Policies RLS de `daycares` pendientes
-
-- **Qué:** `daycares` tiene RLS activado y ninguna policy, así que `anon` y `authenticated` no ven filas. Faltan el select de su propia guardería y el update del admin, con sus helpers `SECURITY DEFINER STABLE`.
-- **Origen:** SPEC 09 (`09-daycares-table`), `supabase/migrations/20261108010057_create_daycares.sql`.
-- **Se resuelve en:** la spec de `users`.
-- **Notas:**
-  - Dependen de `users` para saber a qué guardería pertenece el que llama.
-  - El aviso `rls_enabled_no_policy` de `daycares` desaparece al crear las policies.
-
----
-
 ## Avisos del linter por `rls_auto_enable()` ejecutable por `anon` y `authenticated`
 
 - **Qué:** `get_advisors` (security) marca `public.rls_auto_enable()` como `SECURITY DEFINER` ejecutable vía `/rest/v1/rpc/rls_auto_enable` por `anon` y `authenticated`.
@@ -66,3 +55,37 @@ Formato de cada entrada:
 - **Notas:**
   - Riesgo bajo: devuelve `event_trigger`, y Postgres solo permite invocarla desde un event trigger; una llamada RPC directa falla.
   - Solución prevista: `revoke execute on function public.rls_auto_enable() from public, anon, authenticated;` en una migración. Verificar antes que el event trigger sigue funcionando.
+
+---
+
+## Selects de `users` que dependen de tablas futuras
+
+- **Qué:** faltan dos policies de select en `users`: (1) staff sobre los familiares de sus ancianos asignados y (2) staff/relative sobre los autores de comentarios en posts que pueden ver.
+- **Origen:** SPEC 10 (`10-users-table`), `supabase/migrations/20261108061914_create_users.sql`.
+- **Se resuelve en:** las specs de `staff_elderly`/`guardian_elderly` (1) y de `comments` (2).
+- **Notas:**
+  - Hoy staff y relative ven solo su fila y la de staff/admin de su guardería (`users_select_own` y `users_select_team`).
+  - Quitar esta entrada cuando ambas policies existan.
+
+---
+
+## Probar el guard de admin desde Auth (`supabase_auth_admin`)
+
+- **Qué:** el trigger `handle_new_auth_user()` rechaza `role = 'admin'` si `session_user <> 'postgres'`, pero no se pudo probar como `supabase_auth_admin`: `set session authorization` da `permission denied` y `set role` no cambia `session_user`.
+- **Origen:** SPEC 10 (`10-users-table`), criterio "insertar con `role = 'admin'` como `supabase_auth_admin` falla".
+- **Se resuelve en:** la spec de invitación de staff.
+- **Notas:**
+  - Probar con `auth.admin.inviteUserByEmail` pasando `role: 'admin'` en la metadata: debe fallar y no crear la cuenta.
+  - Verificado: como `postgres` (`execute_sql`) crear un admin funciona.
+
+---
+
+## Avisos del linter aceptados tras la spec 10
+
+- **Qué:** `get_advisors` marca (1) `authenticated_security_definer_function_executable` en `current_user_daycare_id()`, `current_user_role()` e `is_admin()`, (2) `multiple_permissive_policies` en `users` para select y update, y (3) `auth_leaked_password_protection`.
+- **Origen:** SPEC 10 (`10-users-table`).
+- **Se resuelve en:** no se resuelve; (1) y (2) son aceptados. (3) es un ajuste del dashboard de Auth.
+- **Notas:**
+  - (1) Las policies evalúan los helpers con el rol del usuario, así que necesitan `EXECUTE`; solo devuelven datos del propio usuario. Alternativa descartada: moverlos a un esquema privado.
+  - (2) Consecuencia de policies separadas por regla (`own`, `admin`, `team`). Alternativa descartada: unirlas en una sola.
+  - (3) Revisar en el dashboard (Auth > Password security) si el plan lo permite.

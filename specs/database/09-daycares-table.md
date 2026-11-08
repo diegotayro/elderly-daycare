@@ -1,6 +1,6 @@
 # SPEC 09 — Tabla `daycares` con migración y datos de prueba
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** Ninguna
 > **Fecha:** 2026-11-07
 > **Objetivo:** Crear la tabla `daycares` en Supabase con su migración versionada, RLS activado sin policies y un seed de 5 guarderías de prueba.

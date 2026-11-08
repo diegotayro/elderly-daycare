@@ -54,6 +54,18 @@ Diccionario de tablas para PostgreSQL. Tipos en notación Postgres. Convención:
 7. **Funciones helper.** Usar funciones helper en las policies siempre que se pueda, para no repetir lógica. Deben ser `SECURITY DEFINER`, `STABLE` y con `search_path` fijo, para evitar la recursión al leer `users`. Solo pueden devolver datos del propio usuario logueado (`auth.uid()`) o un `true/false`, nunca filas de otras personas. Dentro de las policies, envolverlas en un `select` (ej. `(select is_staff())`) para que se calculen una vez por consulta.
 8. **Solo los usuarios `active` tienen acceso.** Un usuario `pending` o `archived` se trata como si no tuviera rol: no ve ni modifica nada. Lo más simple es que los helpers que devuelven el rol o la guardería **del usuario logueado** solo lo reconozcan si está `active`. Además, un usuario `archived` tiene el login bloqueado en Supabase Auth. Esta regla se refiere a lo que **ese usuario** puede hacer: su fila en `users` sigue visible para los demás, y sus posts y comentarios siguen apareciendo en el feed con su nombre.
 
+### Helpers implementados
+
+Viven en `public`, son `SECURITY DEFINER STABLE` con `search_path` vacío y `EXECUTE` solo para `authenticated` (revocado a `public` y `anon`). Solo reconocen al usuario logueado si está `active`; si no, devuelven `null` / `false`. El linter de Supabase los marca como "ejecutables por `authenticated`": es esperado, porque las policies los evalúan con el rol del usuario.
+
+|Función|Devuelve|
+|---|---|
+|`current_user_daycare_id()`|`uuid` de la guardería del usuario logueado|
+|`current_user_role()`|`user_role` del usuario logueado|
+|`is_admin()`|`boolean`|
+
+Además existe `set_updated_at()`, trigger genérico `BEFORE UPDATE` para mantener `updated_at` en cualquier tabla.
+
 ### Regla del feed: ¿quién puede ver un post?
 
 Las tablas `posts`, `post_elderly`, `post_photos`, `reactions`, `comments` y el Storage de fotos usan esta regla. Debe implementarse **en un solo lugar**.
@@ -113,7 +125,7 @@ Perfil de aplicación vinculado a **Supabase Auth**. Relatives y staff comparten
 
 > **Implementación Supabase:** crear la fila con un trigger `AFTER INSERT` en `auth.users` (función `SECURITY DEFINER` con `set search_path = public`). El signup público está desactivado: nunca usar `supabase.auth.signUp()` desde el cliente. Pasar `daycare_id`, `role`, `first_name` y `last_name` vía `raw_user_meta_data` **desde el servidor**, al crear la cuenta con `auth.admin.inviteUserByEmail` (staff) o `auth.admin.createUser` (relative). Activar RLS en esta tabla. No duplicar `email` ni `password_hash` — Supabase ya los gestiona en `auth.users`.
 > 
-> **El `role` lo fija siempre el servidor**, nunca se toma de lo que envía el cliente: invitación de staff → `staff`; aceptación de invitación → `relative`. Los admins se crean solo a mano en Supabase (SQL Editor o dashboard).
+> **El `role` lo fija siempre el servidor**, nunca se toma de lo que envía el cliente: invitación de staff → `staff`; aceptación de invitación → `relative`. Los admins se crean solo a mano en Supabase (SQL Editor o dashboard): el trigger `handle_new_auth_user()` rechaza `role = 'admin'` salvo que `session_user = 'postgres'` (se usa `session_user` porque dentro de una función `SECURITY DEFINER` `current_user` es siempre el dueño de la función). Desde Auth (signup, `inviteUserByEmail`, `createUser`) solo se acepta `staff` o `relative`.
 
 ### RLS
 
