@@ -1,6 +1,6 @@
 # SPEC 08 — Pantalla "Mi cuenta": perfil y preferencias con datos mock
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 07
 > **Fecha:** 2026-11-06
 > **Objetivo:** Crear la ruta `/account` que replica `mi-cuenta.dc.html` con los datos de `mockSession`, toggles de notificaciones con estado local, conectada al menú "Mi cuenta" y adaptada a móvil.
