@@ -19,6 +19,4 @@ export type CurrentUser = Pick<
 };
 
 export type LoginErrorCode =
-  | "invalid_credentials"
-  | "inactive_account"
-  | "unexpected";
+  "invalid_credentials" | "inactive_account" | "unexpected";

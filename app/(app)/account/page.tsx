@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { AccountView } from "@/account/components/AccountView";
-import { getCurrentUser } from "@/auth/get-current-user";
+import { requireTeamUser } from "@/auth/require-user";
 import { userRoleLabels } from "@/users/user-role-labels";
 
 export const metadata: Metadata = {
@@ -9,8 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AccountPage() {
-  const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  const user = await requireTeamUser();
 
   return (
     <AccountView

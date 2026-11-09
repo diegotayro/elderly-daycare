@@ -51,7 +51,10 @@ export function LoginForm({ searchParams }: LoginFormProps) {
 
       <p className="mt-6 text-center text-[14.5px] text-muted-strong">
         ¿Te invitó la guardería?{" "}
-        <Link href="/activate-account" className="font-extrabold text-coral-link">
+        <Link
+          href="/activate-account"
+          className="font-extrabold text-coral-link"
+        >
           Activa tu cuenta
         </Link>
       </p>
