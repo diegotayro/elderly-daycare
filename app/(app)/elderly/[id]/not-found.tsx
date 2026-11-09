@@ -9,7 +9,10 @@ export default function ElderlyNotFound() {
       <p className="mb-5 text-[15px] text-muted-strong">
         Puede que el enlace sea incorrecto o que ya no esté activo.
       </p>
-      <Link href="/elderly" className="text-[14.5px] font-extrabold text-coral-link">
+      <Link
+        href="/elderly"
+        className="text-[14.5px] font-extrabold text-coral-link"
+      >
         Volver a Adultos mayores
       </Link>
     </div>

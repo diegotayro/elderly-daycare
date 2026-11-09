@@ -17,7 +17,25 @@ export type NavItem = {
 
 export const navItems: NavItem[] = [
   { key: "feed", label: "Feed", href: "/", activePath: "/", icon: HomeIcon },
-  { key: "elderly", label: "Adultos mayores", href: "/elderly", activePath: "/elderly", icon: PeopleIcon },
-  { key: "notices", label: "Avisos", href: "/notices", activePath: "/notices", icon: BellIcon },
-  { key: "account", label: "Mi cuenta", href: "/account", activePath: "/account", icon: UserIcon },
+  {
+    key: "elderly",
+    label: "Adultos mayores",
+    href: "/elderly",
+    activePath: "/elderly",
+    icon: PeopleIcon,
+  },
+  {
+    key: "notices",
+    label: "Avisos",
+    href: "/notices",
+    activePath: "/notices",
+    icon: BellIcon,
+  },
+  {
+    key: "account",
+    label: "Mi cuenta",
+    href: "/account",
+    activePath: "/account",
+    icon: UserIcon,
+  },
 ];

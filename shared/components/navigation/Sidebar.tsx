@@ -8,9 +8,9 @@ import { navItems } from "./nav-items";
 import { NavLink } from "./NavLink";
 
 type SidebarProps = {
-  daycareName: string;
-  userName: string;
-  userRoleLabel: string;
+  daycareName?: string;
+  userName?: string;
+  userRoleLabel?: string;
 };
 
 export function Sidebar({
@@ -45,7 +45,7 @@ export function Sidebar({
 
       <div className="mt-2.5 border-t border-line pt-3.5">
         <div className="flex items-center gap-[11px] px-2 py-1.5">
-          <Avatar initial={userName[0]} />
+          <Avatar initial={userName?.[0] ?? ""} />
           <div className="min-w-0 flex-1">
             <div className="text-sm font-extrabold text-ink">{userName}</div>
             <div className="text-xs text-muted">{userRoleLabel}</div>
