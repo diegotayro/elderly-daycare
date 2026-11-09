@@ -1,6 +1,6 @@
 # SPEC 11 — Autenticación con email y contraseña, y protección de rutas
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 03, SPEC 08, SPEC 10
 > **Fecha:** 2026-11-08
 > **Objetivo:** Implementar login y logout reales con email y contraseña contra Supabase, y proteger las rutas de la app según la sesión, el `status` y el `role` del usuario.
@@ -205,20 +205,20 @@ Se verifican con la cuenta admin existente y sin sesión. La contraseña no se e
 
 **General**
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
 - [ ] La consola no muestra errores de hidratación en `/login`, `/` y `/account`.
-- [ ] No hay migraciones nuevas ni cambios en `references/documents/`.
-- [ ] Ningún archivo usa `signUp()` ni el cliente `service_role`.
-- [ ] `auth/get-current-user.ts` y `auth/require-user.ts` tienen `import "server-only"`.
+- [x] No hay migraciones nuevas ni cambios en `references/documents/`.
+- [x] Ningún archivo usa `signUp()` ni el cliente `service_role`.
+- [x] `auth/get-current-user.ts` y `auth/require-user.ts` tienen `import "server-only"`.
 
 **Login**
 
-- [ ] A 1440×900 y sin `?error=`, `/login` no muestra diferencias visibles respecto al cierre de SPEC 03.
+- [x] A 1440×900 y sin `?error=`, `/login` no muestra diferencias visibles respecto al cierre de SPEC 03.
 - [ ] Con las credenciales del admin, el login termina en `/` y crea las cookies `sb-*`.
 - [ ] Con una contraseña incorrecta, se vuelve a `/login` con el mensaje de `invalid_credentials` en un elemento `role="alert"`.
-- [ ] Con un email que no existe, el mensaje es idéntico al de contraseña incorrecta.
-- [ ] Enviar el formulario vacío muestra el mensaje de `invalid_credentials`.
-- [ ] `/login?error=<script>` no muestra ningún mensaje ni el valor recibido.
+- [x] Con un email que no existe, el mensaje es idéntico al de contraseña incorrecta.
+- [x] Enviar el formulario vacío muestra el mensaje de `invalid_credentials`.
+- [x] `/login?error=<script>` no muestra ningún mensaje ni el valor recibido.
 
 **Logout**
 
@@ -228,12 +228,12 @@ Se verifican con la cuenta admin existente y sin sesión. La contraseña no se e
 
 **Protección de rutas**
 
-- [ ] Sin sesión, `/`, `/elderly`, `/elderly/<id válido>`, `/notices`, `/account` y `/family-pending` redirigen a `/login`.
-- [ ] Sin sesión, `/login` y `/activate-account` cargan sin redirección.
+- [x] Sin sesión, `/`, `/elderly`, `/elderly/<id válido>`, `/notices`, `/account` y `/family-pending` redirigen a `/login`.
+- [x] Sin sesión, `/login` y `/activate-account` cargan sin redirección.
 - [ ] Con sesión de admin, `/login` redirige a `/`.
 - [ ] Con sesión de admin, las cinco rutas de `(app)` cargan.
 - [ ] Con sesión de admin, `/family-pending` redirige a `/`.
-- [ ] `resolveRouteRedirect` cumple las cuatro filas de su tabla, y su archivo no importa Supabase.
+- [x] `resolveRouteRedirect` cumple las cuatro filas de su tabla, y su archivo no importa Supabase.
 
 **Datos reales**
 
@@ -243,8 +243,8 @@ Se verifican con la cuenta admin existente y sin sesión. La contraseña no se e
 
 **Backlog**
 
-- [ ] `specs/BACKLOG.md` contiene las cuatro entradas nuevas y la actualización del aviso de `params`.
-- [ ] Las capturas de verificación están en `.playwright-mcp/`.
+- [x] `specs/BACKLOG.md` contiene las cuatro entradas nuevas y la actualización del aviso de `params`.
+- [x] Las capturas de verificación están en `.playwright-mcp/`.
 
 ---
 
