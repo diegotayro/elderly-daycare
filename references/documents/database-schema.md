@@ -123,7 +123,7 @@ Perfil de aplicación vinculado a **Supabase Auth**. Relatives y staff comparten
 |`daily_summary_enabled`|`boolean` default `true`|Resumen diario (19:00).|
 |`created_at` / `updated_at`|`timestamptz`||
 
-> **Implementación Supabase:** crear la fila con un trigger `AFTER INSERT` en `auth.users` (función `SECURITY DEFINER` con `set search_path = public`). El signup público está desactivado: nunca usar `supabase.auth.signUp()` desde el cliente. Pasar `daycare_id`, `role`, `first_name` y `last_name` vía `raw_user_meta_data` **desde el servidor**, al crear la cuenta con `auth.admin.inviteUserByEmail` (staff) o `auth.admin.createUser` (relative). Activar RLS en esta tabla. No duplicar `email` ni `password_hash` — Supabase ya los gestiona en `auth.users`.
+> **Implementación Supabase:** crear la fila con un trigger `AFTER INSERT` en `auth.users` (función `SECURITY DEFINER` con `set search_path = ''` y nombres calificados). El signup público está desactivado: nunca usar `supabase.auth.signUp()` desde el cliente. Pasar `daycare_id`, `role`, `first_name` y `last_name` vía `raw_user_meta_data` **desde el servidor**, al crear la cuenta con `auth.admin.inviteUserByEmail` (staff) o `auth.admin.createUser` (relative). Activar RLS en esta tabla. No duplicar `email` ni `password_hash` — Supabase ya los gestiona en `auth.users`.
 > 
 > **El `role` lo fija siempre el servidor**, nunca se toma de lo que envía el cliente: invitación de staff → `staff`; aceptación de invitación → `relative`. Los admins se crean solo a mano en Supabase (SQL Editor o dashboard): el trigger `handle_new_auth_user()` rechaza `role = 'admin'` salvo que `session_user = 'postgres'` (se usa `session_user` porque dentro de una función `SECURITY DEFINER` `current_user` es siempre el dueño de la función). Desde Auth (signup, `inviteUserByEmail`, `createUser`) solo se acepta `staff` o `relative`.
 
@@ -160,10 +160,10 @@ Habitaciones donde descansan los adultos mayores (Roble, Cedro…).
 |`id`|`uuid` PK||
 |`daycare_id`|`uuid` FK → `daycares`||
 |`is_default`|`boolean`|NOT NULL default `false`|
-|`name`|`text`|Ej. "Roble".|
+|`name`|`text`|Ej. "Roble". `not null`, no vacío ni solo espacios (`rooms_name_not_blank`) y único por guardería (`rooms_daycare_id_name_key`, distingue mayúsculas).|
 |`created_at`|`timestamptz`||
 
-> **Implementación Supabase:** cada guardería debe tener exactamente una habitación por defecto (`is_default = true`), donde se asignan los adultos mayores recién inscritos. Se crea automáticamente con un trigger `AFTER INSERT` en `daycares` (función `SECURITY DEFINER` con `set search_path = public`), que inserta en `rooms` una habitación con `daycare_id = new.id`, `name = 'Temporal'` e `is_default = true`. Índice único parcial: `create unique index on rooms (daycare_id) where is_default = true`, para que solo haya una por guardería. Las habitaciones creadas desde la app siempre se guardan con `is_default = false`. La habitación por defecto se puede renombrar, pero no eliminar. Activar RLS en esta tabla.
+> **Implementación Supabase:** cada guardería debe tener exactamente una habitación por defecto (`is_default = true`), donde se asignan los adultos mayores recién inscritos. Se crea automáticamente con un trigger `AFTER INSERT` en `daycares` (función `SECURITY DEFINER` con `set search_path = ''` y nombres calificados), que inserta en `rooms` una habitación con `daycare_id = new.id`, `name = 'Temporal'` e `is_default = true`. Índice único parcial: `create unique index on rooms (daycare_id) where is_default = true`, para que solo haya una por guardería. Las habitaciones creadas desde la app siempre se guardan con `is_default = false`. La habitación por defecto se puede renombrar, pero no eliminar. Activar RLS en esta tabla.
 
 ### RLS
 
