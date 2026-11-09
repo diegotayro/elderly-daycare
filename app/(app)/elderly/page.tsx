@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { requireTeamUser } from "@/auth/require-user";
 import { ElderlyListView } from "@/elderly/components/ElderlyListView";
-import { mockElderly } from "@/elderly/mock-elderly";
+import { getElderlySource } from "@/elderly/get-elderly-source";
 
 export const metadata: Metadata = {
   title: "Adultos mayores · Casa Nogal",
@@ -10,5 +10,5 @@ export const metadata: Metadata = {
 export default async function ElderlyPage() {
   await requireTeamUser();
 
-  return <ElderlyListView source={mockElderly} />;
+  return <ElderlyListView source={await getElderlySource()} />;
 }

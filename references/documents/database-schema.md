@@ -163,7 +163,7 @@ Habitaciones donde descansan los adultos mayores (Roble, Cedro…).
 |`name`|`text`|Ej. "Roble". `not null`, no vacío ni solo espacios (`rooms_name_not_blank`) y único por guardería (`rooms_daycare_id_name_key`, distingue mayúsculas).|
 |`created_at`|`timestamptz`||
 
-> **Implementación Supabase:** cada guardería debe tener exactamente una habitación por defecto (`is_default = true`), donde se asignan los adultos mayores recién inscritos. Se crea automáticamente con un trigger `AFTER INSERT` en `daycares` (función `SECURITY DEFINER` con `set search_path = ''` y nombres calificados), que inserta en `rooms` una habitación con `daycare_id = new.id`, `name = 'Temporal'` e `is_default = true`. Índice único parcial: `create unique index on rooms (daycare_id) where is_default = true`, para que solo haya una por guardería. Las habitaciones creadas desde la app siempre se guardan con `is_default = false`. La habitación por defecto se puede renombrar, pero no eliminar. Activar RLS en esta tabla.
+> **Implementación Supabase:** cada guardería debe tener exactamente una habitación por defecto (`is_default = true`), donde se asignan los adultos mayores recién inscritos. Se crea automáticamente con un trigger `AFTER INSERT` en `daycares` (función `SECURITY DEFINER` con `set search_path = ''` y nombres calificados), que inserta en `rooms` una habitación con `daycare_id = new.id`, `name = 'Temporal'` e `is_default = true`. Índice único parcial: `create unique index on rooms (daycare_id) where is_default = true`, para que solo haya una por guardería. Las habitaciones creadas desde la app siempre se guardan con `is_default = false`. La habitación por defecto se puede renombrar, pero no eliminar. Activar RLS en esta tabla. No se puede eliminar una habitación que tenga adultos mayores, incluidos los archivados (`elderly.room_id` es `ON DELETE RESTRICT`).
 
 ### RLS
 
@@ -185,16 +185,16 @@ Ancianos inscritos en la guardería.
 |Campo|Tipo|Notas|
 |---|---|---|
 |`id`|`uuid` PK||
-|`room_id`|`uuid` FK → `rooms`|NOT NULL|
-|`first_name`|text|NOT NULL|
-|`last_name`|text|NOT NULL|
+|`room_id`|`uuid` FK → `rooms`|NOT NULL, `ON DELETE RESTRICT`.|
+|`first_name`|text|NOT NULL, no vacío ni solo espacios (`elderly_first_name_not_blank`).|
+|`last_name`|text|NOT NULL, no vacío ni solo espacios (`elderly_last_name_not_blank`).|
 |`full_name`|`text`|Columna generada y guardada: `first_name` y `last_name` unidos con un espacio.|
-|`birth_date`|`date`|Fecha de nacimiento.|
-|`enrolled_at`|`date`|Fecha de ingreso a la guardería.|
+|`birth_date`|`date`|Fecha de nacimiento. NOT NULL.|
+|`enrolled_at`|`date`|Fecha de ingreso a la guardería. NOT NULL y posterior a `birth_date` (`elderly_enrolled_after_birth`).|
 |`medical_notes`|`text`|Alergias y notas médicas (texto libre).|
-|`allergy_tags`|`text[]`|Etiquetas en inglés, ej. `{peanut}`. _Ver nota._|
-|`photo_consent`|`boolean` default `true`|Consentimiento de fotos. _Ver nota._|
-|`status`|`elderly_status`|`active` / `archived` (borrado lógico).|
+|`allergy_tags`|`text[]`|NOT NULL default `{}` (sin alergias). Etiquetas en inglés, ej. `{peanut}`. _Ver nota._|
+|`photo_consent`|`boolean`|NOT NULL default `true`. Consentimiento de fotos. _Ver nota._|
+|`status`|`elderly_status`|NOT NULL default `active`. `active` / `archived` (borrado lógico).|
 |`created_at` / `updated_at`|`timestamptz`||
 
 > **Nota `allergy_tags`:** Array de Postgres por simplicidad. Valores en inglés (`peanut`, `lactose`, `gluten`, etc.); la UI traduce a MANÍ, LACTOSA, etc. Si quieres normalizar, sácalo a una tabla `allergies` + `elderly_allergies`.
