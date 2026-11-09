@@ -128,3 +128,48 @@ Formato de cada entrada:
 - **Origen:** SPEC 11.
 - **Se resuelve en:** la spec de pantallas para familiares.
 - **Notas:** el destino pasa a ser el feed del familiar.
+
+---
+
+## Policies de `elderly` para staff y relative
+
+- **Qué:** `elderly` solo tiene policies de admin. Staff y relative no ven ninguna fila: staff ve la lista de `/elderly` vacía.
+- **Origen:** SPEC 13 (`13-elderly-table-and-list`), `supabase/migrations/*_create_elderly.sql`.
+- **Se resuelve en:** las specs de `staff_elderly` y `guardian_elderly`.
+- **Notas:** el esquema define select para staff (asignados) y relative (vinculados); la regla de visibilidad debe quedar en un solo lugar.
+
+---
+
+## Conteos reales de familiares en `/elderly`
+
+- **Qué:** `getElderlySource()` devuelve `relatives`, `guardianElderly` e `invitations` vacíos. Todas las tarjetas dicen "sin familiares vinculados" y, sin alergias, VINCULAR.
+- **Origen:** SPEC 13, `elderly/get-elderly-source.ts`.
+- **Se resuelve en:** las specs de `guardian_elderly` e `invitations`.
+- **Notas:** el mockup muestra conteos distintos y "flecha" cuando hay familiares; los builders ya lo soportan.
+
+---
+
+## Conectar `/elderly/[id]` a Supabase y restaurar el enlace de `ElderlyCard`
+
+- **Qué:** el perfil sigue con el mock y las tarjetas de `/elderly` ya no enlazan a él (`<article>` sin hover) para evitar un 404 mientras tanto.
+- **Origen:** SPEC 13, `elderly/components/ElderlyCard.tsx`.
+- **Se resuelve en:** la spec del perfil con datos reales.
+- **Notas:** volver a `<Link href={`/elderly/${id}`}>` con el hover original (`hover:-translate-y-0.5 hover:border-[#F2A78E]`). Ver también la entrada de `params` fuera de `<Suspense>`.
+
+---
+
+## Guardar desde "Agregar adulto mayor"
+
+- **Qué:** el modal valida pero no guarda. Falta la Server Action con validación en servidor y la conversión del texto de alergias a etiquetas (`allergy_tags`).
+- **Origen:** SPEC 13, `elderly/components/AddElderlyForm.tsx`.
+- **Se resuelve en:** una spec de alta de adultos mayores.
+- **Notas:** la policy `elderly_insert_admin` ya existe. Evaluar ocultar el botón al staff.
+
+---
+
+## Diseño de `error.tsx` para fallas de consulta en `(app)`
+
+- **Qué:** si una consulta falla, `getElderlySource()` lanza el error y se muestra el error por defecto de Next.js. Falta un `error.tsx` con diseño propio.
+- **Origen:** SPEC 13, `elderly/get-elderly-source.ts`.
+- **Se resuelve en:** la spec de integración con Supabase.
+- **Notas:** el mockup no cubre este estado; definir el diseño y la acción de reintento.
