@@ -134,42 +134,42 @@ references/documents/database-schema.md    # 3 cambios
 
 **Migración y datos**
 
-- [ ] Existe `supabase/migrations/<version>_create_rooms.sql` y su versión coincide con la de `list_migrations`.
-- [ ] `public.rooms` tiene las columnas, la FK a `daycares`, ambas restricciones de `name` y el índice único parcial; RLS está activado.
-- [ ] Tras correr `seed.sql` dos veces, hay exactamente 7 filas: una `Temporal` con `is_default = true` por guardería, y `Roble` y `Cedro` en Casa Nogal con los UUIDs de la tabla del seed.
+- [x] Existe `supabase/migrations/<version>_create_rooms.sql` y su versión coincide con la de `list_migrations`.
+- [x] `public.rooms` tiene las columnas, la FK a `daycares`, ambas restricciones de `name` y el índice único parcial; RLS está activado.
+- [x] Tras correr `seed.sql` dos veces, hay exactamente 7 filas: una `Temporal` con `is_default = true` por guardería, y `Roble` y `Cedro` en Casa Nogal con los UUIDs de la tabla del seed.
 
 **Restricciones y trigger**
 
-- [ ] Insertar `name = ''` o `'   '` falla por `rooms_name_not_blank`.
-- [ ] Repetir un `name` en la misma guardería falla por `rooms_daycare_id_name_key`; el mismo `name` en otra guardería funciona.
-- [ ] Insertar una segunda habitación con `is_default = true` en una guardería falla por `rooms_one_default_per_daycare_idx`.
-- [ ] Insertar una guardería crea exactamente una habitación `Temporal` con `is_default = true`.
-- [ ] Volver a correr el insert de `Temporal` del seed sobre esa guardería no agrega filas.
+- [x] Insertar `name = ''` o `'   '` falla por `rooms_name_not_blank`.
+- [x] Repetir un `name` en la misma guardería falla por `rooms_daycare_id_name_key`; el mismo `name` en otra guardería funciona.
+- [x] Insertar una segunda habitación con `is_default = true` en una guardería falla por `rooms_one_default_per_daycare_idx`.
+- [x] Insertar una guardería crea exactamente una habitación `Temporal` con `is_default = true`.
+- [x] Volver a correr el insert de `Temporal` del seed sobre esa guardería no agrega filas.
 
 **RLS como admin**
 
-- [ ] `select` devuelve solo habitaciones de su guardería.
-- [ ] Puede crear una habitación en su guardería con `is_default = false`.
-- [ ] Crear una habitación con `is_default = true` o en otra guardería falla.
-- [ ] Puede renombrar una habitación de su guardería, incluida la `Temporal`.
-- [ ] Cambiar `daycare_id` o `is_default` falla por falta de permiso.
-- [ ] Un `update` o `delete` sobre una habitación de otra guardería no afecta filas.
-- [ ] Puede borrar una habitación de su guardería que no sea la de por defecto.
-- [ ] Borrar la habitación por defecto no afecta filas.
+- [x] `select` devuelve solo habitaciones de su guardería.
+- [x] Puede crear una habitación en su guardería con `is_default = false`.
+- [x] Crear una habitación con `is_default = true` o en otra guardería falla.
+- [x] Puede renombrar una habitación de su guardería, incluida la `Temporal`.
+- [x] Cambiar `daycare_id` o `is_default` falla por falta de permiso.
+- [x] Un `update` o `delete` sobre una habitación de otra guardería no afecta filas.
+- [x] Puede borrar una habitación de su guardería que no sea la de por defecto.
+- [x] Borrar la habitación por defecto no afecta filas.
 
 **RLS con otros roles y estados**
 
-- [ ] Como staff o relative: `select` devuelve solo habitaciones de su guardería.
-- [ ] Como staff o relative: `insert` falla, y `update` y `delete` no afectan filas.
-- [ ] Usuario `pending` o `archived` con sesión: `select` devuelve vacío, `insert` falla, y `update` y `delete` no afectan filas.
-- [ ] Como `anon`: `select` no devuelve filas.
-- [ ] Como `authenticated`, llamar a `create_default_room()` falla por falta de permiso.
+- [x] Como staff o relative: `select` devuelve solo habitaciones de su guardería.
+- [x] Como staff o relative: `insert` falla, y `update` y `delete` no afectan filas.
+- [x] Usuario `pending` o `archived` con sesión: `select` devuelve vacío, `insert` falla, y `update` y `delete` no afectan filas.
+- [x] Como `anon`: `select` no devuelve filas.
+- [x] Como `authenticated`, llamar a `create_default_room()` falla por falta de permiso.
 
 **Cierre**
 
-- [ ] `get_advisors` no muestra avisos nuevos causados por `rooms` o `create_default_room()`, salvo los aceptados en BACKLOG.
-- [ ] `database-schema.md` tiene los 3 cambios de esta spec.
-- [ ] No hay cambios en código de la app (`shared/database/types.ts`, mocks, `package.json`).
+- [x] `get_advisors` no muestra avisos nuevos causados por `rooms` o `create_default_room()`, salvo los aceptados en BACKLOG.
+- [x] `database-schema.md` tiene los 3 cambios de esta spec.
+- [x] No hay cambios en código de la app (`shared/database/types.ts`, mocks, `package.json`).
 
 ---
 
