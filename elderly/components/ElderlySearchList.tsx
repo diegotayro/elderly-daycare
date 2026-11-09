@@ -43,7 +43,11 @@ export function ElderlySearchList({ items }: ElderlySearchListProps) {
         </span>
         <span className="h-px flex-1 bg-divider" />
       </div>
-      {visibleItems.length === 0 ? (
+      {items.length === 0 ? (
+        <p className="py-8 text-center text-[15px] text-muted-strong">
+          Todavía no hay adultos mayores.
+        </p>
+      ) : visibleItems.length === 0 ? (
         <p className="py-8 text-center text-[15px] text-muted-strong">
           No encontramos adultos mayores con “{query.trim()}”.
         </p>
