@@ -1,6 +1,6 @@
 # SPEC 12 — Tabla `rooms` con habitación por defecto y datos de prueba
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 09, SPEC 10
 > **Fecha:** 2026-11-09
 > **Objetivo:** Crear la tabla `rooms` con sus policies RLS y el trigger que da una habitación `Temporal` a cada guardería nueva, y sembrar sus datos de prueba.
