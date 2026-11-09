@@ -2,7 +2,11 @@ import { AuthBrandMark } from "./AuthBrandMark";
 import { LoginForm } from "./LoginForm";
 import { LoginHero } from "./LoginHero";
 
-export function LoginView() {
+type LoginViewProps = {
+  searchParams: Promise<{ error?: string | string[] }>;
+};
+
+export function LoginView({ searchParams }: LoginViewProps) {
   return (
     <div className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
       <LoginHero />
@@ -13,7 +17,7 @@ export function LoginView() {
             Casa Nogal
           </span>
         </div>
-        <LoginForm />
+        <LoginForm searchParams={searchParams} />
       </div>
     </div>
   );
