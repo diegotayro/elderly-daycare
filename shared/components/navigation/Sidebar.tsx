@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { SignOutForm } from "@/auth/components/SignOutForm";
 import { NewPostTrigger } from "@/feed/components/NewPostTrigger";
 import { Avatar } from "../Avatar";
 import { LogoutIcon } from "../icons/LogoutIcon";
@@ -50,13 +50,12 @@ export function Sidebar({
             <div className="text-sm font-extrabold text-ink">{userName}</div>
             <div className="text-xs text-muted">{userRoleLabel}</div>
           </div>
-          <Link
-            href="/login"
+          <SignOutForm
             title="Cerrar sesión"
-            className="flex size-8 flex-none items-center justify-center rounded-[10px] bg-cream text-muted-strong"
+            className="flex size-8 flex-none cursor-pointer items-center justify-center rounded-[10px] bg-cream text-muted-strong"
           >
             <LogoutIcon size={16} />
-          </Link>
+          </SignOutForm>
         </div>
       </div>
     </aside>
