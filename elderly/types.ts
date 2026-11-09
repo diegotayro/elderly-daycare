@@ -9,7 +9,7 @@ import type { AvatarTone } from "./avatar-tones";
 
 // Lo que devolvería la consulta: filas del esquema + datos de UI.
 export type ElderlySource = {
-  referenceDate: string; // "2025-06-17": "hoy" fijo para calcular edades
+  referenceDate: string; // "2025-06-17": "hoy" (Lima) para calcular edades; el mock usa una fecha fija
   rooms: Room[];
   elderly: Elderly[];
   relatives: User[]; // role = relative
