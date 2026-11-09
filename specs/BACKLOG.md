@@ -21,6 +21,7 @@ Formato de cada entrada:
   - Opciones: envolver el acceso en `<Suspense>` o `loading.tsx` con un esqueleto de carga, o declarar `export const instant = false` (ruta bloqueante).
   - Con streaming, un id inexistente pasaría de 404 a 200: definir cómo se manejan los ids que no existen.
   - Definir también la estrategia de caché (`use cache`) cuando los ids ya no se conozcan en el build.
+  - SPEC 11: se agregó `(app)/loading.tsx` y `requireTeamUser()` lee la sesión en la página. `npm run build` compila y sigue listando los ids mock como rutas prerrenderizadas. No se verificó con sesión de admin si el aviso desaparece en `npm run dev` ni si un id inexistente responde 200 en vez de 404; se mantiene el `not-found`. Aceptado con datos mock.
 
 ---
 
@@ -89,3 +90,41 @@ Formato de cada entrada:
   - (1) Las policies evalúan los helpers con el rol del usuario, así que necesitan `EXECUTE`; solo devuelven datos del propio usuario. Alternativa descartada: moverlos a un esquema privado.
   - (2) Consecuencia de policies separadas por regla (`own`, `admin`, `team`). Alternativa descartada: unirlas en una sola.
   - (3) Revisar en el dashboard (Auth > Password security) si el plan lo permite.
+
+---
+
+## Estados definitivos de error y carga del login
+
+- **Qué:** el error de `/login` es una línea de texto simple con `role="alert"`, leída desde `?error=`. Falta el diseño final del mensaje, la validación por campo y el estado "Ingresando…" del botón.
+- **Origen:** SPEC 11 (`11-email-password-auth-and-route-protection`), `auth/components/LoginErrorMessage.tsx`.
+- **Se resuelve en:** una spec de estados de `/login`.
+- **Notas:**
+  - Evaluar `useActionState` si se necesita estado pendiente y errores por campo; hoy el formulario es un Server Component.
+  - Revisar el mockup de `/login` antes de diseñar.
+
+---
+
+## Esqueleto de carga definitivo de `(app)`
+
+- **Qué:** `(app)/loading.tsx` devuelve `null` y el layout muestra `Sidebar` y `MobileTopBar` sin datos como fallback. Falta el esqueleto definitivo.
+- **Origen:** SPEC 11, `app/(app)/loading.tsx` y `app/(app)/layout.tsx`.
+- **Se resuelve en:** la spec de integración con Supabase.
+- **Notas:** definir el diseño con los datos reales del feed, adultos mayores y avisos.
+
+---
+
+## Pruebas pendientes con `staff`, `pending`, `archived` y `relative`
+
+- **Qué:** SPEC 11 solo se probó con la cuenta admin. Quedan sin comprobar: `staff` activa entra a `/`; `staff` `pending` con contraseña termina en `/login` con `inactive_account`; usuario `archived` (ban) recibe `user_banned` y `inactive_account`; archivado con sesión abierta pasa por `/auth/end-session`; `relative` activo entra a `/family-pending`; `relative` en una ruta de `(app)` redirige a `/family-pending`.
+- **Origen:** SPEC 11, sección "Casos sin verificar".
+- **Se resuelve en:** antes de crear cuentas reales de esos roles (specs de invitación de staff y familiares).
+- **Notas:** no agregar cuentas a `seed.sql`, para no dejar contraseñas de prueba en el repositorio.
+
+---
+
+## Eliminar `/family-pending` y reescribir la redirección del familiar
+
+- **Qué:** `/family-pending`, `FamilyPendingView` y `requireRelativeUser()` son temporales. Hay que eliminarlos y reescribir el destino del `relative` en `sign-in.ts` y en `requireTeamUser()`.
+- **Origen:** SPEC 11.
+- **Se resuelve en:** la spec de pantallas para familiares.
+- **Notas:** el destino pasa a ser el feed del familiar.
