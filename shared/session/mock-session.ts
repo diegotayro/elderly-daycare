@@ -6,7 +6,6 @@ const CREATED_AT = "2025-06-01T00:00:00Z";
 export const mockSession: {
   daycare: Daycare;
   currentUser: User;
-  email: string;
 } = {
   daycare: { id: DAYCARE_ID, name: "Casa Nogal", created_at: CREATED_AT },
   currentUser: {
@@ -23,5 +22,4 @@ export const mockSession: {
     created_at: CREATED_AT,
     updated_at: CREATED_AT,
   },
-  email: "caro@casanogal.pe",
 };

@@ -20,8 +20,7 @@ export function findInvitationPreview(
   if (!invitation) return null;
 
   const isPending = invitation.status === "pending";
-  const isExpired =
-    invitation.expires_at.slice(0, 10) <= source.referenceDate;
+  const isExpired = invitation.expires_at.slice(0, 10) <= source.referenceDate;
   if (!isPending || isExpired) return null;
 
   const elderly = source.elderly.find(({ id }) => id === invitation.elderly_id);

@@ -3,7 +3,7 @@ import { PlusIcon } from "../icons/PlusIcon";
 import { BrandLink } from "./BrandLink";
 
 type MobileTopBarProps = {
-  daycareName: string;
+  daycareName?: string;
 };
 
 export function MobileTopBar({ daycareName }: MobileTopBarProps) {

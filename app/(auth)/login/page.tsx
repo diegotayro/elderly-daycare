@@ -5,6 +5,10 @@ export const metadata: Metadata = {
   title: "Iniciar sesión · Casa Nogal",
 };
 
-export default function LoginPage() {
-  return <LoginView />;
+type LoginPageProps = {
+  searchParams: Promise<{ error?: string | string[] }>;
+};
+
+export default function LoginPage({ searchParams }: LoginPageProps) {
+  return <LoginView searchParams={searchParams} />;
 }

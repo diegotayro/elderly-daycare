@@ -1,5 +1,5 @@
 import type { NotificationPreferenceKey } from "../notification-preferences";
-import Link from "next/link";
+import { SignOutForm } from "@/auth/components/SignOutForm";
 import { AccountActionsCard } from "./AccountActionsCard";
 import { NotificationSettingsCard } from "./NotificationSettingsCard";
 import { ProfileCard } from "./ProfileCard";
@@ -30,12 +30,9 @@ export function AccountView({
       <ProfileCard fullName={fullName} email={email} roleLabel={roleLabel} />
       <NotificationSettingsCard initialValues={notificationValues} />
       <AccountActionsCard />
-      <Link
-        href="/login"
-        className="block w-full rounded-[14px] border-[1.5px] border-logout-line bg-logout-bg p-3.5 text-center text-[15px] font-extrabold text-coral-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral-strong"
-      >
+      <SignOutForm className="block w-full cursor-pointer rounded-[14px] border-[1.5px] border-logout-line bg-logout-bg p-3.5 text-center text-[15px] font-extrabold text-coral-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral-strong">
         Cerrar sesión
-      </Link>
+      </SignOutForm>
     </div>
   );
 }

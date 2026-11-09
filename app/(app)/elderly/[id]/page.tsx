@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { requireTeamUser } from "@/auth/require-user";
 import { buildElderlyProfile } from "@/elderly/build-elderly-profile";
 import { ElderlyProfileView } from "@/elderly/components/ElderlyProfileView";
 import { mockElderly } from "@/elderly/mock-elderly";
@@ -19,6 +20,7 @@ export async function generateMetadata(
 export default async function ElderlyProfilePage(
   props: PageProps<"/elderly/[id]">,
 ) {
+  await requireTeamUser();
   const { id } = await props.params;
   const profile = buildElderlyProfile(mockElderly, id);
   if (!profile) notFound();

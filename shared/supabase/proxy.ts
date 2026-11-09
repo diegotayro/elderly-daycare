@@ -26,7 +26,7 @@ export async function updateSession(request: NextRequest) {
   });
 
   // Sin código entre createServerClient y getClaims: podría cerrar sesiones al azar.
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
 
-  return response;
+  return { response, hasSession: Boolean(data?.claims) };
 }

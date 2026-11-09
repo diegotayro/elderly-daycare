@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SunIcon } from "../icons/SunIcon";
 
 type BrandLinkProps = {
-  daycareName: string;
+  daycareName?: string;
   className?: string;
 };
 
