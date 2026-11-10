@@ -146,6 +146,21 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 - **Se resuelve en:** antes de crear cuentas reales de esos roles (specs de invitación de staff y familiares).
 - **Notas:** no agregar cuentas a `seed.sql`, para no dejar contraseñas de prueba en el repositorio.
 
+### Reducir los usos de `service_role`
+
+- [ ] **Estado:** pendiente
+- **Qué:** la regla 4 de `database-schema.md` permite usar `service_role` en 6 tareas, pero solo es inevitable donde se crean, invitan o bloquean usuarios en Supabase Auth. Las demás se pueden resolver sin una llave que se salta RLS.
+- **Origen:** conversación al diseñar SPEC 14; `references/documents/database-schema.md`, regla 4.
+- **Se resuelve en:** cada spec que implemente una de esas tareas (invitación de staff, aceptar invitaciones, archivar usuarios, resumen diario).
+- **Notas:**
+  - **Necesario:** crear cuentas, aceptar una invitación de un familiar nuevo (crea la cuenta), reenviar la invitación al staff (`inviteUserByEmail`/`generateLink`) y bloquear el login (`auth.admin.updateUserById` con ban).
+  - **Aceptar una invitación de un familiar con cuenta:** función SQL `SECURITY DEFINER` (ej. `accept_invitation(code)`) llamada con su sesión; valida código, email y guardería, inserta en `guardian_elderly` y marca la invitación.
+  - **Activar al staff:** trigger en `auth.users` que pasa su fila de `users` a `active` cuando crea su contraseña.
+  - **Archivar o reactivar (`status`):** ya lo permite la policy de update del admin.
+  - **Ban:** opcional. Un usuario `archived` ya no ve nada (los helpers solo reconocen `active`) y la app lo saca con `/auth/end-session`; el ban es una capa extra.
+  - **Cron del resumen diario:** con `pg_cron` corre como `postgres` y no lo necesita; desde un cron de Next.js sí.
+  - Si se adopta una alternativa, actualizar la regla 4 de `database-schema.md` y la lista de CLAUDE.md.
+
 ### Eliminar `/family-pending` y reescribir la redirección del familiar
 
 - [ ] **Estado:** pendiente
