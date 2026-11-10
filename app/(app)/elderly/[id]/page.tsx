@@ -1,29 +1,22 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { requireTeamUser } from "@/auth/require-user";
-import { buildElderlyProfile } from "@/elderly/build-elderly-profile";
-import { ElderlyProfileView } from "@/elderly/components/ElderlyProfileView";
-import { mockElderly } from "@/elderly/mock-elderly";
-
-export function generateStaticParams() {
-  return mockElderly.elderly.map(({ id }) => ({ id }));
-}
+import { Suspense } from "react";
+import { ElderlyProfileContent } from "@/elderly/components/ElderlyProfileContent";
+import { ElderlyProfileSkeleton } from "@/elderly/components/ElderlyProfileSkeleton";
+import { getElderlyProfileSource } from "@/elderly/get-elderly-profile-source";
 
 export async function generateMetadata(
   props: PageProps<"/elderly/[id]">,
 ): Promise<Metadata> {
   const { id } = await props.params;
-  const profile = buildElderlyProfile(mockElderly, id);
-  return { title: `${profile?.fullName ?? "Adulto mayor"} · Casa Nogal` };
+  const source = await getElderlyProfileSource(id);
+  const fullName = source?.elderly[0].full_name ?? "Adulto mayor";
+  return { title: `${fullName} · Casa Nogal` };
 }
 
-export default async function ElderlyProfilePage(
-  props: PageProps<"/elderly/[id]">,
-) {
-  await requireTeamUser();
-  const { id } = await props.params;
-  const profile = buildElderlyProfile(mockElderly, id);
-  if (!profile) notFound();
-
-  return <ElderlyProfileView profile={profile} />;
+export default function ElderlyProfilePage(props: PageProps<"/elderly/[id]">) {
+  return (
+    <Suspense fallback={<ElderlyProfileSkeleton />}>
+      <ElderlyProfileContent params={props.params} />
+    </Suspense>
+  );
 }
