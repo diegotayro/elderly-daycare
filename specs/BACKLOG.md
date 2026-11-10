@@ -175,7 +175,7 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 
 ### Guardar desde "Agregar adulto mayor"
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 14
 - **Qué:** el modal valida pero no guarda. Falta la Server Action con validación en servidor y la conversión del texto de alergias a etiquetas (`allergy_tags`).
 - **Origen:** SPEC 13, `elderly/components/AddElderlyForm.tsx`.
 - **Se resuelve en:** una spec de alta de adultos mayores.
