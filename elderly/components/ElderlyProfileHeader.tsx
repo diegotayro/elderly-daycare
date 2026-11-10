@@ -20,9 +20,16 @@ export function ElderlyProfileHeader({ profile }: ElderlyProfileHeaderProps) {
         <h1 className="m-0 font-display text-[28px] leading-[normal] font-semibold text-ink">
           {profile.fullName}
         </h1>
-        <p className="mt-[3px] text-[15px] text-muted-strong">
-          {profile.subtitle}
-        </p>
+        <div className="mt-[3px] flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          <p className="m-0 text-[15px] text-muted-strong">
+            {profile.subtitle}
+          </p>
+          {profile.isArchived && (
+            <span className="flex-none rounded-full bg-line px-[9px] py-1 text-[10.5px] font-extrabold text-nav">
+              ARCHIVADO
+            </span>
+          )}
+        </div>
       </div>
       <Link
         href="/"
