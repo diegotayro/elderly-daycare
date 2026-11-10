@@ -2,13 +2,13 @@
 
 import { useState, type FormEvent } from "react";
 import { ChevronDownIcon } from "@/shared/components/icons/ChevronDownIcon";
-import type {
-  NewElderlyErrors,
-  NewElderlyField,
-  NewElderlyInput,
-  RoomOption,
-} from "../types";
-import { validateNewElderly } from "../validate-new-elderly";
+import { readNewElderlyInput } from "../read-new-elderly-input";
+import type { NewElderlyErrors, NewElderlyField, RoomOption } from "../types";
+import {
+  MEDICAL_NOTES_MAX_LENGTH,
+  NAME_MAX_LENGTH,
+  validateNewElderly,
+} from "../validate-new-elderly";
 import { FormField, fieldControlClassName, getFieldErrorId } from "./FormField";
 
 const FIELD_ORDER: NewElderlyField[] = [
@@ -20,19 +20,6 @@ const FIELD_ORDER: NewElderlyField[] = [
   "allergies",
   "medicalNotes",
 ];
-
-function readInput(formData: FormData): NewElderlyInput {
-  const read = (field: NewElderlyField) => String(formData.get(field) ?? "");
-  return {
-    firstName: read("firstName"),
-    lastName: read("lastName"),
-    birthDate: read("birthDate"),
-    enrolledAt: read("enrolledAt"),
-    roomId: read("roomId"),
-    allergies: read("allergies"),
-    medicalNotes: read("medicalNotes"),
-  };
-}
 
 type AddElderlyFormProps = {
   rooms: RoomOption[];
@@ -52,10 +39,13 @@ export function AddElderlyForm({
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
-    const nextErrors = validateNewElderly(readInput(new FormData(form)), {
-      today,
-      roomIds: rooms.map((room) => room.id),
-    });
+    const nextErrors = validateNewElderly(
+      readNewElderlyInput(new FormData(form)),
+      {
+        today,
+        roomIds: rooms.map((room) => room.id),
+      },
+    );
     setErrors(nextErrors);
 
     const firstInvalidField = FIELD_ORDER.find((field) => nextErrors[field]);
@@ -110,6 +100,7 @@ export function AddElderlyForm({
         <FormField id="firstName" label="NOMBRES" error={errors.firstName}>
           <input
             {...controlProps("firstName")}
+            maxLength={NAME_MAX_LENGTH}
             placeholder="Ej. Rosa"
             className={fieldControlClassName}
           />
@@ -117,6 +108,7 @@ export function AddElderlyForm({
         <FormField id="lastName" label="APELLIDOS" error={errors.lastName}>
           <input
             {...controlProps("lastName")}
+            maxLength={NAME_MAX_LENGTH}
             placeholder="Ej. Méndez Paredes"
             className={fieldControlClassName}
           />
@@ -181,6 +173,7 @@ export function AddElderlyForm({
         >
           <textarea
             {...controlProps("medicalNotes")}
+            maxLength={MEDICAL_NOTES_MAX_LENGTH}
             placeholder="Indicaciones, medicación, contactos…"
             className={`${fieldControlClassName} min-h-[90px] resize-y leading-normal`}
           />
