@@ -31,12 +31,12 @@ Formato de cada entrada:
 ### Avisos del linter aceptados tras la spec 10
 
 - [ ] **Estado:** pendiente
-- **Qué:** `get_advisors` marca (1) `authenticated_security_definer_function_executable` en `current_user_daycare_id()`, `current_user_role()` e `is_admin()`, (2) `multiple_permissive_policies` en `users` para select y update, y (3) `auth_leaked_password_protection`.
-- **Origen:** SPEC 10 (`10-users-table`).
+- **Qué:** `get_advisors` marca (1) `authenticated_security_definer_function_executable` en `current_user_daycare_id()`, `current_user_role()`, `is_admin()`, `current_user_elderly_ids()` y `current_user_relative_ids()`, (2) `multiple_permissive_policies` en `users` para select y update, y en `elderly`, `staff_elderly` y `guardian_elderly` para select, y (3) `auth_leaked_password_protection`.
+- **Origen:** SPEC 10 (`10-users-table`) y SPEC 15 (`current_user_elderly_ids()`, `current_user_relative_ids()` y las tablas nuevas).
 - **Se resuelve en:** no se resuelve; (1) y (2) son aceptados. (3) es un ajuste del dashboard de Auth.
 - **Notas:**
-  - (1) Las policies evalúan los helpers con el rol del usuario, así que necesitan `EXECUTE`; solo devuelven datos del propio usuario. Alternativa descartada: moverlos a un esquema privado.
-  - (2) Consecuencia de policies separadas por regla (`own`, `admin`, `team`). Alternativa descartada: unirlas en una sola.
+  - (1) Las policies evalúan los helpers con el rol del usuario, así que necesitan `EXECUTE`; solo devuelven datos del propio usuario. `current_user_elderly_ids()` y `current_user_relative_ids()` solo devuelven ids ligados a `auth.uid()` y vacío para otros roles. Alternativa descartada: moverlos a un esquema privado.
+  - (2) Consecuencia de policies separadas por regla (`own`, `admin`, `team`, `staff`/`relative`). Alternativa descartada: unirlas en una sola.
   - (3) Revisar en el dashboard (Auth > Password security) si el plan lo permite.
 
 ---
@@ -203,7 +203,7 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 
 ### Policies de `elderly` para staff y relative
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 15
 - **Qué:** `elderly` solo tiene policies de admin. Staff y relative no ven ninguna fila: staff ve la lista de `/elderly` vacía.
 - **Origen:** SPEC 13 (`13-elderly-table-and-list`), `supabase/migrations/*_create_elderly.sql`.
 - **Se resuelve en:** las specs de `staff_elderly` y `guardian_elderly`.
@@ -212,9 +212,9 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 ### Selects de `users` que dependen de tablas futuras
 
 - [ ] **Estado:** pendiente
-- **Qué:** faltan dos policies de select en `users`: (1) staff sobre los familiares de sus ancianos asignados y (2) staff/relative sobre los autores de comentarios en posts que pueden ver.
+- **Qué:** falta la policy de select en `users` para staff/relative sobre los autores de comentarios en posts que pueden ver. La de staff sobre los familiares de sus ancianos asignados se resolvió en SPEC 15 (`users_select_staff_relatives`).
 - **Origen:** SPEC 10 (`10-users-table`), `supabase/migrations/20261108061914_create_users.sql`.
-- **Se resuelve en:** las specs de `staff_elderly`/`guardian_elderly` (1) y de `comments` (2).
+- **Se resuelve en:** la spec de `comments`.
 - **Notas:**
   - Hoy staff y relative ven solo su fila y la de staff/admin de su guardería (`users_select_own` y `users_select_team`).
-  - Marcar como resuelta cuando ambas policies existan.
+  - Marcar como resuelta cuando la policy de autores de comentarios exista.
