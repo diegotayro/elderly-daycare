@@ -3,23 +3,52 @@
 import { useState } from "react";
 import { SearchIcon } from "@/shared/components/icons/SearchIcon";
 import { normalizeSearch } from "@/shared/text/normalize-search";
-import type { ElderlyListItem } from "../types";
+import type { ElderlyList, ElderlyListItem } from "../types";
 import { ElderlyCard } from "./ElderlyCard";
 
 type ElderlySearchListProps = {
-  items: ElderlyListItem[];
+  list: ElderlyList;
 };
 
 function formatCount(count: number): string {
   return count === 1 ? "1 adulto mayor" : `${count} adultos mayores`;
 }
 
-export function ElderlySearchList({ items }: ElderlySearchListProps) {
+type ElderlySectionProps = {
+  label: string;
+  items: ElderlyListItem[];
+};
+
+function ElderlySection({ label, items }: ElderlySectionProps) {
+  return (
+    <section aria-label={label}>
+      <div className="mb-3.5 flex items-center gap-3">
+        <span className="text-[12.5px] font-extrabold tracking-[0.8px] text-ink">
+          {label}
+        </span>
+        <span className="text-[13px] text-muted">
+          {formatCount(items.length)}
+        </span>
+        <span className="h-px flex-1 bg-divider" />
+      </div>
+      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+        {items.map((item) => (
+          <ElderlyCard key={item.id} item={item} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export function ElderlySearchList({ list }: ElderlySearchListProps) {
   const [query, setQuery] = useState("");
   const normalizedQuery = normalizeSearch(query.trim());
-  const visibleItems = items.filter((item) =>
-    normalizeSearch(item.fullName).includes(normalizedQuery),
-  );
+  const matchesQuery = (item: ElderlyListItem) =>
+    normalizeSearch(item.fullName).includes(normalizedQuery);
+  const visibleActive = list.active.filter(matchesQuery);
+  const visibleArchived = list.archived.filter(matchesQuery);
+  const hasAnyItem = list.active.length + list.archived.length > 0;
+  const hasAnyMatch = visibleActive.length + visibleArchived.length > 0;
 
   return (
     <>
@@ -34,28 +63,22 @@ export function ElderlySearchList({ items }: ElderlySearchListProps) {
           className="min-w-0 flex-1 bg-transparent px-0.5 py-px text-[15px] text-ink outline-none placeholder:text-[#B6A99B]"
         />
       </label>
-      <div className="mb-3.5 flex items-center gap-3">
-        <span className="text-[12.5px] font-extrabold tracking-[0.8px] text-ink">
-          ACTIVOS
-        </span>
-        <span className="text-[13px] text-muted">
-          {formatCount(visibleItems.length)}
-        </span>
-        <span className="h-px flex-1 bg-divider" />
-      </div>
-      {items.length === 0 ? (
+      {!hasAnyItem && (
         <p className="py-8 text-center text-[15px] text-muted-strong">
           Todavía no hay adultos mayores.
         </p>
-      ) : visibleItems.length === 0 ? (
+      )}
+      {hasAnyItem && !hasAnyMatch && (
         <p className="py-8 text-center text-[15px] text-muted-strong">
           No encontramos adultos mayores con “{query.trim()}”.
         </p>
-      ) : (
-        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-          {visibleItems.map((item) => (
-            <ElderlyCard key={item.id} item={item} />
-          ))}
+      )}
+      {hasAnyItem && (
+        <div className="flex flex-col gap-7">
+          <ElderlySection label="ACTIVOS" items={visibleActive} />
+          {visibleArchived.length > 0 && (
+            <ElderlySection label="ARCHIVADOS" items={visibleArchived} />
+          )}
         </div>
       )}
     </>

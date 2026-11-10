@@ -38,3 +38,9 @@ export function formatRelativesCount(count: number): string {
   if (count === 1) return "1 familiar vinculado";
   return `${count} familiares vinculados`;
 }
+
+export function formatAllergies(tags: string[]): string | null {
+  if (tags.length === 0) return null;
+  const label = tags.length === 1 ? "Alergia" : "Alergias";
+  return `${label}: ${tags.join(", ")}.`;
+}

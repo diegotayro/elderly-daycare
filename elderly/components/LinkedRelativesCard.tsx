@@ -21,6 +21,11 @@ export function LinkedRelativesCard({
         FAMILIARES VINCULADOS
       </h2>
       <div className="flex flex-col gap-3.5">
+        {relatives.length === 0 && (
+          <p className="m-0 text-[14.5px] text-muted-strong">
+            Todavía no hay familiares vinculados.
+          </p>
+        )}
         {relatives.map((relative) => (
           <LinkedRelativeRow key={relative.id} relative={relative} />
         ))}

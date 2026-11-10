@@ -24,9 +24,10 @@ export function ElderlyProfileView({ profile }: ElderlyProfileViewProps) {
       <div className="flex flex-col gap-[26px] lg:flex-row lg:items-start">
         <div className="flex min-w-0 flex-1 flex-col gap-[18px] lg:min-w-[300px]">
           <ElderlyProfileHeader profile={profile} />
-          {profile.medicalNotes && (
-            <MedicalNotesAlert notes={profile.medicalNotes} />
-          )}
+          <MedicalNotesAlert
+            allergyTags={profile.allergyTags}
+            notes={profile.medicalNotes}
+          />
           <ElderlyDetailsList profile={profile} />
         </div>
         <div className="flex w-full flex-col gap-3.5 lg:w-[300px] lg:flex-none">
