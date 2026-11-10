@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ChevronDownIcon } from "@/shared/components/icons/ChevronDownIcon";
 import { readNewElderlyInput } from "../read-new-elderly-input";
 import type { NewElderlyErrors, NewElderlyField, RoomOption } from "../types";
@@ -25,33 +25,59 @@ type AddElderlyFormProps = {
   rooms: RoomOption[];
   today: string;
   titleId: string;
+  isPending: boolean;
   onCancel: () => void;
+  // El padre guarda y, si el servidor rechaza campos, los devuelve por showFieldErrors
+  onSave: (
+    formData: FormData,
+    showFieldErrors: (errors: NewElderlyErrors) => void,
+  ) => void;
 };
 
 export function AddElderlyForm({
   rooms,
   today,
   titleId,
+  isPending,
   onCancel,
+  onSave,
 }: AddElderlyFormProps) {
   const [errors, setErrors] = useState<NewElderlyErrors>({});
+  const formRef = useRef<HTMLFormElement>(null);
+  // Los campos siguen deshabilitados mientras se guarda: el foco se mueve al terminar
+  const mustFocusInvalidField = useRef(false);
+
+  useEffect(() => {
+    if (isPending || !mustFocusInvalidField.current) return;
+    mustFocusInvalidField.current = false;
+    const firstInvalidField = FIELD_ORDER.find((field) => errors[field]);
+    if (firstInvalidField) {
+      formRef.current
+        ?.querySelector<HTMLElement>(`[name="${firstInvalidField}"]`)
+        ?.focus();
+    }
+  }, [isPending, errors]);
+
+  function showErrors(nextErrors: NewElderlyErrors) {
+    mustFocusInvalidField.current = true;
+    setErrors(nextErrors);
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
-    const nextErrors = validateNewElderly(
-      readNewElderlyInput(new FormData(form)),
-      {
-        today,
-        roomIds: rooms.map((room) => room.id),
-      },
-    );
-    setErrors(nextErrors);
+    if (isPending) return;
+    const formData = new FormData(event.currentTarget);
+    const clientErrors = validateNewElderly(readNewElderlyInput(formData), {
+      today,
+      roomIds: rooms.map((room) => room.id),
+    });
 
-    const firstInvalidField = FIELD_ORDER.find((field) => nextErrors[field]);
-    if (firstInvalidField) {
-      form.querySelector<HTMLElement>(`[name="${firstInvalidField}"]`)?.focus();
+    if (Object.keys(clientErrors).length > 0) {
+      showErrors(clientErrors);
+      return;
     }
+    setErrors({});
+    onSave(formData, showErrors);
   }
 
   function clearFieldError(event: FormEvent<HTMLFormElement>) {
@@ -70,6 +96,7 @@ export function AddElderlyForm({
 
   return (
     <form
+      ref={formRef}
       noValidate
       onSubmit={handleSubmit}
       onChange={clearFieldError}
@@ -79,7 +106,8 @@ export function AddElderlyForm({
         <button
           type="button"
           onClick={onCancel}
-          className="cursor-pointer text-[15px] font-bold text-muted-strong"
+          disabled={isPending}
+          className="cursor-pointer text-[15px] font-bold text-muted-strong disabled:cursor-default disabled:opacity-50"
         >
           Cancelar
         </button>
@@ -91,12 +119,16 @@ export function AddElderlyForm({
         </h2>
         <button
           type="submit"
-          className="cursor-pointer text-[15px] font-extrabold text-coral-strong"
+          disabled={isPending}
+          className="cursor-pointer text-[15px] font-extrabold text-coral-strong disabled:cursor-default disabled:opacity-50"
         >
-          Guardar
+          {isPending ? "Guardando…" : "Guardar"}
         </button>
       </header>
-      <div className="flex min-h-0 flex-col gap-[18px] overflow-y-auto px-[26px] py-6">
+      <fieldset
+        disabled={isPending}
+        className="m-0 flex min-h-0 min-w-0 flex-col gap-[18px] overflow-y-auto border-0 px-[26px] py-6"
+      >
         <FormField id="firstName" label="NOMBRES" error={errors.firstName}>
           <input
             {...controlProps("firstName")}
@@ -178,7 +210,7 @@ export function AddElderlyForm({
             className={`${fieldControlClassName} min-h-[90px] resize-y leading-normal`}
           />
         </FormField>
-      </div>
+      </fieldset>
     </form>
   );
 }
