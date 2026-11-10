@@ -64,6 +64,7 @@ Viven en `public`, son `SECURITY DEFINER STABLE` con `search_path` vacío y `EXE
 |`current_user_role()`|`user_role` del usuario logueado|
 |`is_admin()`|`boolean`|
 |`current_user_elderly_ids()`|`setof uuid`: ids de los ancianos asignados (`staff_elderly`, si es staff) o vinculados (`guardian_elderly`, si es relative) al usuario logueado. Vacío para admin. Es la única fuente de "qué ancianos son del usuario": la usan las policies de `elderly`, `staff_elderly`, `guardian_elderly` y `users`, y la reusarán las del feed.|
+|`current_user_relative_ids()`|`setof uuid`: ids de los familiares (`guardian_elderly`) de los ancianos del usuario logueado, solo si es staff de su guardería. Vacío para los demás roles. Existe para que la policy de `users` no lea `guardian_elderly` directamente: `guardian_elderly_insert_admin` lee `users`, y leerse mutuamente da recursión infinita entre policies.|
 
 Además existe `set_updated_at()`, trigger genérico `BEFORE UPDATE` para mantener `updated_at` en cualquier tabla.
 
