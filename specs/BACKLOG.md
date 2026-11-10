@@ -58,11 +58,11 @@ Formato de cada entrada:
 
 ## Carga y streaming de las rutas
 
-Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spec de carga y streaming"). Decisión tomada: streaming con `<Suspense>` y esqueleto de carga, no rutas bloqueantes (`instant = false`). El patrón que se defina ahí lo reusan el feed, `/notices` y `/elderly/[id]` al conectarse a Supabase.
+Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spec de carga y streaming"). Decisión tomada: streaming con `<Suspense>` y esqueleto de carga, no rutas bloqueantes (`instant = false`). El patrón que se defina ahí lo reusan el feed y `/notices` al conectarse a Supabase. `/elderly` y `/elderly/[id]` se resolvieron antes, en SPEC 16, por decisión del usuario; su patrón (página sin `async`, `*Content` dentro de `<Suspense>`, esqueleto con `SkeletonBlock`) es la referencia para el resto.
 
 ### Aviso de consulta fuera de `<Suspense>` en `/elderly`
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 16
 - **Qué:** en `npm run dev`, `/elderly` muestra `Route "/elderly": Next.js encountered uncached data during prerendering or a navigation` porque `getElderlySource()` consulta Supabase fuera de `<Suspense>`. La navegación no es instantánea. `npm run build` no falla.
 - **Origen:** SPEC 13, `app/(app)/elderly/page.tsx` y `elderly/get-elderly-source.ts`.
 - **Se resuelve en:** la spec de carga y streaming.
@@ -91,7 +91,7 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 
 ### Aviso de `params` fuera de `<Suspense>` en `/elderly/[id]`
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 16
 - **Qué:** en `npm run dev`, al abrir un perfil se ve `Route "/elderly/[id]": Next.js encountered URL data during prerendering or a navigation` porque `await props.params` se hace fuera de `<Suspense>`. Por eso la navegación no es instantánea.
 - **Origen:** SPEC 02 (`02-elderly-list-and-profile-mock`), `app/(app)/elderly/[id]/page.tsx`.
 - **Se resuelve en:** la spec de carga y streaming.
@@ -183,7 +183,7 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 
 ### Conectar `/elderly/[id]` a Supabase y restaurar el enlace de `ElderlyCard`
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 16
 - **Qué:** el perfil sigue con el mock y las tarjetas de `/elderly` ya no enlazan a él (`<article>` sin hover) para evitar un 404 mientras tanto.
 - **Origen:** SPEC 13, `elderly/components/ElderlyCard.tsx`.
 - **Se resuelve en:** la spec del perfil con datos reales.
@@ -192,10 +192,48 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 ### Conteos reales de familiares en `/elderly`
 
 - [ ] **Estado:** pendiente
-- **Qué:** `getElderlySource()` devuelve `relatives`, `guardianElderly` e `invitations` vacíos. Todas las tarjetas dicen "sin familiares vinculados" y, sin alergias, VINCULAR.
+- **Qué:** `getElderlySource()` y el perfil leen los vínculos reales de `guardian_elderly` (SPEC 16), pero `invitations` sigue vacío: faltan las invitaciones pendientes en los conteos del listado y las filas PENDIENTE del perfil.
 - **Origen:** SPEC 13, `elderly/get-elderly-source.ts`.
-- **Se resuelve en:** las specs de `guardian_elderly` e `invitations`.
+- **Se resuelve en:** la spec de `invitations`.
 - **Notas:** el mockup muestra conteos distintos y "flecha" cuando hay familiares; los builders ya lo soportan.
+
+
+### Título de pestaña de un archivado visible para el staff
+
+- [ ] **Estado:** pendiente
+- **Qué:** si un staff asignado abre por URL el perfil de un adulto mayor archivado, el cuerpo muestra el not-found, pero la pestaña dice "{full_name} · Casa Nogal" en vez de "Adulto mayor · Casa Nogal".
+- **Origen:** SPEC 16, `app/(app)/elderly/[id]/page.tsx` (`generateMetadata`).
+- **Se resuelve en:** la spec que trate el manejo de ids no mostrables (ver el 404 real en "Fuera de alcance" de SPEC 16).
+- **Notas:**
+  - `generateMetadata` no conoce el rol; la regla "staff no ve archivados" vive en `ElderlyProfileContent`.
+  - Riesgo bajo: solo afecta al staff asignado a ese adulto mayor (RLS ya le permite leerlo) y solo si escribe la URL a mano; el listado no le muestra archivados.
+  - Al arreglarlo, comprobar que consultar el rol en `generateMetadata` no reintroduce el aviso de datos fuera de `<Suspense>`.
+
+### Familiares `archived` en "Familiares vinculados"
+
+- [ ] **Estado:** pendiente
+- **Qué:** el perfil muestra a todo familiar vinculado como "activa"/"activo", aunque su `users.status` sea `archived`.
+- **Origen:** SPEC 16, `elderly/fetch-relative-links.ts` y `elderly/get-linked-relatives.ts`.
+- **Se resuelve en:** la spec que permita archivar familiares.
+- **Notas:** hoy no hay flujo para archivar familiares. Definir qué se muestra (fila atenuada, badge o se oculta); el mockup no lo cubre.
+
+### Botones "Editar" y "Resumen del día" del perfil
+
+- [ ] **Estado:** pendiente
+- **Qué:** ambos botones de `/elderly/[id]` enlazan a `/`.
+- **Origen:** SPEC 02, `elderly/components/ElderlyProfileHeader.tsx` y `ElderlyProfileView.tsx`.
+- **Se resuelve en:** las specs de edición de adultos mayores y de resumen del día.
+- **Notas:** el mockup define su ubicación y estilo; falta el destino y la lógica.
+
+### Reactivar un adulto mayor archivado
+
+- [ ] **Estado:** pendiente
+- **Qué:** el admin ya ve a los archivados en `/elderly` (sección "ARCHIVADOS") y en su perfil, pero no puede reactivarlos ni archivar desde la UI.
+- **Origen:** SPEC 16.
+- **Se resuelve en:** una spec de gestión de estado de adultos mayores.
+- **Notas:**
+  - Requiere Server Action y UI sin mockup (desde el perfil o desde la sección de archivados), solo admin.
+  - Revisar `elderly_update_admin` antes de definir la acción.
 
 ---
 

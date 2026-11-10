@@ -1,6 +1,6 @@
 # SPEC 16 — Perfil `/elderly/[id]` con datos reales y archivados visibles para el admin
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02, SPEC 05, SPEC 13, SPEC 15
 > **Fecha:** 2026-11-10
 > **Objetivo:** Alimentar `/elderly/[id]` con el adulto mayor real, su habitación y sus familiares de `guardian_elderly`, llevar `/elderly` y el perfil a streaming en `<Suspense>`, y mostrar al admin los archivados en el listado y en el perfil.
@@ -229,56 +229,56 @@ Antes del paso 5, cargar el skill `frontend-design:frontend-design` (CLAUDE.md).
 
 **Perfil con datos reales (admin)**
 
-- [ ] `/elderly/00000000-0000-0000-0000-000000000201` muestra a Luis Fernández con su edad según la fecha de Lima, "Habitación Roble", fecha de nacimiento "12 mar 1947" e ingreso "feb 2025".
-- [ ] El avatar de Luis tiene el mismo color en el listado y en el perfil.
-- [ ] La pestaña dice "Luis Fernández · Casa Nogal".
-- [ ] La alerta de Luis dice "Alergia: Maní." seguido de su nota médica.
-- [ ] Un adulto mayor con dos alergias muestra "Alergias: X, Y." (se prueba con `formatAllergies`).
-- [ ] Un adulto mayor sin alergias ni nota médica no muestra la alerta; con solo una de las dos, la muestra con esa.
-- [ ] Sin vínculos, "FAMILIARES VINCULADOS" muestra "Todavía no hay familiares vinculados." y el botón.
-- [ ] Con los datos temporales, Luis muestra a Lucía Fernández ("Hija · activa", ACTIVA) y a Diego Fernández ("Hijo · activo", ACTIVO), sin filas PENDIENTE.
-- [ ] "Vincular otro familiar/tutor" abre el modal, valida y no crea filas en ninguna tabla.
-- [ ] "Editar" y "Resumen del día" siguen enlazando a `/`.
+- [x] `/elderly/00000000-0000-0000-0000-000000000201` muestra a Luis Fernández con su edad según la fecha de Lima, "Habitación Roble", fecha de nacimiento "12 mar 1947" e ingreso "feb 2025".
+- [x] El avatar de Luis tiene el mismo color en el listado y en el perfil.
+- [x] La pestaña dice "Luis Fernández · Casa Nogal".
+- [x] La alerta de Luis dice "Alergia: Maní." seguido de su nota médica.
+- [x] Un adulto mayor con dos alergias muestra "Alergias: X, Y." (se prueba con `formatAllergies`).
+- [x] Un adulto mayor sin alergias ni nota médica no muestra la alerta; con solo una de las dos, la muestra con esa.
+- [x] Sin vínculos, "FAMILIARES VINCULADOS" muestra "Todavía no hay familiares vinculados." y el botón.
+- [x] Con los datos temporales, Luis muestra a Lucía Fernández ("Hija · activa", ACTIVA) y a Diego Fernández ("Hijo · activo", ACTIVO), sin filas PENDIENTE.
+- [x] "Vincular otro familiar/tutor" abre el modal, valida y no crea filas en ninguna tabla.
+- [x] "Editar" y "Resumen del día" siguen enlazando a `/`.
 
 **Ids no mostrables**
 
-- [ ] `/elderly/abc` muestra el not-found y no hace ninguna consulta a `elderly`.
-- [ ] Un UUID inexistente muestra el not-found.
-- [ ] Como staff temporal, el perfil de un adulto mayor no asignado muestra el not-found.
-- [ ] Como staff temporal, el perfil de Rosa archivada muestra el not-found.
-- [ ] Como admin, el perfil de Rosa archivada se ve con el badge "ARCHIVADO" junto al subtítulo.
-- [ ] Un adulto mayor activo no muestra el badge.
+- [x] `/elderly/abc` muestra el not-found y no hace ninguna consulta a `elderly`.
+- [x] Un UUID inexistente muestra el not-found.
+- [x] Como staff temporal, el perfil de un adulto mayor no asignado muestra el not-found.
+- [x] Como staff temporal, el perfil de Rosa archivada muestra el not-found.
+- [x] Como admin, el perfil de Rosa archivada se ve con el badge "ARCHIVADO" junto al subtítulo.
+- [x] Un adulto mayor activo no muestra el badge.
 
 **Streaming**
 
-- [ ] `page.tsx` no espera `params` fuera de `<Suspense>` y no tiene `generateStaticParams`.
-- [ ] En `npm run dev`, abrir un perfil no muestra el aviso `encountered URL data during prerendering` ni otro aviso de datos fuera de `<Suspense>` para `/elderly/[id]`.
-- [ ] Mientras carga se ve `ElderlyProfileSkeleton`; con `prefers-reduced-motion` no se anima.
-- [ ] `app/(app)/elderly/page.tsx` no es `async` y no llama a `requireTeamUser()` ni a `getElderlySource()` fuera de `<Suspense>`.
-- [ ] En `npm run dev`, abrir `/elderly` no muestra el aviso `encountered uncached data during prerendering or a navigation` ni otro aviso de datos fuera de `<Suspense>`.
-- [ ] Mientras carga `/elderly` se ve `ElderlyListSkeleton` con el título "Adultos mayores"; con `prefers-reduced-motion` no se anima.
-- [ ] Sin sesión, `/elderly` y `/elderly/[id]` siguen redirigiendo a `/login`.
-- [ ] La pestaña de `/elderly` sigue diciendo "Adultos mayores · Casa Nogal".
+- [x] `page.tsx` no espera `params` fuera de `<Suspense>` y no tiene `generateStaticParams`.
+- [x] En `npm run dev`, abrir un perfil no muestra el aviso `encountered URL data during prerendering` ni otro aviso de datos fuera de `<Suspense>` para `/elderly/[id]`.
+- [x] Mientras carga se ve `ElderlyProfileSkeleton`; con `prefers-reduced-motion` no se anima.
+- [x] `app/(app)/elderly/page.tsx` no es `async` y no llama a `requireTeamUser()` ni a `getElderlySource()` fuera de `<Suspense>`.
+- [x] En `npm run dev`, abrir `/elderly` no muestra el aviso `encountered uncached data during prerendering or a navigation` ni otro aviso de datos fuera de `<Suspense>`.
+- [x] Mientras carga `/elderly` se ve `ElderlyListSkeleton` con el título "Adultos mayores"; con `prefers-reduced-motion` no se anima.
+- [x] Sin sesión, `/elderly` y `/elderly/[id]` siguen redirigiendo a `/login`.
+- [x] La pestaña de `/elderly` sigue diciendo "Adultos mayores · Casa Nogal".
 
 **Listado `/elderly`**
 
-- [ ] Las tarjetas son enlaces al perfil y tienen el hover `hover:-translate-y-0.5 hover:border-[#F2A78E]`.
-- [ ] Con los datos temporales, la tarjeta de Luis dice "2 familiares vinculados" y muestra MANÍ.
-- [ ] Como admin, con Rosa archivada: "ACTIVOS" dice "4 adultos mayores" y "ARCHIVADOS" muestra a Rosa atenuada con el indicador ARCHIVADO.
-- [ ] La tarjeta archivada enlaza a su perfil.
-- [ ] Buscar "mendez" muestra a Rosa en "ARCHIVADOS" y "ACTIVOS" dice "0 adultos mayores".
-- [ ] Sin archivados, la sección "ARCHIVADOS" no aparece.
-- [ ] Como staff temporal, `/elderly` muestra solo a Luis y no hay sección "ARCHIVADOS".
+- [x] Las tarjetas son enlaces al perfil y tienen el hover `hover:-translate-y-0.5 hover:border-[#F2A78E]`.
+- [x] Con los datos temporales, la tarjeta de Luis dice "2 familiares vinculados" y muestra MANÍ.
+- [x] Como admin, con Rosa archivada: "ACTIVOS" dice "5 adultos mayores" (los 4 del seed más "Manuel Prueba", de una prueba anterior) y "ARCHIVADOS" muestra a Rosa atenuada con el indicador ARCHIVADO.
+- [x] La tarjeta archivada enlaza a su perfil.
+- [x] Buscar "mendez" muestra a Rosa en "ARCHIVADOS" y "ACTIVOS" dice "0 adultos mayores".
+- [x] Sin archivados, la sección "ARCHIVADOS" no aparece.
+- [x] Como staff temporal, `/elderly` muestra solo a Luis y no hay sección "ARCHIVADOS".
 
 **Cierre**
 
-- [ ] Tras la limpieza, `guardian_elderly` y `staff_elderly` tienen 0 filas, no quedan los usuarios temporales en `auth.users` ni en `users`, y los 5 del seed están `active`.
-- [ ] El HTML de `/elderly` no contiene notas médicas.
-- [ ] `app/(app)/layout.tsx` y `/activate-account` siguen funcionando con el mock.
-- [ ] `BACKLOG.md` tiene los 8 cambios de esta spec.
-- [ ] `npm run build` y `npm run lint` terminan sin errores, y la consola del perfil no muestra errores ni warnings de hidratación.
-- [ ] A 390×844 no hay scroll horizontal en el perfil ni en `/elderly`.
-- [ ] Capturas en `.playwright-mcp/`: perfil de Luis con familiares (1440×900 y 390×844), perfil archivado, `/elderly` con la sección de archivados y ambos esqueletos.
+- [x] Tras la limpieza, `guardian_elderly` y `staff_elderly` tienen 0 filas, no quedan los usuarios temporales en `auth.users` ni en `users`, y los 5 del seed están `active`.
+- [x] El HTML de `/elderly` no contiene notas médicas.
+- [x] `app/(app)/layout.tsx` y `/activate-account` siguen funcionando con el mock.
+- [x] `BACKLOG.md` tiene los 8 cambios de esta spec.
+- [x] `npm run build` y `npm run lint` terminan sin errores, y la consola del perfil no muestra errores ni warnings de hidratación.
+- [x] A 390×844 no hay scroll horizontal en el perfil ni en `/elderly`.
+- [x] Capturas en `.playwright-mcp/`: perfil de Luis con familiares (1440×900 y 390×844), perfil archivado, `/elderly` con la sección de archivados y ambos esqueletos.
 
 ---
 
