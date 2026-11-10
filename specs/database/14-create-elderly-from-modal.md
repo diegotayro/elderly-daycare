@@ -226,63 +226,63 @@ shared/components/toast/
 
 **Migración y datos**
 
-- [ ] Existe `supabase/migrations/<version>_add_elderly_length_limits.sql` y su versión coincide con la de `list_migrations`.
-- [ ] `elderly` tiene `elderly_first_name_max_length`, `elderly_last_name_max_length`, `elderly_medical_notes_max_length` y `elderly_allergy_tags_valid`.
-- [ ] Luis tiene `{Maní}` y Alberto `{Lactosa}` en el remoto y en `seed.sql`; ninguna fila tiene `peanut` ni `lactose`.
-- [ ] `elderly/allergy-labels.ts` no existe y nada lo importa.
+- [x] Existe `supabase/migrations/<version>_add_elderly_length_limits.sql` y su versión coincide con la de `list_migrations`.
+- [x] `elderly` tiene `elderly_first_name_max_length`, `elderly_last_name_max_length`, `elderly_medical_notes_max_length` y `elderly_allergy_tags_valid`.
+- [x] Luis tiene `{Maní}` y Alberto `{Lactosa}` en el remoto y en `seed.sql`; ninguna fila tiene `peanut` ni `lactose`.
+- [x] `elderly/allergy-labels.ts` no existe y nada lo importa.
 
 **Restricciones**
 
-- [ ] Insertar `first_name` o `last_name` de 81 caracteres falla; de 80 funciona.
-- [ ] Insertar `medical_notes` de 2001 caracteres falla; de 2000 funciona; `null` funciona.
-- [ ] Insertar 16 alergias falla; 15 funciona; `{}` funciona.
-- [ ] Insertar una alergia de 41 caracteres, vacía, solo con espacios o `null` falla.
-- [ ] `get_advisors` no muestra avisos nuevos causados por esta spec, salvo los aceptados en BACKLOG.
+- [x] Insertar `first_name` o `last_name` de 81 caracteres falla; de 80 funciona.
+- [x] Insertar `medical_notes` de 2001 caracteres falla; de 2000 funciona; `null` funciona.
+- [x] Insertar 16 alergias falla; 15 funciona; `{}` funciona.
+- [x] Insertar una alergia de 41 caracteres, vacía, solo con espacios o `null` falla.
+- [x] `get_advisors` no muestra avisos nuevos causados por esta spec, salvo los aceptados en BACKLOG.
 
 **Funciones puras**
 
-- [ ] `parseAllergyTags("maní,  Lactosa, , Maní")` devuelve `["maní", "Lactosa"]`.
-- [ ] `parseAllergyTags("")` y `parseAllergyTags(" , ")` devuelven `[]`.
-- [ ] `parseAllergyTags("Polen de olivo")` devuelve `["Polen de olivo"]`.
-- [ ] `validateNewElderly` devuelve los mensajes de límites de la tabla y cuenta "ñ" o "á" como un carácter.
-- [ ] `readNewElderlyInput`, `parseAllergyTags` y `validateNewElderly` son funciones puras sin imports de React.
+- [x] `parseAllergyTags("maní,  Lactosa, , Maní")` devuelve `["maní", "Lactosa"]`.
+- [x] `parseAllergyTags("")` y `parseAllergyTags(" , ")` devuelven `[]`.
+- [x] `parseAllergyTags("Polen de olivo")` devuelve `["Polen de olivo"]`.
+- [x] `validateNewElderly` devuelve los mensajes de límites de la tabla y cuenta "ñ" o "á" como un carácter.
+- [x] `readNewElderlyInput`, `parseAllergyTags` y `validateNewElderly` son funciones puras sin imports de React.
 
 **Guardar como admin**
 
-- [ ] Con datos válidos, "Guardar" muestra "Guardando…", deshabilitado, y Cancelar y Esc no cierran mientras tanto.
-- [ ] Al terminar, el modal se cierra, el nuevo adulto mayor aparece en `/elderly` en su orden alfabético y el conteo sube en 1, sin recargar la página.
-- [ ] Aparece el toast "Adulto mayor agregado" con "{nombre completo} ya está en la lista." y `role="status"`.
-- [ ] Al reabrir, el modal está vacío, sin errores y con la primera habitación seleccionada.
-- [ ] La fila guardada tiene los nombres recortados, la habitación elegida, `photo_consent = true` y `status = active`.
-- [ ] Alergias `"maní,  Lactosa, , Maní"` se guardan como `{maní,Lactosa}` y la tarjeta muestra MANÍ.
-- [ ] Notas médicas vacías o solo con espacios se guardan como `null`.
+- [x] Con datos válidos, "Guardar" muestra "Guardando…", deshabilitado, y Cancelar y Esc no cierran mientras tanto.
+- [x] Al terminar, el modal se cierra, el nuevo adulto mayor aparece en `/elderly` en su orden alfabético y el conteo sube en 1, sin recargar la página.
+- [x] Aparece el toast "Adulto mayor agregado" con "{nombre completo} ya está en la lista." y `role="status"`.
+- [x] Al reabrir, el modal está vacío, sin errores y con la primera habitación seleccionada.
+- [x] La fila guardada tiene los nombres recortados, la habitación elegida, `photo_consent = true` y `status = active`.
+- [x] Alergias `"maní,  Lactosa, , Maní"` se guardan como `{maní,Lactosa}` y la tarjeta muestra MANÍ.
+- [x] Notas médicas vacías o solo con espacios se guardan como `null`.
 
 **Errores**
 
 - [ ] Si la Server Action recibe datos inválidos (por ejemplo, nacimiento futuro saltando la validación del cliente), devuelve `invalid` y el modal muestra el error bajo el campo, sin toast y sin crear la fila.
 - [ ] Si el insert falla (por ejemplo, una habitación que dejó de existir), aparece el toast "No pudimos guardar" con `role="alert"`, el modal sigue abierto con lo escrito y no se crea ninguna fila.
-- [ ] El toast de error se ve por encima del modal y su ✕ funciona con el modal abierto.
-- [ ] La respuesta al cliente no incluye el mensaje de error de Postgres.
+- [x] El toast de error se ve por encima del modal y su ✕ funciona con el modal abierto.
+- [x] La respuesta al cliente no incluye el mensaje de error de Postgres.
 
 **Permisos**
 
-- [ ] Como staff, el botón "Agregar adulto mayor" no aparece en `/elderly`.
+- [x] Como staff, el botón "Agregar adulto mayor" no aparece en `/elderly`.
 - [ ] Llamar a `createElderly` como staff devuelve `error` y no crea filas.
-- [ ] La Server Action usa el cliente de `shared/supabase/server.ts`; no hay cliente `service_role`.
+- [x] La Server Action usa el cliente de `shared/supabase/server.ts`; no hay cliente `service_role`.
 
 **Toast**
 
-- [ ] Coincide con el diseño A: fondo `#FFFDF9`, borde `#ECE0D0`, círculo verde `#5FB97E` en éxito y `#C5413A` en error.
+- [x] Coincide con el diseño A: fondo `#FFFDF9`, borde `#ECE0D0`, círculo verde `#5FB97E` en éxito y `#C5413A` en error.
 - [ ] El de éxito se cierra solo a los 5 s y el de error a los 8 s; con el mouse encima o con foco dentro no se cierra.
-- [ ] ✕ lo cierra y tiene `aria-label="Cerrar aviso"`.
-- [ ] Con `prefers-reduced-motion: reduce` aparece sin animación.
-- [ ] A 390×844 ocupa el ancho con 16px a los lados, sin scroll horizontal; desde `sm` queda abajo a la derecha con máximo 360px.
+- [x] ✕ lo cierra y tiene `aria-label="Cerrar aviso"`.
+- [x] Con `prefers-reduced-motion: reduce` aparece sin animación.
+- [x] A 390×844 ocupa el ancho con 16px a los lados, sin scroll horizontal; desde `sm` queda abajo a la derecha con máximo 360px.
 
 **Cierre**
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores, y la consola de `/elderly` no muestra errores nuevos ni warnings de hidratación.
-- [ ] `BACKLOG.md` marca "Guardar desde «Agregar adulto mayor»" como resuelto en SPEC 14.
-- [ ] Las capturas de verificación están en `.playwright-mcp/`.
+- [x] `npm run build` y `npm run lint` terminan sin errores, y la consola de `/elderly` no muestra errores nuevos ni warnings de hidratación.
+- [x] `BACKLOG.md` marca "Guardar desde «Agregar adulto mayor»" como resuelto en SPEC 14.
+- [x] Las capturas de verificación están en `.playwright-mcp/`.
 
 ---
 
