@@ -1,4 +1,3 @@
-import { getAllergyLabel } from "./allergy-labels";
 import { formatAge, formatRelativesCount } from "./elderly-formatters";
 import { getLinkedRelatives } from "./get-linked-relatives";
 import type { Elderly } from "@/shared/database/types";
@@ -10,7 +9,7 @@ function resolveIndicator(
 ): ElderlyIndicator {
   const [firstAllergy] = elderly.allergy_tags;
   if (firstAllergy)
-    return { kind: "allergy", label: getAllergyLabel(firstAllergy) };
+    return { kind: "allergy", label: firstAllergy.toLocaleUpperCase("es") };
   if (relativesCount === 0) return { kind: "link" };
   return { kind: "none" };
 }
