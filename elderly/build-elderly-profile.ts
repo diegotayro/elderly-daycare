@@ -21,9 +21,11 @@ export function buildElderlyProfile(
     initial: elderly.first_name[0],
     tone: source.avatarTones[elderly.id] ?? "blue",
     subtitle: `${formatAge(elderly.birth_date, source.referenceDate)} · Habitación ${room.name}`,
+    allergyTags: elderly.allergy_tags,
     medicalNotes: elderly.medical_notes,
     birthDateLabel: formatBirthDate(elderly.birth_date),
     roomName: room.name,
+    isArchived: elderly.status === "archived",
     enrolledAtLabel: formatEnrolledAt(elderly.enrolled_at),
     relatives: getLinkedRelatives(source, elderly.id),
     pendingInvitationEmails: source.invitations

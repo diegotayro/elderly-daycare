@@ -17,11 +17,8 @@ export async function ElderlyProfileContent({
   if (!source) notFound();
 
   // El staff no ve archivados aunque RLS se lo permita
-  const isArchived = source.elderly[0].status === "archived";
-  if (isArchived && user.role !== "admin") notFound();
-
   const profile = buildElderlyProfile(source, id);
-  if (!profile) notFound();
+  if (!profile || (profile.isArchived && user.role !== "admin")) notFound();
 
   return <ElderlyProfileView profile={profile} />;
 }

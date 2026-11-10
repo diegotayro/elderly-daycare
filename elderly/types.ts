@@ -21,7 +21,8 @@ export type ElderlySource = {
 export type ElderlyIndicator =
   | { kind: "allergy"; label: string } // "MANÍ"
   | { kind: "link" } // "VINCULAR"
-  | { kind: "none" }; // flecha
+  | { kind: "none" } // flecha
+  | { kind: "archived" }; // "ARCHIVADO", solo en la sección de archivados
 
 export type ElderlyListItem = {
   id: string;
@@ -30,6 +31,11 @@ export type ElderlyListItem = {
   tone: AvatarTone;
   summary: string; // "78 años · 2 familiares vinculados"
   indicator: ElderlyIndicator;
+};
+
+export type ElderlyList = {
+  active: ElderlyListItem[];
+  archived: ElderlyListItem[]; // vacío si no es admin
 };
 
 export type LinkedRelative = {
@@ -49,9 +55,11 @@ export type ElderlyProfile = {
   initial: string;
   tone: AvatarTone;
   subtitle: string; // "78 años · Habitación Roble"
+  allergyTags: string[]; // tal como están en la DB: ["Maní", "Lactosa"]
   medicalNotes: string | null; // null → no se muestra el bloque
   birthDateLabel: string; // "12 mar 1947"
   roomName: string; // "Roble"
+  isArchived: boolean;
   enrolledAtLabel: string; // "feb 2025"
   relatives: LinkedRelative[];
   pendingInvitationEmails: string[]; // invitaciones pending de este adulto mayor
