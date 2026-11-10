@@ -22,6 +22,10 @@ export function ElderlyCardIndicator({ indicator }: ElderlyCardIndicatorProps) {
           VINCULAR
         </span>
       );
+    case "archived":
+      return (
+        <span className={`${badgeClassName} bg-line text-nav`}>ARCHIVADO</span>
+      );
     case "none":
       return (
         <ChevronRightIcon size={18} className="flex-none text-[#CBB89F]" />

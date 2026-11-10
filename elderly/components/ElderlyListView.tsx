@@ -15,7 +15,7 @@ export function ElderlyListView({
   canAddElderly,
   includeArchived,
 }: ElderlyListViewProps) {
-  const { active } = buildElderlyList(source, { includeArchived });
+  const list = buildElderlyList(source, { includeArchived });
 
   return (
     <div className="mx-auto w-full max-w-[880px] px-4 pt-5 pb-8 lg:px-10 lg:pt-[34px] lg:pb-20">
@@ -35,7 +35,7 @@ export function ElderlyListView({
           />
         )}
       </header>
-      <ElderlySearchList items={active} />
+      <ElderlySearchList list={list} />
     </div>
   );
 }
