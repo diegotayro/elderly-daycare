@@ -73,6 +73,11 @@ export type NewElderlyInput = {
 export type NewElderlyField = keyof NewElderlyInput;
 export type NewElderlyErrors = Partial<Record<NewElderlyField, string>>;
 
+export type CreateElderlyResult =
+  | { status: "success"; fullName: string }
+  | { status: "invalid"; errors: NewElderlyErrors }
+  | { status: "error" };
+
 // Valores del formulario de invitación tal como llegan del FormData
 export type RelativeInvitationInput = {
   firstName: string;

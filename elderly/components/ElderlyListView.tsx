@@ -6,9 +6,13 @@ import { ElderlySearchList } from "./ElderlySearchList";
 
 type ElderlyListViewProps = {
   source: ElderlySource;
+  canAddElderly: boolean;
 };
 
-export function ElderlyListView({ source }: ElderlyListViewProps) {
+export function ElderlyListView({
+  source,
+  canAddElderly,
+}: ElderlyListViewProps) {
   const items = buildElderlyList(source);
 
   return (
@@ -22,10 +26,12 @@ export function ElderlyListView({ source }: ElderlyListViewProps) {
             Adultos mayores
           </h1>
         </div>
-        <AddElderlyDialog
-          rooms={buildRoomOptions(source)}
-          today={source.referenceDate}
-        />
+        {canAddElderly && (
+          <AddElderlyDialog
+            rooms={buildRoomOptions(source)}
+            today={source.referenceDate}
+          />
+        )}
       </header>
       <ElderlySearchList items={items} />
     </div>

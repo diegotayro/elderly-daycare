@@ -78,6 +78,7 @@ Ninguna feature se implementa sin una spec aprobada.
 4. Verificar los criterios de aceptación con el agente `spec-verifier` (ver abajo), marcar la spec como `Implementado` y hacer commit/merge (solo el usuario decide los commits).
 
 Reglas:
+- Al diseñar una spec con `/spec`, revisar `specs/BACKLOG.md` (solo entradas `[ ]`). Las entradas que la spec pueda resolver por su tema o por los archivos que toca se incluyen en su alcance, y la spec indica cuáles resuelve. Al implementarla, se marcan como resueltas según el formato de `BACKLOG.md`.
 - La spec es el contrato: implementar lo que dice. Si algo debe cambiar, se cambia primero en la spec.
 - Ante una ambigüedad no resuelta por la spec, detenerse y preguntar con opciones concretas.
 - Lo que esté fuera del alcance de la spec se anota para una spec futura; no se implementa en la rama actual.

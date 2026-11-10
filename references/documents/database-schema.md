@@ -2,7 +2,7 @@
 
 Diccionario de tablas para PostgreSQL. Tipos en notación Postgres. Convención: PK `id` tipo `uuid` (default `gen_random_uuid()`), y `created_at` / `updated_at` tipo `timestamptz`.
 
-**Convención de idioma:** todo lo que se persiste en la base de datos va en **inglés** (enums, tags, códigos). Las etiquetas visibles al usuario se traducen en la capa de UI (español).
+**Convención de idioma:** todo lo que se persiste como **valor controlado** (enums, códigos) va en **inglés**; las etiquetas visibles al usuario se traducen en la capa de UI (español). El texto que escribe el usuario (nombres, notas, alergias) se guarda tal como lo escribe.
 
 ---
 
@@ -65,6 +65,8 @@ Viven en `public`, son `SECURITY DEFINER STABLE` con `search_path` vacío y `EXE
 |`is_admin()`|`boolean`|
 
 Además existe `set_updated_at()`, trigger genérico `BEFORE UPDATE` para mantener `updated_at` en cualquier tabla.
+
+También existe `are_valid_allergy_tags(text[])`, `IMMUTABLE` y no `SECURITY DEFINER`, que usa el `check` `elderly_allergy_tags_valid`.
 
 ### Regla del feed: ¿quién puede ver un post?
 
@@ -186,18 +188,18 @@ Ancianos inscritos en la guardería.
 |---|---|---|
 |`id`|`uuid` PK||
 |`room_id`|`uuid` FK → `rooms`|NOT NULL, `ON DELETE RESTRICT`.|
-|`first_name`|text|NOT NULL, no vacío ni solo espacios (`elderly_first_name_not_blank`).|
-|`last_name`|text|NOT NULL, no vacío ni solo espacios (`elderly_last_name_not_blank`).|
+|`first_name`|text|NOT NULL, no vacío ni solo espacios (`elderly_first_name_not_blank`), máximo 80 caracteres (`elderly_first_name_max_length`).|
+|`last_name`|text|NOT NULL, no vacío ni solo espacios (`elderly_last_name_not_blank`), máximo 80 caracteres (`elderly_last_name_max_length`).|
 |`full_name`|`text`|Columna generada y guardada: `first_name` y `last_name` unidos con un espacio.|
 |`birth_date`|`date`|Fecha de nacimiento. NOT NULL.|
 |`enrolled_at`|`date`|Fecha de ingreso a la guardería. NOT NULL y posterior a `birth_date` (`elderly_enrolled_after_birth`).|
-|`medical_notes`|`text`|Alergias y notas médicas (texto libre).|
-|`allergy_tags`|`text[]`|NOT NULL default `{}` (sin alergias). Etiquetas en inglés, ej. `{peanut}`. _Ver nota._|
+|`medical_notes`|`text`|Notas médicas (texto libre). Nullable; vacía se guarda como `null`. Máximo 2000 caracteres (`elderly_medical_notes_max_length`).|
+|`allergy_tags`|`text[]`|NOT NULL default `{}` (sin alergias). Texto libre en español, tal como lo escribe el admin, ej. `{Maní, Polen de olivo}`. Máximo 15; cada una de 1 a 40 caracteres, sin vacías ni `null` (`elderly_allergy_tags_valid`). _Ver nota._|
 |`photo_consent`|`boolean`|NOT NULL default `true`. Consentimiento de fotos. _Ver nota._|
 |`status`|`elderly_status`|NOT NULL default `active`. `active` / `archived` (borrado lógico).|
 |`created_at` / `updated_at`|`timestamptz`||
 
-> **Nota `allergy_tags`:** Array de Postgres por simplicidad. Valores en inglés (`peanut`, `lactose`, `gluten`, etc.); la UI traduce a MANÍ, LACTOSA, etc. Si quieres normalizar, sácalo a una tabla `allergies` + `elderly_allergies`.
+> **Nota `allergy_tags`:** Array de Postgres por simplicidad. Cada alergia es específica de la persona, así que no se usan códigos ni traducción. Al guardar, el texto se separa por comas, se limpian los espacios y se quitan los repetidos sin distinguir mayúsculas ni tildes. La UI las muestra en mayúsculas (`MANÍ`). Si algún día se quiere normalizar, se puede pasar a una tabla `allergies` + `elderly_allergies`.
 
 ### RLS
 

@@ -8,7 +8,12 @@ export const metadata: Metadata = {
 };
 
 export default async function ElderlyPage() {
-  await requireTeamUser();
+  const user = await requireTeamUser();
 
-  return <ElderlyListView source={await getElderlySource()} />;
+  return (
+    <ElderlyListView
+      source={await getElderlySource()}
+      canAddElderly={user.role === "admin"}
+    />
+  );
 }

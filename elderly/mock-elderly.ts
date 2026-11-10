@@ -89,7 +89,7 @@ export const mockElderly: ElderlySource = {
       room_id: ROOM_ROBLE_ID,
       birth_date: "1947-03-12",
       enrolled_at: "2025-02-10",
-      allergy_tags: ["peanut"],
+      allergy_tags: ["Maní"],
       medical_notes:
         "Alergia al maní. Evitar frutos secos. Hipertensión: toma su pastilla a las 12:00.",
     }),
@@ -112,7 +112,7 @@ export const mockElderly: ElderlySource = {
       room_id: ROOM_ROBLE_ID,
       birth_date: "1939-04-03",
       enrolled_at: "2024-07-15",
-      allergy_tags: ["lactose"],
+      allergy_tags: ["Lactosa"],
       medical_notes:
         "Intolerancia a la lactosa. Usar leche sin lactosa en el desayuno.",
     }),
