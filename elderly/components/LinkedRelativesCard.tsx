@@ -4,6 +4,8 @@ import { LinkRelativeDialog } from "./LinkRelativeDialog";
 
 type LinkedRelativesCardProps = {
   relatives: LinkedRelative[];
+  elderlyId: string;
+  canLinkRelative: boolean;
   elderlyFullName: string;
   elderlyFirstName: string;
   pendingInvitationEmails: string[];
@@ -11,6 +13,8 @@ type LinkedRelativesCardProps = {
 
 export function LinkedRelativesCard({
   relatives,
+  elderlyId,
+  canLinkRelative,
   elderlyFullName,
   elderlyFirstName,
   pendingInvitationEmails,
@@ -29,11 +33,14 @@ export function LinkedRelativesCard({
         {relatives.map((relative) => (
           <LinkedRelativeRow key={relative.id} relative={relative} />
         ))}
-        <LinkRelativeDialog
-          elderlyFullName={elderlyFullName}
-          elderlyFirstName={elderlyFirstName}
-          pendingInvitationEmails={pendingInvitationEmails}
-        />
+        {canLinkRelative && (
+          <LinkRelativeDialog
+            elderlyId={elderlyId}
+            elderlyFullName={elderlyFullName}
+            elderlyFirstName={elderlyFirstName}
+            pendingInvitationEmails={pendingInvitationEmails}
+          />
+        )}
       </div>
     </section>
   );

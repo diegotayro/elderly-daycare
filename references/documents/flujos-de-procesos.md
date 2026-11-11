@@ -4,7 +4,7 @@
 - Toda creación de cuentas ocurre en Server Actions con el cliente `supabaseAdmin` (service_role), y solo después de verificar que quien la ejecuta tiene role = 'admin' (o un código válido).
 - El `role` y el `daycare_id` los fija SIEMPRE el servidor, nunca se toman del formulario:
     - `role`: staff → `'staff'`, familiar → `'relative'`. Los admins se crean solo a mano en Supabase.
-    - `daycare_id`: se toma de la fila del admin que hace la acción.
+    - `daycare_id`: para el staff se toma de la fila del admin que hace la acción; para el familiar, del adulto mayor de la invitación (ver paso 6 de "Familiar").
 
 ### Staff
 
@@ -16,22 +16,23 @@
 
 ### Familiar
 
-1. El admin llena "Vincular familiar/tutor" (first_name, last_name, email, relationship) para un adulto mayor.
-2. Se guarda SOLO una fila en invitations (status = pending, expires_at = +7 días). NO se crea usuario.
-3. Se envía un correo con el código desde Next.js (Resend).
-4. El familiar entra a "Activar cuenta": código, email, contraseña y consentimiento de fotos.
-5. Server Action valida: código existe, status = pending, no vencido, email coincide con el de la invitación.
-6. RECIÉN AQUÍ se crea el usuario: `auth.admin.createUser({ email, password, email_confirm: true, user_metadata: { first_name, last_name, role: 'relative', daycare_id } })`, con first_name y last_name tomados de la invitación (no del formulario). El `daycare_id` se obtiene del adulto mayor de la invitación (invitación → adulto mayor → su habitación → su guardería), ya que `invitations` no tiene `daycare_id`. El trigger crea su fila en users con status = active.
-7. Insertar en guardian_elderly (con el relationship de la invitación), aplicar el consentimiento de fotos (ver regla abajo) y marcar la invitación accepted (con accepted_at).
+1. El admin llena "Vincular familiar/tutor" (first_name, last_name, email, relationship) para un adulto mayor activo (no se invita para uno archivado). Server Action con la sesión del admin; valida que el email no esté ya vinculado a ese adulto mayor (`is_email_linked_to_elderly`) y que no sea de un staff o admin de la guardería (`is_team_email`).
+2. Antes de insertar, las `pending` vencidas de ese email y adulto mayor se marcan `expired`. Si queda una `pending` vigente, el admin confirma el reemplazo y la anterior pasa a `cancelled`. Se guarda SOLO una fila en invitations (status = pending, expires_at = +7 días, email en minúsculas). NO se crea usuario.
+3. Se envía un correo con el código desde Next.js (Resend). Si el correo falla, la invitación queda guardada y el admin ve el código para compartirlo.
+4. El familiar entra a "Activar cuenta" (sin sesión): código, email, contraseña y consentimiento de fotos. Para mostrar la tarjeta del adulto mayor, el servidor lee la invitación con `service_role` (`get_invitation_preview`).
+5. Server Action valida: formato del código, código existe, status = pending, no vencido, adulto mayor activo, email coincide con el de la invitación y contraseña con mínimo 8 caracteres, con letras y dígitos.
+6. RECIÉN AQUÍ se crea el usuario, con `service_role`: `auth.admin.createUser({ email, password, email_confirm: true, user_metadata: { first_name, last_name, role: 'relative', daycare_id } })`, con first_name y last_name tomados de la invitación (no del formulario). El `daycare_id` se obtiene del adulto mayor de la invitación (invitación → adulto mayor → su habitación → su guardería), ya que `invitations` no tiene `daycare_id`. El trigger crea su fila en users con status = active.
+7. Con el cliente con sesión, `signInWithPassword`. Luego, con la sesión del familiar, `accept_invitation`: en una sola transacción inserta en guardian_elderly (con el relationship de la invitación), aplica el consentimiento de fotos (ver regla abajo) y marca la invitación accepted (con accepted_at). Si falla, se cierra la sesión y se muestra el error.
+8. Con el vínculo creado, el familiar queda con sesión iniciada y se le redirige a su destino.
 
 ### Familiar que ya tiene cuenta (otro adulto mayor)
 
 Ej.: un hijo que ya tiene cuenta por su papá y ahora se inscribe su mamá.
 
 1. El admin genera la invitación igual que en el flujo de Familiar (pasos 1 a 3).
-2. El familiar inicia sesión y entra a "Vincular adulto mayor": ingresa el código y el consentimiento de fotos.
-3. Server Action valida: código existe, status = pending, no vencido, el email de la invitación coincide con el del usuario logueado, y el usuario logueado es `relative` y de la misma guardería que el adulto mayor de la invitación.
-4. NO se crea usuario. Insertar en guardian_elderly, aplicar el consentimiento de fotos (ver regla abajo) y marcar la invitación accepted.
+2. El familiar entra a "Activar cuenta" (con el link del correo o escribiendo el código). Como su email ya tiene cuenta, la etiqueta es "INGRESE SU CONTRASEÑA" (si el formulario estaba en "CREAR CONTRASEÑA", el servidor responde "Este email ya tiene cuenta. Ingresa tu contraseña." y la etiqueta cambia). Ingresa su contraseña y el consentimiento de fotos.
+3. Server Action valida: código existe, status = pending, no vencido, el email coincide con el de la invitación, y la contraseña cumple la regla de formato. Con el cliente con sesión, `signInWithPassword` con la contraseña ingresada.
+4. NO se crea usuario. Con la sesión del familiar, `accept_invitation` valida que sea `relative` y de la misma guardería que el adulto mayor de la invitación; luego, en una sola transacción, inserta en guardian_elderly, aplica el consentimiento de fotos (ver regla abajo) y marca la invitación accepted.
 
 ### Regla del consentimiento de fotos
 
@@ -42,7 +43,7 @@ Un adulto mayor puede tener varios familiares, y siempre gana el "no":
 - Ningún familiar puede pasar el consentimiento de `false` a `true`. Solo el admin puede modificarlo después.
 - En "Mi cuenta" del familiar, el estado de fotos de cada adulto mayor es solo de lectura.
 
-> En "Activar cuenta" (flujo de Familiar), si el email ya tiene cuenta, mostrar un mensaje para que inicie sesión y use "Vincular adulto mayor".
+> En "Activar cuenta" (flujo de Familiar), si el email ya tiene cuenta, la etiqueta pasa a "INGRESE SU CONTRASEÑA" y el vínculo se crea con esa cuenta (ver "Familiar que ya tiene cuenta").
 
 ---
 

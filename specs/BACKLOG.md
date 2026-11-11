@@ -31,13 +31,24 @@ Formato de cada entrada:
 ### Avisos del linter aceptados tras la spec 10
 
 - [ ] **Estado:** pendiente
-- **Qué:** `get_advisors` marca (1) `authenticated_security_definer_function_executable` en `current_user_daycare_id()`, `current_user_role()`, `is_admin()`, `current_user_elderly_ids()` y `current_user_relative_ids()`, (2) `multiple_permissive_policies` en `users` para select y update, y en `elderly`, `staff_elderly` y `guardian_elderly` para select, y (3) `auth_leaked_password_protection`.
-- **Origen:** SPEC 10 (`10-users-table`) y SPEC 15 (`current_user_elderly_ids()`, `current_user_relative_ids()` y las tablas nuevas).
+- **Qué:** `get_advisors` marca (1) `authenticated_security_definer_function_executable` en `current_user_daycare_id()`, `current_user_role()`, `is_admin()`, `current_user_elderly_ids()`, `current_user_relative_ids()`, `is_email_linked_to_elderly()`, `is_team_email()` y `accept_invitation()`, (2) `multiple_permissive_policies` en `users` para select y update, y en `elderly`, `staff_elderly` y `guardian_elderly` para select, y (3) `auth_leaked_password_protection`.
+- **Origen:** SPEC 10 (`10-users-table`), SPEC 15 (`current_user_elderly_ids()`, `current_user_relative_ids()` y las tablas nuevas) y SPEC 17 (`is_email_linked_to_elderly()`, `is_team_email()` y `accept_invitation()`).
 - **Se resuelve en:** no se resuelve; (1) y (2) son aceptados. (3) es un ajuste del dashboard de Auth.
 - **Notas:**
   - (1) Las policies evalúan los helpers con el rol del usuario, así que necesitan `EXECUTE`; solo devuelven datos del propio usuario. `current_user_elderly_ids()` y `current_user_relative_ids()` solo devuelven ids ligados a `auth.uid()` y vacío para otros roles. Alternativa descartada: moverlos a un esquema privado.
+  - Las tres funciones de SPEC 17 deben ser ejecutables por `authenticated` (el admin las llama al invitar y el familiar al activar) y validan el rol y la guardería de quien llama dentro de la función. `get_invitation_preview()` es solo para `service_role` y no genera aviso.
   - (2) Consecuencia de policies separadas por regla (`own`, `admin`, `team`, `staff`/`relative`). Alternativa descartada: unirlas en una sola.
   - (3) Revisar en el dashboard (Auth > Password security) si el plan lo permite.
+
+### Vulnerabilidad moderada de `deepmerge` en `@react-email/components`
+
+- [ ] **Estado:** pendiente
+- **Qué:** `npm audit` marca `deepmerge` (GHSA-gcqx-w48m-w2h4, prototype poisoning en `mergeObject()`) sin fix disponible. Llega por `@react-email/components` → `@react-email/render` → `html-to-text` → `deepmerge`.
+- **Origen:** SPEC 17 (paso 4, instalación de `@react-email/components`).
+- **Se resuelve en:** una spec de endurecimiento de seguridad, cuando haya una versión corregida.
+- **Notas:**
+  - Riesgo bajo: solo corre en el servidor al renderizar el correo, con contenido propio y sin entrada del usuario en el merge.
+  - Revisar `npm audit` al actualizar `@react-email/components`; si sigue sin fix, evaluar renderizar el correo con HTML propio.
 
 ---
 
@@ -73,7 +84,7 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 
 ### Pérdida de lo escrito en `/activate-account` durante el streaming
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 17
 - **Qué:** la página lee `searchParams` dentro de `<Suspense>` y el fallback es el mismo formulario sin invitación. Si el usuario escribe antes de que termine el streaming, lo escrito se pierde al reemplazarse por el formulario real.
 - **Origen:** SPEC 03 (`03-login-and-activate-account-ui`), `app/(auth)/activate-account/page.tsx`.
 - **Se resuelve en:** la spec de carga y streaming.
@@ -118,6 +129,16 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 
 ## Autenticación y cuentas
 
+### Mensaje de código no válido cuando la invitación ya no existe (cancelada, vencida o archivada)
+
+- [ ] **Estado:** pendiente
+- **Qué:** si el familiar reintenta con un código cancelado, reemplazado, vencido o de un adulto mayor archivado, `/activate-account` solo dice "El código no es válido o ya venció." y no le indica qué hacer. Puede quedarle una cuenta creada sin vínculos (por ejemplo, si falló `accept_invitation` tras crearla).
+- **Origen:** SPEC 17 (`auth/actions/activate-account.ts`, `activate-account-messages.ts`).
+- **Se resuelve en:** la spec de pantallas para familiares o una de mejoras de autenticación.
+- **Notas:**
+  - Mejorar el mensaje para pedir una invitación nueva a la guardería ("Pídele a la guardería que te envíe una invitación nueva").
+  - La cuenta sin vínculos no es un riesgo: RLS no le muestra ningún adulto mayor, y una invitación nueva al mismo email la reutiliza ("INGRESE SU CONTRASEÑA").
+
 ### Estados definitivos de error y carga del login
 
 - [ ] **Estado:** pendiente
@@ -127,6 +148,50 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 - **Notas:**
   - Evaluar `useActionState` si se necesita estado pendiente y errores por campo; hoy el formulario es un Server Component.
   - Revisar el mockup de `/login` antes de diseñar.
+
+### Cuentas `relative` sin vínculos tras una activación fallida
+
+- [ ] **Estado:** pendiente
+- **Qué:** si se crea la cuenta del familiar pero falla `accept_invitation` (invitación cancelada, vencida o adulto mayor archivado justo en ese momento, o un error transitorio), la cuenta `relative` queda sin vínculos.
+- **Origen:** SPEC 17 (`auth/actions/activate-account.ts`).
+- **Se resuelve en:** una spec futura, solo si estas cuentas llegan a estorbar.
+- **Notas:**
+  - Limitación conocida, sin riesgo de seguridad: RLS no le muestra ningún adulto mayor.
+  - Si la invitación sigue vigente, el reintento entra por "INGRESE SU CONTRASEÑA" y crea el vínculo. Si no, el admin invita de nuevo al mismo email y se reutiliza la cuenta.
+  - No se borra la cuenta al fallar: un borrado compensatorio puede fallar o pisar una activación concurrente.
+  - Si se decide limpiar, evaluar un job que borre `relative` sin `guardian_elderly` pasado cierto tiempo.
+
+### Staff que también es familiar
+
+- [ ] **Estado:** pendiente
+- **Qué:** un staff o admin no puede ser familiar de un adulto mayor: `is_team_email` bloquea la invitación y `accept_invitation` exige `role = 'relative'`.
+- **Origen:** SPEC 17.
+- **Se resuelve en:** la spec que defina cuentas con más de un rol (si hace falta).
+- **Notas:** hoy un staff que quiera seguir a un familiar suyo necesita un email distinto.
+
+### Dominio verificado en Resend
+
+- [ ] **Estado:** pendiente
+- **Qué:** el remitente es `onboarding@resend.dev`, que solo entrega al email de la cuenta de Resend. Hace falta un dominio verificado para invitar a cualquier familiar.
+- **Origen:** SPEC 17 (`RESEND_FROM_EMAIL`, `shared/email/resend.ts`).
+- **Se resuelve en:** antes del primer uso real con familiares (puesta en producción).
+- **Notas:** verificar el dominio en Resend y cambiar `RESEND_FROM_EMAIL`; no requiere cambios de código.
+
+### Cancelar y reenviar invitaciones de familiares
+
+- [ ] **Estado:** pendiente
+- **Qué:** el admin solo puede reemplazar una invitación pendiente al volver a invitar. No hay botones para cancelar ni reenviar desde el perfil, ni un cron que marque `expired`.
+- **Origen:** SPEC 17 (fuera de alcance); flujos "Cancelar invitación de familiar" e "Invitaciones vencidas".
+- **Se resuelve en:** la spec de gestión de familiares.
+- **Notas:** cancelar es un `update` de `status` (el admin ya puede). Reenviar debe crear código nuevo, como el reemplazo.
+
+### Límite de intentos de código en `/activate-account`
+
+- [ ] **Estado:** pendiente
+- **Qué:** `/activate-account` no limita los intentos de código. Con 31⁵ ≈ 28,6 M combinaciones y vigencia de 7 días, adivinar un código sigue exigiendo conocer además el email de la invitación, pero no hay rate limiting.
+- **Origen:** SPEC 17.
+- **Se resuelve en:** una spec de endurecimiento de seguridad.
+- **Notas:** evaluar un límite por IP y por código en la Server Action.
 
 ### Probar el guard de admin desde Auth (`supabase_auth_admin`)
 
@@ -153,13 +218,86 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 - **Origen:** conversación al diseñar SPEC 14; `references/documents/database-schema.md`, regla 4.
 - **Se resuelve en:** cada spec que implemente una de esas tareas (invitación de staff, aceptar invitaciones, archivar usuarios, resumen diario).
 - **Notas:**
-  - **Necesario:** crear cuentas, aceptar una invitación de un familiar nuevo (crea la cuenta), reenviar la invitación al staff (`inviteUserByEmail`/`generateLink`) y bloquear el login (`auth.admin.updateUserById` con ban).
-  - **Aceptar una invitación de un familiar con cuenta:** función SQL `SECURITY DEFINER` (ej. `accept_invitation(code)`) llamada con su sesión; valida código, email y guardería, inserta en `guardian_elderly` y marca la invitación.
+  - **Necesario:** crear cuentas (incluida la del familiar nuevo al activar su invitación), reenviar la invitación al staff (`inviteUserByEmail`/`generateLink`) y bloquear el login (`auth.admin.updateUserById` con ban).
+  - **Aceptar una invitación:** resuelto en SPEC 17 con `accept_invitation(code, photo_consent)` (`SECURITY DEFINER`), llamada con la sesión del familiar. `service_role` solo se usa para leer la vista previa de la invitación sin sesión (`get_invitation_preview`) y para `auth.admin.createUser`.
   - **Activar al staff:** trigger en `auth.users` que pasa su fila de `users` a `active` cuando crea su contraseña.
   - **Archivar o reactivar (`status`):** ya lo permite la policy de update del admin.
   - **Ban:** opcional. Un usuario `archived` ya no ve nada (los helpers solo reconocen `active`) y la app lo saca con `/auth/end-session`; el ban es una capa extra.
   - **Cron del resumen diario:** con `pg_cron` corre como `postgres` y no lo necesita; desde un cron de Next.js sí.
   - Si se adopta una alternativa, actualizar la regla 4 de `database-schema.md` y la lista de CLAUDE.md.
+
+### Verificación manual de invitar y activar familiares (SPEC 17, pasos 11 y 12)
+
+- [ ] **Estado:** pendiente
+- **Qué:** probar a mano el flujo completo de invitar a un familiar desde el perfil y activar la invitación, y luego borrar los datos de prueba. Escribe en el remoto y envía correos reales.
+- **Origen:** SPEC 17, pasos 11 (verificación con datos) y 12 (limpieza) y sus criterios de aceptación.
+- **Se resuelve en:** SPEC 17, antes de marcarla `Implementado`. Al terminar, tachar los criterios en la spec y marcar esta entrada como resuelta.
+- **Notas:**
+
+**Antes de empezar**
+
+- `.env` con `SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL=onboarding@resend.dev` y `APP_URL=http://localhost:3000`; `npm run dev` corriendo.
+- Con `onboarding@resend.dev` solo se puede enviar al email de tu cuenta de Resend. Úsalo como `TU_EMAIL` en todo lo de abajo.
+- La contraseña del admin debe tener 8 o más caracteres, con una letra y un número (si no, `/login` la rechaza).
+- Capturas en `.playwright-mcp/`.
+
+**A. Modal de invitación (como admin, en `/elderly/[id]` de Luis Fernández)**
+
+1. Entra como staff: no debe verse "Vincular otro familiar/tutor". Como admin sí; en un adulto mayor archivado no.
+2. Abre el modal: no debe verse el bloque CÓDIGO DE INVITACIÓN. Captura.
+3. Envía con datos vacíos: errores bajo cada campo y foco en el primero.
+4. Llena NOMBRES, APELLIDOS, `TU_EMAIL` (prueba con mayúsculas y espacios) y parentesco, y envía.
+   - Mientras envía: botón "Enviando…"; la X, Esc y los campos no responden.
+   - Éxito: "Invitación enviada a {email}" (en minúsculas y sin espacios), código de 5 caracteres, "Vence en 7 días" y "Listo". Captura.
+5. Llega el correo a `TU_EMAIL` con el asunto "Te invitaron a seguir a Luis Fernández en Casa Nogal", el código y el botón a `http://localhost:3000/activate-account?code={código}`.
+6. Cierra con "Listo": el perfil muestra la fila PENDIENTE y `/elderly` cuenta la invitación en Luis. Captura.
+7. Vuelve a invitar al mismo email para Luis:
+   - Al enviar no se envía: aviso de reemplazo bajo EMAIL y botón "Reemplazar invitación". Captura.
+   - Edita EMAIL: el aviso desaparece y el botón vuelve a "Enviar invitación".
+   - Vuelve a poner el email y pulsa "Reemplazar invitación": invitación nueva con otro código y correo nuevo. El perfil muestra una sola fila PENDIENTE. El código anterior ya no sirve en `/activate-account`.
+8. Invita el email del admin: "Este email pertenece al personal.".
+9. Falla del correo: pon una `RESEND_API_KEY` inválida, reinicia `npm run dev` e invita a otro email. La invitación se guarda y el éxito muestra "No pudimos enviar el correo. Comparte este código con {nombres}.". Captura. Restaura la llave.
+
+**B. Activación como familiar nuevo (ventana privada, sin sesión)**
+
+1. Abre el link del correo: tarjeta de Luis, código y email precargados, etiqueta "CREAR CONTRASEÑA". Captura.
+2. Prueba errores: contraseña `abcdefgh` y `12345678` (error de la regla), código inexistente ("El código no es válido o ya venció."), email distinto ("Este email no coincide con la invitación."). Los campos con error tienen `aria-invalid="true"` y `aria-describedby`. Captura con errores.
+3. Desmarca el consentimiento de fotos y activa con una contraseña válida (ej. `Prueba123`).
+   - Mientras activa: botón "Activando…" deshabilitado.
+   - Resultado: sesión iniciada y redirección a `/family-pending`.
+4. Comprueba en la base (SQL Editor): usuario `relative` `active`, fila en `guardian_elderly` con el parentesco elegido, invitación `accepted` con `accepted_at`, y `elderly.photo_consent = false` en Luis.
+
+**C. Activación con cuenta existente**
+
+1. Como admin, invita `TU_EMAIL` a otro adulto mayor activo (ej. Rosa Méndez).
+2. Abre el link del correo (ventana privada): etiqueta "INGRESE SU CONTRASEÑA". Captura.
+3. Contraseña incorrecta: "La contraseña no es correcta." y no se crea el vínculo.
+4. Contraseña correcta, con el consentimiento marcado: no se crea otro usuario, se crea el segundo vínculo, se inicia sesión y `photo_consent` de Rosa sigue en `true`.
+5. Cierra sesión. Abre `/activate-account` sin código, escribe a mano un código de una invitación nueva con `TU_EMAIL` y una contraseña cualquiera válida: debe mostrar "Este email ya tiene cuenta. Ingresa tu contraseña." y la etiqueta cambia a "INGRESE SU CONTRASEÑA".
+6. Reusa un código ya aceptado: "El código no es válido o ya venció.".
+
+**D. Login y otras comprobaciones**
+
+- `/login` con contraseña `abc`: "El email o la contraseña no son correctos."; el admin sigue entrando con la suya.
+- A 390×844 no hay scroll horizontal en el modal (formulario y éxito) ni en `/activate-account`. Captura.
+- Consola de `/elderly/[id]` y `/activate-account` sin errores ni warnings de hidratación.
+- Mientras carga `/activate-account?code=...`, el fallback muestra el formulario con los campos deshabilitados.
+- `npm run build` y `npm run lint` sin errores.
+
+**E. Limpieza (paso 12)** — en el SQL Editor de Supabase, reemplazando `TU_EMAIL`:
+
+```sql
+-- Deja el consentimiento de Luis como estaba (si lo cambiaste en B.3)
+update public.elderly set photo_consent = true where full_name = 'Luis Fernández';
+
+delete from public.guardian_elderly
+  where relative_id in (select id from auth.users where email = 'TU_EMAIL');
+delete from public.invitations where email in ('TU_EMAIL', 'EMAIL_DEL_PASO_A9');
+-- El usuario de prueba (public.users se borra en cascada)
+delete from auth.users where email = 'TU_EMAIL';
+```
+
+Después comprueba que no quedan el usuario de prueba, sus vínculos ni las invitaciones de prueba.
 
 ### Eliminar `/family-pending` y reescribir la redirección del familiar
 
@@ -191,7 +329,7 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 
 ### Conteos reales de familiares en `/elderly`
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 17
 - **Qué:** `getElderlySource()` y el perfil leen los vínculos reales de `guardian_elderly` (SPEC 16), pero `invitations` sigue vacío: faltan las invitaciones pendientes en los conteos del listado y las filas PENDIENTE del perfil.
 - **Origen:** SPEC 13, `elderly/get-elderly-source.ts`.
 - **Se resuelve en:** la spec de `invitations`.

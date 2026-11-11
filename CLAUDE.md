@@ -26,7 +26,7 @@ No hay framework de tests configurado todavía.
 - Tailwind CSS v4 cargado vía loader de Turbopack (`@tailwindcss/turbopack` en `next.config.ts`), no vía PostCSS.
 - `next.config.ts` activa `cacheComponents`, `partialPrefetching` y `experimental.agentFeedback`. Consultar `node_modules/next/dist/docs/` antes de usar APIs de caché/rendering.
 - En Next 16 `middleware.ts` se llama `proxy.ts`.
-- Backend: Supabase (Postgres + Auth + Storage) con `@supabase/ssr` y `@supabase/supabase-js`; correos con Resend (previsto).
+- Backend: Supabase (Postgres + Auth + Storage) con `@supabase/ssr` y `@supabase/supabase-js`; correos con Resend (`shared/email/resend.ts`).
 
 ## Documentos de referencia (fuente de verdad)
 
@@ -41,7 +41,7 @@ No hay framework de tests configurado todavía.
 - Solo usuarios con `status = active` tienen acceso.
 - La regla de visibilidad del feed (según `audience`, nunca `type`) se implementa en un solo lugar y la reusan `posts`, `post_elderly`, `post_photos`, `reactions`, `comments` y Storage.
 - Signup público desactivado. La creación de cuentas va en Server Actions con el cliente `service_role`, solo después de verificar permisos del que llama. `role` y `daycare_id` los fija siempre el servidor.
-- El cliente `service_role` se usa solo para los casos listados en el esquema (crear cuentas, aceptar invitaciones, activar/archivar usuarios, cron del resumen diario).
+- El cliente `service_role` se usa solo para los casos listados en el esquema (crear cuentas, leer la invitación sin sesión y crear la cuenta del familiar, activar/archivar usuarios, cron del resumen diario).
 - Consentimiento de fotos: siempre gana el "no"; un familiar nunca puede pasarlo de `false` a `true`.
 
 ## Convenciones
@@ -66,7 +66,7 @@ No hay framework de tests configurado todavía.
   - `server.ts`: Server Components, Server Actions y Route Handlers.
   - `client.ts`: Client Components.
   - `proxy.ts`: lo usa solo `proxy.ts` de la raíz para refrescar la sesión.
-- La única excepción es el cliente `service_role`, solo para los casos listados en el esquema. Aún no existe.
+- La única excepción es el cliente `service_role` (`shared/supabase/admin.ts`, `server-only`), solo para los casos listados en el esquema. Hoy se usa en `auth/get-invitation-preview.ts` y `auth/actions/activate-account.ts`.
 
 ## Flujo de trabajo: Spec Driven Design (SDD)
 

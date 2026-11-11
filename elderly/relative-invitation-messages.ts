@@ -3,6 +3,10 @@ export const relativeInvitationMessages = {
   lastNameRequired: "Ingresa los apellidos.",
   emailRequired: "Ingresa el email.",
   emailInvalid: "Ingresa un email válido.",
-  emailAlreadyPending: "Ya hay una invitación pendiente con este email.",
+  emailAlreadyLinked: (elderlyFirstName: string) =>
+    `Este email ya está vinculado a ${elderlyFirstName}.`,
+  emailBelongsToTeam: "Este email pertenece al personal.",
+  pendingReplaceWarning:
+    "Este familiar ya tiene una invitación pendiente. Si continúas, la nueva reemplazará a la anterior y su código dejará de funcionar.",
   relationshipRequired: "Elige el parentesco.",
 } as const;

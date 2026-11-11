@@ -60,6 +60,7 @@ export type ElderlyProfile = {
   birthDateLabel: string; // "12 mar 1947"
   roomName: string; // "Roble"
   isArchived: boolean;
+  canLinkRelative: boolean; // admin y adulto mayor activo
   enrolledAtLabel: string; // "feb 2025"
   relatives: LinkedRelative[];
   pendingInvitationEmails: string[]; // invitaciones pending de este adulto mayor
@@ -98,3 +99,24 @@ export type RelativeInvitationField = keyof RelativeInvitationInput;
 export type RelativeInvitationErrors = Partial<
   Record<RelativeInvitationField, string>
 >;
+
+export type CreateRelativeInvitationResult =
+  | { status: "invalid"; errors: RelativeInvitationErrors }
+  | { status: "needs_replace_confirmation" } // hay una pending vigente y no se confirmó
+  | { status: "error" }
+  | {
+      status: "success";
+      code: string;
+      email: string;
+      expiresInDays: number;
+      emailSent: boolean;
+    };
+
+// Lo que muestra el estado de éxito del modal
+export type RelativeInvitationSent = {
+  code: string;
+  email: string;
+  expiresInDays: number;
+  emailSent: boolean;
+  firstName: string; // nombres del invitado, para el aviso de compartir el código
+};

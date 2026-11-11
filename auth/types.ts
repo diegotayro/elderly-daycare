@@ -8,7 +8,32 @@ export type InvitationPreview = {
   elderlyInitial: string; // "L"
   elderlyTone: AvatarTone; // "blue"
   roomName: string; // "Roble"
+  hasAccount: boolean; // decide CREAR vs INGRESE SU CONTRASEÑA
 };
+
+export type PasswordMode = "create" | "existing";
+
+// Valores del formulario de activación tal como llegan del FormData
+export type ActivateAccountInput = {
+  code: string;
+  email: string;
+  password: string;
+  photoConsent: boolean;
+};
+
+export type ActivateAccountField = "code" | "email" | "password";
+export type ActivateAccountErrors = Partial<
+  Record<ActivateAccountField, string>
+>;
+
+// Si todo sale bien la acción redirige, así que no hay resultado de éxito
+export type ActivateAccountResult =
+  | {
+      status: "invalid";
+      errors: ActivateAccountErrors;
+      passwordMode: PasswordMode;
+    }
+  | { status: "error"; message: string; passwordMode: PasswordMode };
 
 export type CurrentUser = Pick<
   User,

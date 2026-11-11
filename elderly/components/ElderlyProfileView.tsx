@@ -40,6 +40,8 @@ export function ElderlyProfileView({ profile }: ElderlyProfileViewProps) {
           </Link>
           <LinkedRelativesCard
             relatives={profile.relatives}
+            elderlyId={profile.id}
+            canLinkRelative={profile.canLinkRelative}
             elderlyFullName={profile.fullName}
             elderlyFirstName={profile.firstName}
             pendingInvitationEmails={profile.pendingInvitationEmails}

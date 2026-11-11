@@ -4,10 +4,9 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { LoginErrorCode } from "@/auth/types";
+import { RELATIVE_HOME, TEAM_HOME } from "@/auth/home-routes";
+import { isValidPassword } from "@/auth/validate-password";
 import { createClient } from "@/shared/supabase/server";
-
-const TEAM_HOME = "/";
-const RELATIVE_HOME = "/family-pending";
 
 function redirectToLoginError(code: LoginErrorCode): never {
   redirect(`/login?error=${code}`);
@@ -27,7 +26,10 @@ function toLoginErrorCode(authErrorCode: string | undefined): LoginErrorCode {
 export async function signIn(formData: FormData) {
   const email = readCredential(formData, "email").trim();
   const password = readCredential(formData, "password");
-  if (!email || !password) redirectToLoginError("invalid_credentials");
+  // No se revela la regla de contraseña a quien prueba cuentas ajenas
+  if (!email || !isValidPassword(password)) {
+    redirectToLoginError("invalid_credentials");
+  }
 
   const supabase = createClient(await cookies());
 
