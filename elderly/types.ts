@@ -60,6 +60,7 @@ export type ElderlyProfile = {
   birthDateLabel: string; // "12 mar 1947"
   roomName: string; // "Roble"
   isArchived: boolean;
+  canLinkRelative: boolean; // admin y adulto mayor activo
   enrolledAtLabel: string; // "feb 2025"
   relatives: LinkedRelative[];
   pendingInvitationEmails: string[]; // invitaciones pending de este adulto mayor

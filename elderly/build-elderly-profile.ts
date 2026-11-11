@@ -6,9 +6,12 @@ import {
 import { getLinkedRelatives } from "./get-linked-relatives";
 import type { ElderlyProfile, ElderlySource } from "./types";
 
+type BuildElderlyProfileOptions = { isAdmin: boolean };
+
 export function buildElderlyProfile(
   source: ElderlySource,
   id: string,
+  { isAdmin }: BuildElderlyProfileOptions,
 ): ElderlyProfile | null {
   const elderly = source.elderly.find((item) => item.id === id);
   const room = source.rooms.find((item) => item.id === elderly?.room_id);
@@ -26,6 +29,7 @@ export function buildElderlyProfile(
     birthDateLabel: formatBirthDate(elderly.birth_date),
     roomName: room.name,
     isArchived: elderly.status === "archived",
+    canLinkRelative: isAdmin && elderly.status === "active",
     enrolledAtLabel: formatEnrolledAt(elderly.enrolled_at),
     relatives: getLinkedRelatives(source, elderly.id),
     pendingInvitationEmails: source.invitations

@@ -6,6 +6,7 @@ import { getLimaToday } from "@/shared/date/get-lima-today";
 import { isUuid } from "@/shared/text/is-uuid";
 import { createClient } from "@/shared/supabase/server";
 import type { Elderly, Room } from "@/shared/database/types";
+import { fetchPendingInvitations } from "./fetch-pending-invitations";
 import { fetchRelativeLinks } from "./fetch-relative-links";
 import { getAvatarTone } from "./get-avatar-tone";
 import type { ElderlySource } from "./types";
@@ -28,10 +29,12 @@ export const getElderlyProfileSource = cache(
     if (!elderlyResult.data) return null;
     const elderly: Elderly = elderlyResult.data;
 
-    const [roomResult, { guardianElderly, relatives }] = await Promise.all([
+    const [roomResult, { guardianElderly, relatives }, invitations] =
+      await Promise.all([
       supabase.from("rooms").select("*").eq("id", elderly.room_id),
-      fetchRelativeLinks(supabase, [id]),
-    ]);
+        fetchRelativeLinks(supabase, [id]),
+        fetchPendingInvitations(supabase, [id]),
+      ]);
     if (roomResult.error) throw roomResult.error;
     const rooms: Room[] = roomResult.data;
 
@@ -41,8 +44,7 @@ export const getElderlyProfileSource = cache(
       elderly: [elderly],
       relatives,
       guardianElderly,
-      // Aún no existe la tabla invitations
-      invitations: [],
+      invitations,
       avatarTones: Object.fromEntries(
         [elderly, ...relatives].map(({ id }) => [id, getAvatarTone(id)]),
       ),
