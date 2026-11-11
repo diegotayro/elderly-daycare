@@ -111,3 +111,12 @@ export type CreateRelativeInvitationResult =
       expiresInDays: number;
       emailSent: boolean;
     };
+
+// Lo que muestra el estado de éxito del modal
+export type RelativeInvitationSent = {
+  code: string;
+  email: string;
+  expiresInDays: number;
+  emailSent: boolean;
+  firstName: string; // nombres del invitado, para el aviso de compartir el código
+};

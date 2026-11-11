@@ -1,8 +1,12 @@
-import { mockInvitationCode } from "../mock-invitation-code";
+type InvitationCodePreviewProps = {
+  code: string;
+  expiresInDays: number;
+};
 
-export function InvitationCodePreview() {
-  const { code, expiresInDays } = mockInvitationCode;
-
+export function InvitationCodePreview({
+  code,
+  expiresInDays,
+}: InvitationCodePreviewProps) {
   return (
     <div className="rounded-2xl border-[1.5px] border-dashed border-code-line bg-consent-bg p-[18px] text-center">
       <div className="mb-2 text-xs font-extrabold tracking-[0.7px] text-code-ink">
