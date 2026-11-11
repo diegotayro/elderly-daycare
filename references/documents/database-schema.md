@@ -48,7 +48,7 @@ Diccionario de tablas para PostgreSQL. Tipos en notación Postgres. Convención:
 1. **RLS activado en todas las tablas.** Una tabla con RLS y sin policies queda cerrada; cada policy abre solo lo que un rol necesita.
 2. **Todas las policies son `to authenticated`.** El rol `anon` (sin login) no tiene ninguna policy.
 3. **Todo `insert` y `update` lleva `with check`** (además del `using` en `update`).
-4. **Cliente con sesión (`@supabase/ssr`) para todo.** El cliente admin (`service_role`) solo se usa para: crear cuentas (`auth.admin.*`), aceptar invitaciones, reenviar invitaciones al staff, activar al staff (de `pending` a `active`), archivar y reactivar usuarios (incluye bloquear o desbloquear su login) y el cron del resumen diario. Antes de usarlo, el código verifica que quien llama tiene permiso.
+4. **Cliente con sesión (`@supabase/ssr`) para todo.** El cliente admin (`service_role`) solo se usa para: crear cuentas (`auth.admin.*`), leer la invitación sin sesión y crear la cuenta del familiar, reenviar invitaciones al staff, activar al staff (de `pending` a `active`), archivar y reactivar usuarios (incluye bloquear o desbloquear su login) y el cron del resumen diario. Antes de usarlo, el código verifica que quien llama tiene permiso.
 5. **Nombres de policies en inglés:** `<tabla>_<acción>_<quién>` (ej. `posts_select_visible`).
 6. **Sin policy de `delete`** donde hay borrado lógico (`elderly`, `invitations`) o donde lo maneja Supabase Auth (`users`).
 7. **Funciones helper.** Usar funciones helper en las policies siempre que se pueda, para no repetir lógica. Deben ser `SECURITY DEFINER`, `STABLE` y con `search_path` fijo, para evitar la recursión al leer `users`. Solo pueden devolver datos del propio usuario logueado (`auth.uid()`) o un `true/false`, nunca filas de otras personas. Dentro de las policies, envolverlas en un `select` (ej. `(select is_staff())`) para que se calculen una vez por consulta.
@@ -69,6 +69,20 @@ Viven en `public`, son `SECURITY DEFINER STABLE` con `search_path` vacío y `EXE
 Además existe `set_updated_at()`, trigger genérico `BEFORE UPDATE` para mantener `updated_at` en cualquier tabla.
 
 También existe `are_valid_allergy_tags(text[])`, `IMMUTABLE` y no `SECURITY DEFINER`, que usa el `check` `elderly_allergy_tags_valid`.
+
+### Funciones de invitaciones
+
+Todas con `search_path` vacío y `EXECUTE` revocado a `public` y `anon`.
+
+|Función|Tipo|EXECUTE|Devuelve|
+|---|---|---|---|
+|`generate_invitation_code()`|`volatile`, invoker|`authenticated` (es el default de `invitations.code`)|5 caracteres de `ABCDEFGHJKMNPQRSTUVWXYZ23456789` (sin `I`, `L`, `O`, `0`, `1`), con `extensions.gen_random_bytes` y muestreo por rechazo (sin sesgo).|
+|`is_email_linked_to_elderly(p_elderly_id, p_email)`|`SECURITY DEFINER STABLE`|`authenticated`|`true` si ese email ya está vinculado (`guardian_elderly`) a ese adulto mayor. `false` si quien llama no es admin de la guardería del adulto mayor.|
+|`is_team_email(p_email)`|`SECURITY DEFINER STABLE`|`authenticated`|`true` si el email es de un staff o admin de la guardería de quien llama. `false` si quien llama no es admin.|
+|`get_invitation_preview(p_code)`|`SECURITY DEFINER STABLE`|solo `service_role`|Una fila (`email`, `first_name`, `last_name`, `elderly_full_name`, `elderly_first_name`, `elderly_id`, `room_name`, `daycare_id`, `has_account`) si la invitación es `pending`, vigente y el adulto mayor está `active`. Sin filas en otro caso. Sirve para `/activate-account`, donde aún no hay sesión.|
+|`accept_invitation(p_code, p_photo_consent)`|`SECURITY DEFINER`, `volatile`|`authenticated`|`uuid` del adulto mayor. Con la sesión del familiar: valida que sea `relative` activo, y que la invitación sea `pending`, vigente, de su guardería y con su email. Crea el vínculo en `guardian_elderly`, aplica el consentimiento de fotos (solo `false` cambia algo) y marca la invitación `accepted`, todo en una transacción. Errores: `not_a_relative`, `invitation_not_found`, `invitation_email_mismatch`.|
+
+> El linter marca `is_email_linked_to_elderly`, `is_team_email` y `accept_invitation` como "ejecutables por `authenticated`": es esperado. Las tres validan el rol y la guardería de quien llama dentro de la función.
 
 ### Regla del feed: ¿quién puede ver un post?
 
@@ -246,7 +260,7 @@ Decide quién es familia de quién: un relative **nunca** puede escribir aquí.
 |delete|admin|vínculos de ancianos de su guardería|
 |update|nadie|para cambiar un vínculo, se borra y se crea de nuevo|
 
-> En el flujo normal, el vínculo lo crea la server action que acepta la invitación (con `service_role`).
+> En el flujo normal, el vínculo lo crea `accept_invitation` (`SECURITY DEFINER`), llamada con la sesión del familiar después de validar que la invitación es suya. El insert directo del familiar sigue bloqueado por RLS.
 
 ---
 
@@ -287,17 +301,18 @@ El admin genera un código para vincular a un relative con un anciano.
 |---|---|---|
 |`id`|`uuid` PK||
 |`elderly_id`|`uuid` FK → `elderly`|A qué anciano se vincula.|
-|`invited_by`|`uuid` FK → `users`|Admin que invita.|
-|`first_name`|`text`|NOT NULL|
-|`last_name`|`text`|NOT NULL|
+|`invited_by`|`uuid` FK → `users`|NOT NULL. Admin que invita.|
+|`first_name`|`text`|NOT NULL, no vacío, máx. 80.|
+|`last_name`|`text`|NOT NULL, no vacío, máx. 80.|
 |`full_name`|`text`|Columna generada y guardada: `first_name` y `last_name` unidos con un espacio.|
-|`email`|`text`||
-|`relationship`|`relationship_type`||
-|`code`|`text` UNIQUE|Código corto, ej. `7K4P9`.|
-|`status`|`invitation_status`|`pending` / `accepted` / `expired` / `cancelled`.|
-|`expires_at`|`timestamptz`||
+|`email`|`text`|NOT NULL. En minúsculas y sin espacios (`invitations_email_normalized`), máx. 254.|
+|`relationship`|`relationship_type`|NOT NULL.|
+|`code`|`text` UNIQUE|NOT NULL. Código de 5 caracteres, ej. `7K4P9`; lo genera `generate_invitation_code()` (`invitations_code_format`).|
+|`status`|`invitation_status`|`pending` / `accepted` / `expired` / `cancelled`. Por defecto `pending`.|
+|`expires_at`|`timestamptz`|NOT NULL. Por defecto `now() + interval '7 days'`.|
 |`accepted_at`|`timestamptz`|Nullable.|
 |`created_at`|`timestamptz`||
+|||Índice único parcial `invitations_elderly_id_email_pending_key` sobre (`elderly_id`, `email`) donde `status = 'pending'`: una sola pendiente por adulto mayor y email. Índices en `elderly_id` e `invited_by`.|
 
 ### RLS
 
@@ -305,8 +320,9 @@ Los `code` son llaves de acceso: **solo el admin** toca esta tabla.
 
 |Acción|Quién|Regla|
 |---|---|---|
-|select / update|admin|invitaciones de ancianos de su guardería|
-|insert|admin|anciano de su guardería y `invited_by` = él mismo|
+|select|admin|invitaciones de ancianos de su guardería|
+|update|admin|invitaciones de ancianos de su guardería. Solo puede cambiar la columna `status` (`grant update (status)`).|
+|insert|admin|anciano de su guardería, `invited_by` = él mismo y `status = 'pending'`|
 |delete|nadie|se cancela con `status = 'cancelled'`|
 |(cualquiera)|relative|nada: no lee ni escribe la tabla|
 
