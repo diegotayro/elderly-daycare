@@ -1,9 +1,21 @@
 import type { ReactNode } from "react";
 import { authSubmitClassName } from "./auth-submit-styles";
 
-export function AuthSubmitButton({ children }: { children: ReactNode }) {
+type AuthSubmitButtonProps = {
+  children: ReactNode;
+  disabled?: boolean;
+};
+
+export function AuthSubmitButton({
+  children,
+  disabled,
+}: AuthSubmitButtonProps) {
   return (
-    <button type="submit" className={authSubmitClassName}>
+    <button
+      type="submit"
+      disabled={disabled}
+      className={`${authSubmitClassName} disabled:cursor-default disabled:opacity-70`}
+    >
       {children}
     </button>
   );

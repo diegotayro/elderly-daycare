@@ -10,25 +10,15 @@ import {
   type InvitationPreviewRecord,
 } from "@/auth/get-invitation-preview";
 import { RELATIVE_HOME } from "@/auth/home-routes";
+import { readActivateAccountInput } from "@/auth/read-activate-account-input";
 import type {
   ActivateAccountErrors,
-  ActivateAccountInput,
   ActivateAccountResult,
   PasswordMode,
 } from "@/auth/types";
 import { validateActivateAccount } from "@/auth/validate-activate-account";
 import { createAdminClient } from "@/shared/supabase/admin";
 import { createClient } from "@/shared/supabase/server";
-
-function readInput(formData: FormData): ActivateAccountInput {
-  const read = (field: string) => String(formData.get(field) ?? "");
-  return {
-    code: read("code"),
-    email: read("email"),
-    password: read("password"),
-    photoConsent: formData.get("photoConsent") === "on",
-  };
-}
 
 function invalid(
   errors: ActivateAccountErrors,
@@ -105,7 +95,8 @@ async function acceptInvitation(
   if (!error) return null;
 
   await supabase.auth.signOut();
-  const mode: PasswordMode = record.hasAccount ? "existing" : "create";
+  // La cuenta ya existe (la creamos o ya la tenía): el reintento pide su contraseña
+  const mode: PasswordMode = "existing";
   if (error.message.includes("not_a_relative")) {
     return failed(messages.accountNotAllowed, mode);
   }
@@ -123,7 +114,7 @@ export async function activateAccount(
   currentMode: PasswordMode,
   formData: FormData,
 ): Promise<ActivateAccountResult> {
-  const input = readInput(formData);
+  const input = readActivateAccountInput(formData);
   const formErrors = validateActivateAccount(input);
   if (Object.keys(formErrors).length > 0) {
     return invalid(formErrors, currentMode);
