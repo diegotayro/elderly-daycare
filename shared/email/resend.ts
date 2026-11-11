@@ -22,8 +22,10 @@ export async function sendEmail({
       subject,
       react,
     });
+    if (error) console.error("[sendEmail] Resend error:", error);
     return !error;
-  } catch {
+  } catch (exception) {
+    console.error("[sendEmail] Unexpected error:", exception);
     return false;
   }
 }
