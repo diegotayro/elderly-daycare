@@ -13,6 +13,28 @@ export type InvitationPreview = {
 
 export type PasswordMode = "create" | "existing";
 
+// Valores del formulario de activación tal como llegan del FormData
+export type ActivateAccountInput = {
+  code: string;
+  email: string;
+  password: string;
+  photoConsent: boolean;
+};
+
+export type ActivateAccountField = "code" | "email" | "password";
+export type ActivateAccountErrors = Partial<
+  Record<ActivateAccountField, string>
+>;
+
+// Si todo sale bien la acción redirige, así que no hay resultado de éxito
+export type ActivateAccountResult =
+  | {
+      status: "invalid";
+      errors: ActivateAccountErrors;
+      passwordMode: PasswordMode;
+    }
+  | { status: "error"; message: string; passwordMode: PasswordMode };
+
 export type CurrentUser = Pick<
   User,
   "id" | "role" | "full_name" | "notify_on_post" | "daily_summary_enabled"

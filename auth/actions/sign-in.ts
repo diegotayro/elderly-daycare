@@ -4,11 +4,9 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { LoginErrorCode } from "@/auth/types";
+import { RELATIVE_HOME, TEAM_HOME } from "@/auth/home-routes";
 import { isValidPassword } from "@/auth/validate-password";
 import { createClient } from "@/shared/supabase/server";
-
-const TEAM_HOME = "/";
-const RELATIVE_HOME = "/family-pending";
 
 function redirectToLoginError(code: LoginErrorCode): never {
   redirect(`/login?error=${code}`);

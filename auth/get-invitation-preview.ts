@@ -2,6 +2,7 @@ import "server-only";
 import { getAvatarTone } from "@/elderly/get-avatar-tone";
 import { createAdminClient } from "@/shared/supabase/admin";
 import type { InvitationPreview } from "./types";
+import { normalizeInvitationCode } from "./validate-activate-account";
 
 type InvitationPreviewRow = {
   email: string;
@@ -28,10 +29,6 @@ export type InvitationPreviewRecord = {
   daycareId: string;
   hasAccount: boolean;
 };
-
-export function normalizeInvitationCode(code: string): string {
-  return code.replace(/\s/g, "").toUpperCase();
-}
 
 // null = código inexistente, vencido, usado o de un adulto mayor archivado
 export async function getInvitationPreview(
