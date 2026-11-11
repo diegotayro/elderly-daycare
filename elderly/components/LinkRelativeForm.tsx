@@ -4,10 +4,10 @@ import { useState, type FormEvent } from "react";
 import { CloseIcon } from "@/shared/components/icons/CloseIcon";
 import { InfoIcon } from "@/shared/components/icons/InfoIcon";
 import { SendIcon } from "@/shared/components/icons/SendIcon";
+import { readRelativeInvitationInput } from "../read-relative-invitation-input";
 import type {
   RelativeInvitationErrors,
   RelativeInvitationField,
-  RelativeInvitationInput,
 } from "../types";
 import { validateRelativeInvitation } from "../validate-relative-invitation";
 import { FormField, fieldControlClassName, getFieldErrorId } from "./FormField";
@@ -21,22 +21,11 @@ const FIELD_ORDER: RelativeInvitationField[] = [
   "relationship",
 ];
 
-function readInput(formData: FormData): RelativeInvitationInput {
-  const read = (field: RelativeInvitationField) =>
-    String(formData.get(field) ?? "");
-  return {
-    firstName: read("firstName"),
-    lastName: read("lastName"),
-    email: read("email"),
-    relationship: read("relationship"),
-  };
-}
-
 type LinkRelativeFormProps = {
   titleId: string;
   elderlyFullName: string;
   elderlyFirstName: string;
-  pendingInvitationEmails: string[];
+  pendingInvitationEmails: string[]; // lo usa el aviso de reemplazo (paso 6)
   onClose: () => void;
 };
 
@@ -44,7 +33,6 @@ export function LinkRelativeForm({
   titleId,
   elderlyFullName,
   elderlyFirstName,
-  pendingInvitationEmails,
   onClose,
 }: LinkRelativeFormProps) {
   const [errors, setErrors] = useState<RelativeInvitationErrors>({});
@@ -53,8 +41,7 @@ export function LinkRelativeForm({
     event.preventDefault();
     const form = event.currentTarget;
     const nextErrors = validateRelativeInvitation(
-      readInput(new FormData(form)),
-      { pendingEmails: pendingInvitationEmails },
+      readRelativeInvitationInput(new FormData(form)),
     );
     setErrors(nextErrors);
 

@@ -39,6 +39,16 @@ Formato de cada entrada:
   - (2) Consecuencia de policies separadas por regla (`own`, `admin`, `team`, `staff`/`relative`). Alternativa descartada: unirlas en una sola.
   - (3) Revisar en el dashboard (Auth > Password security) si el plan lo permite.
 
+### Vulnerabilidad moderada de `deepmerge` en `@react-email/components`
+
+- [ ] **Estado:** pendiente
+- **Qué:** `npm audit` marca `deepmerge` (GHSA-gcqx-w48m-w2h4, prototype poisoning en `mergeObject()`) sin fix disponible. Llega por `@react-email/components` → `@react-email/render` → `html-to-text` → `deepmerge`.
+- **Origen:** SPEC 17 (paso 4, instalación de `@react-email/components`).
+- **Se resuelve en:** una spec de endurecimiento de seguridad, cuando haya una versión corregida.
+- **Notas:**
+  - Riesgo bajo: solo corre en el servidor al renderizar el correo, con contenido propio y sin entrada del usuario en el merge.
+  - Revisar `npm audit` al actualizar `@react-email/components`; si sigue sin fix, evaluar renderizar el correo con HTML propio.
+
 ---
 
 ## Mi cuenta

@@ -99,3 +99,15 @@ export type RelativeInvitationField = keyof RelativeInvitationInput;
 export type RelativeInvitationErrors = Partial<
   Record<RelativeInvitationField, string>
 >;
+
+export type CreateRelativeInvitationResult =
+  | { status: "invalid"; errors: RelativeInvitationErrors }
+  | { status: "needs_replace_confirmation" } // hay una pending vigente y no se confirmó
+  | { status: "error" }
+  | {
+      status: "success";
+      code: string;
+      email: string;
+      expiresInDays: number;
+      emailSent: boolean;
+    };
