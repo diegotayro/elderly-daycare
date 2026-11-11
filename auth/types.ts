@@ -8,7 +8,10 @@ export type InvitationPreview = {
   elderlyInitial: string; // "L"
   elderlyTone: AvatarTone; // "blue"
   roomName: string; // "Roble"
+  hasAccount: boolean; // decide CREAR vs INGRESE SU CONTRASEÑA
 };
+
+export type PasswordMode = "create" | "existing";
 
 export type CurrentUser = Pick<
   User,
