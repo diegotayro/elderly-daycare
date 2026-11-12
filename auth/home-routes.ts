@@ -1,2 +1,2 @@
 export const TEAM_HOME = "/";
-export const RELATIVE_HOME = "/family-pending";
+export const RELATIVE_HOME = "/family";
