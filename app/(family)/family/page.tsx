@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
-import { requireRelativeUser } from "@/auth/require-user";
-import { FamilyFeedView } from "@/family/components/FamilyFeedView";
+import { Suspense } from "react";
+import { FamilyFeedSkeleton } from "@/family/components/FamilyFeedSkeleton";
+import { FamilyFeedContent } from "@/family/components/FamilyFeedContent";
 
 export const metadata: Metadata = {
   title: "Feed · Casa Nogal",
 };
 
-export default async function FamilyFeedPage() {
-  const user = await requireRelativeUser();
-
-  return <FamilyFeedView firstName={user.first_name} />;
+export default function FamilyFeedPage() {
+  return (
+    <Suspense fallback={<FamilyFeedSkeleton />}>
+      <FamilyFeedContent />
+    </Suspense>
+  );
 }
