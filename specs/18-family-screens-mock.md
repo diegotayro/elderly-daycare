@@ -387,52 +387,52 @@ Solo `FamilyFeedList`, `DailySummaryView` y el `NotificationToggle` que ya exist
 
 **Build, rutas y redirecciones**
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] La consola no muestra errores ni warnings de hidratación en `/family`, `/family/summary` y `/family/account`.
-- [ ] Los títulos son "Feed · Casa Nogal", "Resumen del día · Casa Nogal" y "Mi cuenta · Casa Nogal".
-- [ ] No existen `app/(auth)/family-pending/` ni `FamilyPendingView`, y `grep -r "family-pending"` no encuentra nada en el código (fuera de `specs/` y `references/`).
-- [ ] `RELATIVE_HOME === "/family"`, y `require-user.ts` redirige con `TEAM_HOME` / `RELATIVE_HOME`, sin literales.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] La consola no muestra errores ni warnings de hidratación en `/family`, `/family/summary` y `/family/account`.
+- [x] Los títulos son "Feed · Casa Nogal", "Resumen del día · Casa Nogal" y "Mi cuenta · Casa Nogal".
+- [x] No existen `app/(auth)/family-pending/` ni `FamilyPendingView`, y `grep -r "family-pending"` no encuentra nada en el código (fuera de `specs/` y `references/`).
+- [x] `RELATIVE_HOME === "/family"`, y `require-user.ts` redirige con `TEAM_HOME` / `RELATIVE_HOME`, sin literales.
 - [ ] Con sesión de admin, abrir `/family`, `/family/summary` o `/family/account` redirige a `/`.
 - [ ] Con una cuenta `relative` de prueba (si existe), el login termina en `/family` y abrir `/` o `/account` redirige a `/family`. Si no hay cuenta, se deja indicado en la verificación y queda cubierto por la entrada de pruebas pendientes del BACKLOG.
 
 **Navegación**
 
 - [ ] El área del equipo (`/`, `/elderly`, `/notices` y `/account`) se ve igual que antes de la spec a 1440×900 y a 390×844.
-- [ ] El sidebar familiar muestra "Casa Nogal" / "Familia", sin "Nueva publicación".
-- [ ] El menú familiar tiene Feed, Resumen del día y Mi cuenta, y cada uno se marca activo solo en su ruta (Feed no se marca en `/family/summary`).
-- [ ] El pie del sidebar familiar muestra el `full_name` real, el parentesco real y un avatar lila.
-- [ ] `buildSidebarRelationship` devuelve "Familiar", "Hija de Luis", "Hija de Luis y Carmen", "Familiar de Luis y Carmen" y "Hija de Luis, Carmen y 2 más" en los 5 casos del Modelo de datos.
-- [ ] `fetchSidebarElderlyLinks` usa el cliente con sesión, excluye adultos mayores archivados y ordena por `guardian_elderly.created_at`.
-- [ ] Un detalle largo se corta en una línea con "…" y tiene el texto completo en `title`.
-- [ ] El pie del sidebar del equipo sigue mostrando el rol ("Staff" / "Admin").
+- [x] El sidebar familiar muestra "Casa Nogal" / "Familia", sin "Nueva publicación".
+- [x] El menú familiar tiene Feed, Resumen del día y Mi cuenta, y cada uno se marca activo solo en su ruta (Feed no se marca en `/family/summary`).
+- [x] El pie del sidebar familiar muestra el `full_name` real, el parentesco real y un avatar lila.
+- [x] `buildSidebarRelationship` devuelve "Familiar", "Hija de Luis", "Hija de Luis y Carmen", "Familiar de Luis y Carmen" y "Hija de Luis, Carmen y 2 más" en los 5 casos del Modelo de datos.
+- [x] `fetchSidebarElderlyLinks` usa el cliente con sesión, excluye adultos mayores archivados y ordena por `guardian_elderly.created_at`.
+- [x] Un detalle largo se corta en una línea con "…" y tiene el texto completo en `title`.
+- [x] El pie del sidebar del equipo sigue mostrando el rol ("Staff" / "Admin").
 
 **Feed**
 
-- [ ] A 1440×900, `/family` (chip Luis) y `familia-feed.dc.html` no muestran diferencias visibles en el contenido (textos, colores, tipografía, bordes, espaciado y orden). Las únicas diferencias permitidas son el nombre del saludo y el pie del sidebar, que salen de datos reales.
-- [ ] Los chips son botones con `aria-pressed`, alternan con clic y teclado, y filtran: Luis → 3 tarjetas, Carmen → 2 y Todos → 4.
-- [ ] Las tarjetas, la foto y los contadores no son enlaces.
+- [x] A 1440×900, `/family` (chip Luis) y `familia-feed.dc.html` no muestran diferencias visibles en el contenido (textos, colores, tipografía, bordes, espaciado y orden). Las únicas diferencias permitidas son el nombre del saludo y el pie del sidebar, que salen de datos reales.
+- [x] Los chips son botones con `aria-pressed`, alternan con clic y teclado, y filtran: Luis → 3 tarjetas, Carmen → 2 y Todos → 4.
+- [x] Las tarjetas, la foto y los contadores no son enlaces.
 
 **Resumen del día**
 
-- [ ] A 1440×900, `/family/summary` (chip Luis) y `resumen-dia.dc.html` no muestran diferencias visibles en el contenido, salvo el pie del sidebar.
-- [ ] El chip Carmen muestra "El día de Doña Carmen", 2 comidas, "1h", 2 momentos, "Tranquila y conversadora" y 1 momento en la lista.
-- [ ] `formatSleepDuration` devuelve "1h 30", "1h" y "45 min" para 90, 60 y 45.
+- [x] A 1440×900, `/family/summary` (chip Luis) y `resumen-dia.dc.html` no muestran diferencias visibles en el contenido, salvo el pie del sidebar.
+- [x] El chip Carmen muestra "El día de Doña Carmen", 2 comidas, "1h", 2 momentos, "Tranquila y conversadora" y 1 momento en la lista.
+- [x] `formatSleepDuration` devuelve "1h 30", "1h" y "45 min" para 90, 60 y 45.
 
 **Mi cuenta**
 
-- [ ] A 1440×900, `/family/account` y `familia-cuenta.dc.html` no muestran diferencias visibles en el contenido, salvo el nombre, el email y el pie del sidebar, que salen de datos reales.
-- [ ] El indicador de fotos no es un botón, no recibe foco, tiene texto accesible "Fotos permitidas" / "Fotos no permitidas", y con `photoConsent: false` en el mock se pinta beige con la perilla a la izquierda.
-- [ ] Los toggles familiares usan el copy del mockup, empiezan según `notify_on_post` y `daily_summary_enabled`, y alternan con clic y teclado.
-- [ ] "Cerrar sesión" (pantalla y sidebar) cierra la sesión con `SignOutForm`.
+- [x] A 1440×900, `/family/account` y `familia-cuenta.dc.html` no muestran diferencias visibles en el contenido, salvo el nombre, el email y el pie del sidebar, que salen de datos reales.
+- [x] El indicador de fotos no es un botón, no recibe foco, tiene texto accesible "Fotos permitidas" / "Fotos no permitidas", y con `photoConsent: false` en el mock se pinta beige con la perilla a la izquierda.
+- [x] Los toggles familiares usan el copy del mockup, empiezan según `notify_on_post` y `daily_summary_enabled`, y alternan con clic y teclado.
+- [x] "Cerrar sesión" (pantalla y sidebar) cierra la sesión con `SignOutForm`.
 
 **Móvil, cliente y documentos**
 
-- [ ] A 390×844 las tres pantallas no tienen scroll horizontal, el top bar no tiene "+" y el bottom nav muestra los 3 ítems del familiar.
-- [ ] Solo `FamilyFeedList`, `DailySummaryView` y `NotificationToggle` tienen `"use client"` entre los archivos de esta spec.
-- [ ] No hay migraciones ni cambios en `database-schema.md`.
-- [ ] `specs/BACKLOG.md`: la entrada de `/family-pending` aparece resuelta en SPEC 18, la de pruebas pendientes menciona `/family` y existen las entradas nuevas.
-- [ ] Los puntos 3, 6 y 7 de `pantallas-pendientes.md` están marcados.
-- [ ] Las capturas de verificación están en `.playwright-mcp/`.
+- [x] A 390×844 las tres pantallas no tienen scroll horizontal, el top bar no tiene "+" y el bottom nav muestra los 3 ítems del familiar.
+- [x] Solo `FamilyFeedList`, `DailySummaryView` y `NotificationToggle` tienen `"use client"` entre los archivos de esta spec.
+- [x] No hay migraciones ni cambios en `database-schema.md`.
+- [x] `specs/BACKLOG.md`: la entrada de `/family-pending` aparece resuelta en SPEC 18, la de pruebas pendientes menciona `/family` y existen las entradas nuevas.
+- [x] Los puntos 3, 6 y 7 de `pantallas-pendientes.md` están marcados.
+- [x] Las capturas de verificación están en `.playwright-mcp/`.
 
 ---
 

@@ -41,11 +41,11 @@ export function FamilyPostCard({ post, author }: FamilyPostCardProps) {
       )}
 
       <div className="mt-4 flex items-center gap-[18px] border-t border-line-soft pt-3.5">
-        <span className="flex items-center gap-[7px] text-sm font-bold text-coral-icon">
+        <span className="flex items-center gap-[7px] text-sm leading-[normal] font-bold text-coral-icon">
           <HeartIcon size={19} />
           {post.reactionCount}
         </span>
-        <span className="flex items-center gap-[7px] text-sm font-bold text-muted-strong">
+        <span className="flex items-center gap-[7px] text-sm leading-[normal] font-bold text-muted-strong">
           <CommentIcon size={18} />
           {post.commentCount}
         </span>

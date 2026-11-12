@@ -18,12 +18,12 @@ export function SummaryHighlightItem({ highlight }: SummaryHighlightItemProps) {
       </div>
       <div>
         <div
-          className="font-display text-base font-semibold"
+          className="font-display text-base leading-[normal] font-semibold"
           style={{ color: fg }}
         >
           {highlight.title}
         </div>
-        <div className="mt-0.5 text-sm text-muted-strong">
+        <div className="mt-0.5 text-sm leading-[normal] text-muted-strong">
           {highlight.time} · {highlight.detail}
         </div>
       </div>

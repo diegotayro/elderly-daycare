@@ -21,7 +21,7 @@ export function SummaryStatCard({
       className={`rounded-[18px] px-2 py-4 text-center lg:p-5 ${bgClassName}`}
       style={{ color }}
     >
-      <Icon size={26} className="mx-auto mb-2" />
+      <Icon size={26} className="mx-auto mb-3.5" />
       <div className="font-display text-2xl leading-[normal] font-semibold lg:text-[26px]">
         {value}
       </div>

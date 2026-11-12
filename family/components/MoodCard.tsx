@@ -12,7 +12,7 @@ export function MoodCard({ mood }: MoodCardProps) {
       </div>
       <div>
         <div className="text-[13px] text-muted">Ánimo del día</div>
-        <div className="font-display text-lg font-semibold text-ink">
+        <div className="font-display text-lg leading-[normal] font-semibold text-ink">
           {mood}
         </div>
       </div>

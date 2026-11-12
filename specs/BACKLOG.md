@@ -100,6 +100,14 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 - **Se resuelve en:** la spec de carga y streaming.
 - **Notas:** definir el diseño con los datos reales del feed, adultos mayores y avisos. El mockup no lo cubre: revisar los mockups de todas las pantallas afectadas antes de diseñarlo.
 
+### Aviso de consulta fuera de `<Suspense>` y esqueleto de carga de `(family)`
+
+- [ ] **Estado:** pendiente
+- **Qué:** en `npm run dev`, `/family`, `/family/summary` y `/family/account` muestran `Route "...": Next.js encountered uncached data during prerendering or a navigation`, porque `requireRelativeUser()` consulta la sesión fuera de `<Suspense>`. `(family)/loading.tsx` devuelve `null`, sin esqueleto.
+- **Origen:** SPEC 18, `app/(family)/` (mismo patrón y mismo aviso que `(app)` antes de SPEC 16).
+- **Se resuelve en:** la spec de carga y streaming.
+- **Notas:** `npm run build` no falla. Seguir el patrón de SPEC 16 (página sin `async`, `*Content` dentro de `<Suspense>`, esqueleto con `SkeletonBlock`). El pie del sidebar (`CurrentFamilySidebar`) ya tiene su fallback.
+
 ### Aviso de `params` fuera de `<Suspense>` en `/elderly/[id]`
 
 - [x] **Estado:** resuelto en SPEC 16
@@ -206,7 +214,7 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 ### Pruebas pendientes con `staff`, `pending`, `archived` y `relative`
 
 - [ ] **Estado:** pendiente
-- **Qué:** SPEC 11 solo se probó con la cuenta admin. Quedan sin comprobar: `staff` activa entra a `/`; `staff` `pending` con contraseña termina en `/login` con `inactive_account`; usuario `archived` (ban) recibe `user_banned` y `inactive_account`; archivado con sesión abierta pasa por `/auth/end-session`; `relative` activo entra a `/family-pending`; `relative` en una ruta de `(app)` redirige a `/family-pending`.
+- **Qué:** SPEC 11 solo se probó con la cuenta admin. Quedan sin comprobar: `staff` activa entra a `/`; `staff` `pending` con contraseña termina en `/login` con `inactive_account`; usuario `archived` (ban) recibe `user_banned` y `inactive_account`; archivado con sesión abierta pasa por `/auth/end-session`; `relative` activo entra a `/family`; `relative` en una ruta de `(app)` redirige a `/family`.
 - **Origen:** SPEC 11, sección "Casos sin verificar".
 - **Se resuelve en:** antes de crear cuentas reales de esos roles (specs de invitación de staff y familiares).
 - **Notas:** no agregar cuentas a `seed.sql`, para no dejar contraseñas de prueba en el repositorio.
@@ -301,11 +309,49 @@ Después comprueba que no quedan el usuario de prueba, sus vínculos ni las invi
 
 ### Eliminar `/family-pending` y reescribir la redirección del familiar
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 18
 - **Qué:** `/family-pending`, `FamilyPendingView` y `requireRelativeUser()` son temporales. Hay que eliminarlos y reescribir el destino del `relative` en `sign-in.ts` y en `requireTeamUser()`.
 - **Origen:** SPEC 11.
 - **Se resuelve en:** la spec de pantallas para familiares.
 - **Notas:** el destino pasa a ser el feed del familiar.
+
+---
+
+## Familiar
+
+Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en SPEC 18 con datos mock (`family/mock-family.ts`). Solo el nombre, el email, las preferencias de notificación y el parentesco del pie del sidebar son reales.
+
+### Chips con un solo adulto mayor
+
+- [ ] **Estado:** pendiente
+- **Qué:** decidir si los chips de adulto mayor del feed y del resumen se ocultan cuando el familiar tiene un solo adulto mayor vinculado.
+- **Origen:** SPEC 18, `family/components/ElderlyFilterChips.tsx`.
+- **Se resuelve en:** la spec que conecte las pantallas del familiar a Supabase.
+- **Notas:** con un solo adulto mayor el chip "Todos" y el filtro no aportan nada; en el resumen es el único chip.
+
+### Enlaces al detalle de publicación desde `/family` y `/family/summary`
+
+- [ ] **Estado:** pendiente
+- **Qué:** las tarjetas del feed, la foto y los ítems de "Lo más lindo de hoy" no enlazan todavía.
+- **Origen:** SPEC 18, `family/components/FamilyPostCard.tsx` y `SummaryHighlightItem.tsx`.
+- **Se resuelve en:** la spec del detalle de publicación (`detalle-publicacion.dc.html`) y del visor de foto (`foto.dc.html`).
+- **Notas:** no usar `href="/"` provisional: llevaría al familiar a un redirect.
+
+### Conectar las pantallas del familiar a Supabase
+
+- [ ] **Estado:** pendiente
+- **Qué:** hoy salen del mock:
+  - posts (visibilidad por `audience`), conteos de reacciones y comentarios, autor y hora;
+  - adultos mayores vinculados (`guardian_elderly`), parentesco, edad y sala (el pie del sidebar ya es real desde SPEC 18);
+  - `photo_consent`;
+  - el resumen (`daily_summaries`, que el esquema marca como diferido);
+  - `todayLabel` y `dateLabel`.
+- **Origen:** SPEC 18, `family/mock-family.ts`.
+- **Se resuelve en:** spec(s) de datos del familiar (feed por `audience`, `daily_summaries`).
+- **Notas:**
+  - Reemplazar `mockFamily` por builders desde las filas reales.
+  - Probar en pantalla el pie del sidebar con varios vínculos y el truncado con "…" (SPEC 18 solo lo probó con un vínculo); y la consulta de `fetchSidebarElderlyLinks` con adultos mayores archivados.
+  - Mientras tanto el sidebar puede decir "Hija de Luis y Carmen" aunque el mock muestre otros adultos mayores.
 
 ---
 

@@ -37,7 +37,9 @@ export function Sidebar({
         </NewPostTrigger>
       )}
 
-      <nav className="flex flex-1 flex-col gap-1">
+      <nav
+        className={`flex flex-1 flex-col gap-1 ${showNewPost ? "" : "mt-1"}`}
+      >
         {items.map(({ key, label, href, activePath, exact, icon: Icon }) => (
           <NavLink
             key={key}
