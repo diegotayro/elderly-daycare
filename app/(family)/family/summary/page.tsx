@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
-import { requireRelativeUser } from "@/auth/require-user";
-import { DailySummaryView } from "@/family/components/DailySummaryView";
+import { Suspense } from "react";
+import { DailySummarySkeleton } from "@/family/components/DailySummarySkeleton";
+import { DailySummaryContent } from "@/family/components/DailySummaryContent";
 
 export const metadata: Metadata = {
   title: "Resumen del día · Casa Nogal",
 };
 
-export default async function FamilySummaryPage() {
-  await requireRelativeUser();
-
-  return <DailySummaryView />;
+export default function FamilySummaryPage() {
+  return (
+    <Suspense fallback={<DailySummarySkeleton />}>
+      <DailySummaryContent />
+    </Suspense>
+  );
 }

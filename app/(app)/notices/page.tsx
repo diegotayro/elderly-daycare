@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
-import { requireTeamUser } from "@/auth/require-user";
-import { NoticesView } from "@/notices/components/NoticesView";
-import { mockNotices } from "@/notices/mock-notices";
+import { Suspense } from "react";
+import { NoticesContent } from "@/notices/components/NoticesContent";
+import { NoticesSkeleton } from "@/notices/components/NoticesSkeleton";
 
 export const metadata: Metadata = {
   title: "Avisos · Casa Nogal",
 };
 
-export default async function NoticesPage() {
-  await requireTeamUser();
-
-  return <NoticesView notices={mockNotices} />;
+export default function NoticesPage() {
+  return (
+    <Suspense fallback={<NoticesSkeleton />}>
+      <NoticesContent />
+    </Suspense>
+  );
 }

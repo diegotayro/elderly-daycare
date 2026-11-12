@@ -1,9 +1,11 @@
-import { requireTeamUser } from "@/auth/require-user";
-import { FeedView } from "@/feed/components/FeedView";
-import { mockFeed } from "@/feed/mock-feed";
+import { Suspense } from "react";
+import { FeedContent } from "@/feed/components/FeedContent";
+import { FeedSkeleton } from "@/feed/components/FeedSkeleton";
 
-export default async function Home() {
-  await requireTeamUser();
-
-  return <FeedView source={mockFeed} />;
+export default function Home() {
+  return (
+    <Suspense fallback={<FeedSkeleton />}>
+      <FeedContent />
+    </Suspense>
+  );
 }

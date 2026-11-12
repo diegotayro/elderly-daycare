@@ -69,7 +69,7 @@ Formato de cada entrada:
 
 ## Carga y streaming de las rutas
 
-Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spec de carga y streaming"). Decisión tomada: streaming con `<Suspense>` y esqueleto de carga, no rutas bloqueantes (`instant = false`). El patrón que se defina ahí lo reusan el feed y `/notices` al conectarse a Supabase. `/elderly` y `/elderly/[id]` se resolvieron antes, en SPEC 16, por decisión del usuario; su patrón (página sin `async`, `*Content` dentro de `<Suspense>`, esqueleto con `SkeletonBlock`) es la referencia para el resto.
+Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spec de carga y streaming"). Decisión tomada: streaming con `<Suspense>` y esqueleto de carga, no rutas bloqueantes (`instant = false`). El patrón que se defina ahí lo reusan el feed y `/notices` al conectarse a Supabase. `/elderly` y `/elderly/[id]` se resolvieron antes, en SPEC 16, por decisión del usuario; su patrón (página sin `async`, `*Content` dentro de `<Suspense>`, esqueleto con `SkeletonBlock`) es la referencia para el resto. La sección quedó cerrada en SPEC 19 (`(app)` y `(family)`); el patrón se reusa al conectar el feed y `/notices` a Supabase.
 
 ### Aviso de consulta fuera de `<Suspense>` en `/elderly`
 
@@ -94,7 +94,7 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 
 ### Esqueleto de carga definitivo de `(app)`
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 19
 - **Qué:** `(app)/loading.tsx` devuelve `null` y el layout muestra `Sidebar` y `MobileTopBar` sin datos como fallback. Falta el esqueleto definitivo.
 - **Origen:** SPEC 11, `app/(app)/loading.tsx` y `app/(app)/layout.tsx`.
 - **Se resuelve en:** la spec de carga y streaming.
@@ -102,7 +102,7 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 
 ### Aviso de consulta fuera de `<Suspense>` y esqueleto de carga de `(family)`
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 19
 - **Qué:** en `npm run dev`, `/family`, `/family/summary` y `/family/account` muestran `Route "...": Next.js encountered uncached data during prerendering or a navigation`, porque `requireRelativeUser()` consulta la sesión fuera de `<Suspense>`. `(family)/loading.tsx` devuelve `null`, sin esqueleto.
 - **Origen:** SPEC 18, `app/(family)/` (mismo patrón y mismo aviso que `(app)` antes de SPEC 16).
 - **Se resuelve en:** la spec de carga y streaming.

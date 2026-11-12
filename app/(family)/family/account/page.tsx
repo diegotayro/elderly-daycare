@@ -1,22 +1,16 @@
 import type { Metadata } from "next";
-import { requireRelativeUser } from "@/auth/require-user";
-import { FamilyAccountView } from "@/family/components/FamilyAccountView";
+import { Suspense } from "react";
+import { AccountSkeleton } from "@/account/components/AccountSkeleton";
+import { FamilyAccountContent } from "@/family/components/FamilyAccountContent";
 
 export const metadata: Metadata = {
   title: "Mi cuenta · Casa Nogal",
 };
 
-export default async function FamilyAccountPage() {
-  const user = await requireRelativeUser();
-
+export default function FamilyAccountPage() {
   return (
-    <FamilyAccountView
-      fullName={user.full_name}
-      email={user.email}
-      notificationValues={{
-        notify_on_post: user.notify_on_post,
-        daily_summary_enabled: user.daily_summary_enabled,
-      }}
-    />
+    <Suspense fallback={<AccountSkeleton withElderlyCard />}>
+      <FamilyAccountContent />
+    </Suspense>
   );
 }
