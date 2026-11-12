@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AccountView } from "@/account/components/AccountView";
+import { teamNotificationPreferences } from "@/account/notification-preferences";
 import { requireTeamUser } from "@/auth/require-user";
 import { userRoleLabels } from "@/users/user-role-labels";
 
@@ -14,7 +15,8 @@ export default async function AccountPage() {
     <AccountView
       fullName={user.full_name}
       email={user.email}
-      roleLabel={userRoleLabels[user.role]}
+      detail={userRoleLabels[user.role]}
+      preferences={teamNotificationPreferences}
       notificationValues={{
         notify_on_post: user.notify_on_post,
         daily_summary_enabled: user.daily_summary_enabled,
