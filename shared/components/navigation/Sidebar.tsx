@@ -59,7 +59,9 @@ export function Sidebar({
           <Avatar initial={userName?.[0] ?? ""} colors={userAvatarColors} />
           <div className="min-w-0 flex-1">
             <div className="text-sm font-extrabold text-ink">{userName}</div>
-            <div className="text-xs text-muted">{userRoleLabel}</div>
+            <div className="truncate text-xs text-muted" title={userRoleLabel}>
+              {userRoleLabel}
+            </div>
           </div>
           <SignOutForm
             title="Cerrar sesión"

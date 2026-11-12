@@ -10,7 +10,9 @@ export default async function FamilyAccountPage() {
 
   return (
     <div className="px-4 pt-5 pb-8 lg:px-10 lg:pt-[34px] lg:pb-20">
-      <h1 className="font-display text-[26px] font-semibold text-ink">Mi cuenta</h1>
+      <h1 className="font-display text-[26px] font-semibold text-ink">
+        Mi cuenta
+      </h1>
     </div>
   );
 }
