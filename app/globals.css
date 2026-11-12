@@ -46,6 +46,14 @@
   --color-pill-selected-line: #9fb8ec;
   --color-code-line: #e6d08a;
   --color-code-ink: #a88526;
+  --color-summary-meal: #f7e7a6;
+  --color-summary-nap: #e7dcf6;
+  --color-summary-moment: #c7e7f1;
+  --color-summary-hero-from: #fbe0d2;
+  --color-summary-hero-to: #f9d2de;
+  --color-summary-hero-date: #9a6a6a;
+  --color-mood-bg: #f9d2de;
+  --color-mood-ink: #c56486;
 }
 
 body {
