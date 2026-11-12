@@ -37,7 +37,12 @@ export type ActivateAccountResult =
 
 export type CurrentUser = Pick<
   User,
-  "id" | "role" | "full_name" | "notify_on_post" | "daily_summary_enabled"
+  | "id"
+  | "role"
+  | "first_name"
+  | "full_name"
+  | "notify_on_post"
+  | "daily_summary_enabled"
 > & {
   email: string;
   daycareName: string;

@@ -1,14 +1,16 @@
-import {
-  notificationPreferences,
-  type NotificationPreferenceKey,
+import type {
+  NotificationPreference,
+  NotificationPreferenceKey,
 } from "../notification-preferences";
 import { NotificationToggle } from "./NotificationToggle";
 
 type NotificationSettingsCardProps = {
+  preferences: NotificationPreference[];
   initialValues: Record<NotificationPreferenceKey, boolean>;
 };
 
 export function NotificationSettingsCard({
+  preferences,
   initialValues,
 }: NotificationSettingsCardProps) {
   return (
@@ -16,7 +18,7 @@ export function NotificationSettingsCard({
       <h2 className="m-0 mb-3.5 text-[12.5px] font-extrabold tracking-[0.8px] text-label">
         NOTIFICACIONES
       </h2>
-      {notificationPreferences.map(({ key, label }) => (
+      {preferences.map(({ key, label }) => (
         <NotificationToggle
           key={key}
           label={label}

@@ -28,7 +28,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const { data, error } = await supabase
     .from("users")
     .select(
-      "id, role, full_name, notify_on_post, daily_summary_enabled, daycares!inner(name)",
+      "id, role, first_name, full_name, notify_on_post, daily_summary_enabled, daycares!inner(name)",
     )
     .eq("id", claims.sub)
     .maybeSingle<CurrentUserRow>();

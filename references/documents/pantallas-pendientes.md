@@ -13,11 +13,11 @@ Lista de pantallas, modales y componentes que faltan. Marcar cada uno al termina
 
 ### Familiar (relative)
 
-- [ ] **3. Feed familiar** (`familia-feed.dc.html`): saludo, filtro por adulto mayor (Luis / Carmen / Todos) y posts. Tiene un menú propio: Feed, Resumen del día, Mi cuenta.
+- [x] **3. Feed familiar** (`familia-feed.dc.html`): saludo, filtro por adulto mayor (Luis / Carmen / Todos) y posts. Tiene un menú propio: Feed, Resumen del día, Mi cuenta. Ruta `/family` (SPEC 18, datos mock).
 - [ ] **4. Detalle de publicación** (`detalle-publicacion.dc.html`): post completo, "Me encanta", comentarios y caja para comentar.
 - [ ] **5. Foto a pantalla completa** (`foto.dc.html`): visor oscuro con los datos del post.
-- [ ] **6. Mi cuenta familiar** (`familia-cuenta.dc.html`): sus adultos mayores con el estado de fotos (solo lectura) y sus notificaciones.
-- [ ] **7. Resumen del día** (`resumen-dia.dc.html`): el esquema dice que **todavía no** se construye. Solo se crea la tabla.
+- [x] **6. Mi cuenta familiar** (`familia-cuenta.dc.html`): sus adultos mayores con el estado de fotos (solo lectura) y sus notificaciones. Ruta `/family/account` (SPEC 18, datos mock).
+- [x] **7. Resumen del día** (`resumen-dia.dc.html`): el esquema dice que **todavía no** se construye. Solo se crea la tabla. Ruta `/family/summary` (SPEC 18, datos mock).
 
 ---
 

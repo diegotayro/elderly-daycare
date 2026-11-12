@@ -1,3 +1,4 @@
+import { avatarTones, type AvatarTone } from "@/elderly/avatar-tones";
 import { Avatar } from "@/shared/components/Avatar";
 import { MegaphoneIcon } from "@/shared/components/icons/MegaphoneIcon";
 import type { PostType } from "@/shared/database/types";
@@ -6,11 +7,13 @@ import { postTypeStyles } from "../post-type-styles";
 type PostAuthorAvatarProps = {
   avatarInitial: string | null;
   type: PostType;
+  tone?: AvatarTone; // sin tono, el adulto mayor se pinta en azul
 };
 
 export function PostAuthorAvatar({
   avatarInitial,
   type,
+  tone,
 }: PostAuthorAvatarProps) {
   if (avatarInitial) {
     return (
@@ -19,6 +22,7 @@ export function PostAuthorAvatar({
         size={44}
         fontSize={17}
         colorClassName="bg-elderly-bg text-elderly-ink"
+        colors={tone && avatarTones[tone]}
       />
     );
   }

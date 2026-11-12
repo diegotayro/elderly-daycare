@@ -12,14 +12,14 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
   return (
     <NewPostDialogProvider options={buildNewPostOptions(mockElderly)}>
       <div className="flex min-h-screen flex-col bg-cream lg:flex-row">
-        <Suspense fallback={<Sidebar />}>
+        <Suspense fallback={<Sidebar variant="team" />}>
           <CurrentUserSidebar />
         </Suspense>
-        <Suspense fallback={<MobileTopBar />}>
-          <CurrentUserMobileTopBar />
+        <Suspense fallback={<MobileTopBar variant="team" />}>
+          <CurrentUserMobileTopBar variant="team" />
         </Suspense>
         <main className="min-w-0 flex-1 pb-16 lg:pb-0">{children}</main>
-        <MobileBottomNav />
+        <MobileBottomNav variant="team" />
       </div>
     </NewPostDialogProvider>
   );

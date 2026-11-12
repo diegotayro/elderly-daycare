@@ -1,8 +1,15 @@
 import { getCurrentUser } from "@/auth/get-current-user";
+import type { NavVariant } from "./nav-items";
 import { MobileTopBar } from "./MobileTopBar";
 
-export async function CurrentUserMobileTopBar() {
+type CurrentUserMobileTopBarProps = {
+  variant: NavVariant;
+};
+
+export async function CurrentUserMobileTopBar({
+  variant,
+}: CurrentUserMobileTopBarProps) {
   const user = await getCurrentUser();
 
-  return <MobileTopBar daycareName={user?.daycareName} />;
+  return <MobileTopBar variant={variant} daycareName={user?.daycareName} />;
 }
