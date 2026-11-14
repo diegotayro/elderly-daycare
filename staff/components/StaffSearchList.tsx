@@ -10,7 +10,6 @@ import { StaffCard } from "./StaffCard";
 type StaffSearchListProps = {
   title: ReactNode;
   list: StaffList;
-  existingEmails: string[];
 };
 
 function formatCount(count: number): string {
@@ -45,11 +44,7 @@ function StaffSection({ label, items }: StaffSectionProps) {
   );
 }
 
-export function StaffSearchList({
-  title,
-  list,
-  existingEmails,
-}: StaffSearchListProps) {
+export function StaffSearchList({ title, list }: StaffSearchListProps) {
   const [query, setQuery] = useState("");
   const normalizedQuery = normalizeSearch(query.trim());
   const matchesQuery = (item: StaffListItem) =>
@@ -69,7 +64,7 @@ export function StaffSearchList({
     <>
       <header className="mb-[22px] flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
         {title}
-        <AddStaffDialog existingEmails={existingEmails} />
+        <AddStaffDialog />
       </header>
       <label className="mb-[22px] flex items-center gap-[11px] rounded-[14px] border border-line bg-surface px-4 py-3 focus-within:border-coral">
         <SearchIcon size={18} className="flex-none text-[#B0A290]" />

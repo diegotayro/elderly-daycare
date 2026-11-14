@@ -13,7 +13,6 @@ export function StaffListView({ source }: StaffListViewProps) {
       <StaffSearchList
         title={<StaffListTitle />}
         list={buildStaffList(source)}
-        existingEmails={source.staff.map((staff) => staff.email)}
       />
     </div>
   );
