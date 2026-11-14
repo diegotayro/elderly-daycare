@@ -41,7 +41,7 @@ No hay framework de tests configurado todavía.
 - Solo usuarios con `status = active` tienen acceso.
 - La regla de visibilidad del feed (según `audience`, nunca `type`) se implementa en un solo lugar y la reusan `posts`, `post_elderly`, `post_photos`, `reactions`, `comments` y Storage.
 - Signup público desactivado. La creación de cuentas va en Server Actions con el cliente `service_role`, solo después de verificar permisos del que llama. `role` y `daycare_id` los fija siempre el servidor.
-- El cliente `service_role` se usa solo para los casos listados en el esquema (crear cuentas, leer la invitación sin sesión y crear la cuenta del familiar, activar/archivar usuarios, cron del resumen diario).
+- El cliente `service_role` se usa solo para los casos listados en el esquema (crear cuentas, leer la invitación sin sesión y crear la cuenta del familiar, invitar y reenviar la invitación al staff, archivar/reactivar usuarios, cron del resumen diario).
 - Consentimiento de fotos: siempre gana el "no"; un familiar nunca puede pasarlo de `false` a `true`.
 
 ## Convenciones
@@ -66,7 +66,7 @@ No hay framework de tests configurado todavía.
   - `server.ts`: Server Components, Server Actions y Route Handlers.
   - `client.ts`: Client Components.
   - `proxy.ts`: lo usa solo `proxy.ts` de la raíz para refrescar la sesión.
-- La única excepción es el cliente `service_role` (`shared/supabase/admin.ts`, `server-only`), solo para los casos listados en el esquema. Hoy se usa en `auth/get-invitation-preview.ts` y `auth/actions/activate-account.ts`.
+- La única excepción es el cliente `service_role` (`shared/supabase/admin.ts`, `server-only`), solo para los casos listados en el esquema. Hoy se usa en `auth/get-invitation-preview.ts`, `auth/actions/activate-account.ts`, `staff/actions/invite-staff.ts` y `staff/actions/resend-staff-invitation.ts`.
 
 ## Flujo de trabajo: Spec Driven Design (SDD)
 
