@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { StaffListContent } from "@/staff/components/StaffListContent";
+import { StaffListSkeleton } from "@/staff/components/StaffListSkeleton";
 
 export const metadata: Metadata = {
   title: "Staff · Casa Nogal",
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function StaffPage() {
   return (
-    <Suspense>
+    <Suspense fallback={<StaffListSkeleton />}>
       <StaffListContent />
     </Suspense>
   );
