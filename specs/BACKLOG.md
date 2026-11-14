@@ -214,8 +214,8 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 ### Pruebas pendientes con `staff`, `pending`, `archived` y `relative`
 
 - [ ] **Estado:** pendiente
-- **Qué:** SPEC 11 solo se probó con la cuenta admin. Quedan sin comprobar: `staff` activa entra a `/`; `staff` `pending` con contraseña termina en `/login` con `inactive_account`; usuario `archived` (ban) recibe `user_banned` y `inactive_account`; archivado con sesión abierta pasa por `/auth/end-session`; `relative` activo entra a `/family`; `relative` en una ruta de `(app)` redirige a `/family`.
-- **Origen:** SPEC 11, sección "Casos sin verificar".
+- **Qué:** SPEC 11 solo se probó con la cuenta admin. Quedan sin comprobar: `staff` activa entra a `/`; `staff` `pending` con contraseña termina en `/login` con `inactive_account`; usuario `archived` (ban) recibe `user_banned` y `inactive_account`; archivado con sesión abierta pasa por `/auth/end-session`; `relative` activo entra a `/family`; `relative` en una ruta de `(app)` redirige a `/family`; `staff` que abre `/staff` o `/staff/[id]` redirige a `/` y `relative` a `/family` (SPEC 20, `requireAdminUser()`).
+- **Origen:** SPEC 11, sección "Casos sin verificar"; SPEC 20 (redirección de `/staff`).
 - **Se resuelve en:** antes de crear cuentas reales de esos roles (specs de invitación de staff y familiares).
 - **Notas:** no agregar cuentas a `seed.sql`, para no dejar contraseñas de prueba en el repositorio.
 
@@ -418,6 +418,26 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Notas:**
   - Requiere Server Action y UI sin mockup (desde el perfil o desde la sección de archivados), solo admin.
   - Revisar `elderly_update_admin` antes de definir la acción.
+
+---
+
+## Staff
+
+### Botón Editar del perfil de staff
+
+- [ ] **Estado:** pendiente
+- **Qué:** el botón "Editar" de `/staff/[id]` no tiene acción (es un `<button type="button">`).
+- **Origen:** SPEC 20 (`staff/components/StaffProfileHeader.tsx`).
+- **Se resuelve en:** una spec de edición de staff (sin asignar).
+- **Notas:** `/elderly/[id]` tampoco lo tiene resuelto; definir qué campos se editan (nombres, apellidos; el email vive en `auth.users`).
+
+### Reenviar invitación a staff pendiente
+
+- [ ] **Estado:** pendiente
+- **Qué:** el perfil y la lista de un staff `pending` no permiten reenviar la invitación (punto 8 de `pantallas-pendientes.md`).
+- **Origen:** SPEC 20.
+- **Se resuelve en:** una spec de invitación de staff posterior a SPEC 21 (sin asignar).
+- **Notas:** requiere el cliente `service_role` (`inviteUserByEmail` o `generateLink`). Cancelar la invitación va en SPEC 22.
 
 ---
 

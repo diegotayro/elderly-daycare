@@ -19,6 +19,12 @@ export async function requireTeamUser(): Promise<CurrentUser> {
   return user;
 }
 
+export async function requireAdminUser(): Promise<CurrentUser> {
+  const user = await requireTeamUser();
+  if (user.role !== "admin") redirect(TEAM_HOME);
+  return user;
+}
+
 export async function requireRelativeUser(): Promise<CurrentUser> {
   const user = await requireActiveUser();
   if (user.role !== "relative") redirect(TEAM_HOME);

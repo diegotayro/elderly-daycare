@@ -1,14 +1,18 @@
-import { navVariants, type NavVariant } from "./nav-items";
+import { getVisibleNavItems, type NavVariant } from "./nav-items";
 import { NavLink } from "./NavLink";
 
 type MobileBottomNavProps = {
   variant: NavVariant;
+  isAdmin?: boolean;
 };
 
-export function MobileBottomNav({ variant }: MobileBottomNavProps) {
+export function MobileBottomNav({
+  variant,
+  isAdmin = false,
+}: MobileBottomNavProps) {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-10 flex h-16 border-t border-line bg-surface lg:hidden">
-      {navVariants[variant].items.map(
+      {getVisibleNavItems(variant, isAdmin).map(
         ({ key, label, href, activePath, exact, icon: Icon }) => (
           <NavLink
             key={key}

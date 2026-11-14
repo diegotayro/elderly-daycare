@@ -104,3 +104,10 @@ export type Invitation = {
   accepted_at: string | null;
   created_at: string;
 };
+
+export type StaffElderly = {
+  id: string;
+  staff_id: string;
+  elderly_id: string;
+  created_at: string;
+};

@@ -4,7 +4,7 @@ import { Avatar } from "../Avatar";
 import { LogoutIcon } from "../icons/LogoutIcon";
 import { PlusIcon } from "../icons/PlusIcon";
 import { BrandLink } from "./BrandLink";
-import { navVariants, type NavVariant } from "./nav-items";
+import { getVisibleNavItems, navVariants, type NavVariant } from "./nav-items";
 import { NavLink } from "./NavLink";
 
 type SidebarProps = {
@@ -12,6 +12,7 @@ type SidebarProps = {
   daycareName?: string;
   userName?: string;
   userRoleLabel?: string;
+  isAdmin?: boolean;
 };
 
 export function Sidebar({
@@ -19,8 +20,10 @@ export function Sidebar({
   daycareName,
   userName,
   userRoleLabel,
+  isAdmin = false,
 }: SidebarProps) {
-  const { items, showNewPost, userAvatarColors } = navVariants[variant];
+  const { showNewPost, userAvatarColors } = navVariants[variant];
+  const items = getVisibleNavItems(variant, isAdmin);
 
   return (
     <aside className="sticky top-0 hidden h-screen w-62 flex-none flex-col border-r border-line bg-surface px-4 py-6 lg:flex">

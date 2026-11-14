@@ -12,6 +12,7 @@ export async function CurrentUserSidebar() {
       daycareName={user.daycareName}
       userName={user.full_name}
       userRoleLabel={userRoleLabels[user.role]}
+      isAdmin={user.role === "admin"}
     />
   );
 }
