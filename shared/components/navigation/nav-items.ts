@@ -3,6 +3,7 @@ import type { IconProps } from "../icons/Icon";
 import { BellIcon } from "../icons/BellIcon";
 import { HomeIcon } from "../icons/HomeIcon";
 import { PeopleIcon } from "../icons/PeopleIcon";
+import { StaffIcon } from "../icons/StaffIcon";
 import { SunIcon } from "../icons/SunIcon";
 import { UserIcon } from "../icons/UserIcon";
 import { avatarTones } from "@/elderly/avatar-tones";
@@ -16,6 +17,7 @@ export type NavItem = {
   activePath: string; // ruta que marca la opción como activa
   exact: boolean; // true: activo solo en la ruta exacta (inicio de cada área)
   icon: ComponentType<IconProps>;
+  adminOnly?: boolean; // solo se muestra al admin
 };
 
 export type NavVariantConfig = {
@@ -25,6 +27,15 @@ export type NavVariantConfig = {
   showNewPost: boolean;
   userAvatarColors?: { bg: string; fg: string };
 };
+
+export function getVisibleNavItems(
+  variant: NavVariant,
+  isAdmin: boolean,
+): NavItem[] {
+  return navVariants[variant].items.filter(
+    ({ adminOnly }) => isAdmin || !adminOnly,
+  );
+}
 
 export const navVariants: Record<NavVariant, NavVariantConfig> = {
   team: {
@@ -44,6 +55,15 @@ export const navVariants: Record<NavVariant, NavVariantConfig> = {
         activePath: "/elderly",
         exact: false,
         icon: PeopleIcon,
+      },
+      {
+        key: "staff",
+        label: "Staff",
+        href: "/staff",
+        activePath: "/staff",
+        exact: false,
+        icon: StaffIcon,
+        adminOnly: true,
       },
       {
         key: "notices",
