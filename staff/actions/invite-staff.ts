@@ -5,9 +5,9 @@ import { cookies } from "next/headers";
 import { getCurrentUser } from "@/auth/get-current-user";
 import { createAdminClient } from "@/shared/supabase/admin";
 import { createClient } from "@/shared/supabase/server";
-import { getAcceptInviteUrl } from "../get-accept-invite-url";
 import { newStaffMessages as messages } from "../new-staff-messages";
 import { readNewStaffInput } from "../read-new-staff-input";
+import { buildStaffInvitationOptions } from "../staff-invitation-options";
 import type { InviteStaffResult } from "../types";
 import { validateNewStaff } from "../validate-new-staff";
 
@@ -39,18 +39,13 @@ export async function inviteStaff(
     return { status: "invalid", errors: { email: messages.teamEmail } };
   }
 
-  // role y daycare_id los fija el servidor, nunca el formulario
   const { error } = await createAdminClient().auth.admin.inviteUserByEmail(
     email,
-    {
-      redirectTo: getAcceptInviteUrl(),
-      data: {
-        first_name: input.firstName.trim(),
-        last_name: input.lastName.trim(),
-        role: "staff",
-        daycare_id: daycareResult.data,
-      },
-    },
+    buildStaffInvitationOptions({
+      firstName: input.firstName.trim(),
+      lastName: input.lastName.trim(),
+      daycareId: daycareResult.data,
+    }),
   );
   if (error) {
     if (error.code === "email_exists") {

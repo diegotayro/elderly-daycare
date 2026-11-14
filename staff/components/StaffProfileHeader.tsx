@@ -1,6 +1,7 @@
 import { avatarTones } from "@/elderly/avatar-tones";
 import { Avatar } from "@/shared/components/Avatar";
 import type { StaffProfile } from "../types";
+import { ResendInvitationButton } from "./ResendInvitationButton";
 
 type StaffProfileHeaderProps = {
   profile: StaffProfile;
@@ -8,7 +9,7 @@ type StaffProfileHeaderProps = {
 
 export function StaffProfileHeader({ profile }: StaffProfileHeaderProps) {
   return (
-    <div className="flex items-center gap-[18px]">
+    <div className="flex flex-wrap items-center gap-x-[18px] gap-y-3">
       <Avatar
         initial={profile.initial}
         size={84}
@@ -21,12 +22,17 @@ export function StaffProfileHeader({ profile }: StaffProfileHeaderProps) {
         </h1>
         <p className="m-0 mt-[3px] text-[15px] text-muted-strong">Staff</p>
       </div>
-      <button
-        type="button"
-        className="cursor-pointer rounded-xl border-[1.5px] border-line bg-surface px-4 py-[9px] text-sm font-bold text-nav"
-      >
-        Editar
-      </button>
+      <div className="flex gap-2">
+        {profile.canResendInvitation && (
+          <ResendInvitationButton staffId={profile.id} email={profile.email} />
+        )}
+        <button
+          type="button"
+          className="cursor-pointer rounded-xl border-[1.5px] border-line bg-surface px-4 py-[9px] text-sm font-bold text-nav"
+        >
+          Editar
+        </button>
+      </div>
     </div>
   );
 }
