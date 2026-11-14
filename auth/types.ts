@@ -53,3 +53,17 @@ export type LoginErrorCode =
   | "inactive_account"
   | "invalid_invitation_link"
   | "unexpected";
+
+// Formulario de /create-password (staff invitado)
+export type CreatePasswordInput = {
+  password: string;
+  passwordConfirmation: string;
+};
+
+export type CreatePasswordField = keyof CreatePasswordInput;
+export type CreatePasswordErrors = Partial<Record<CreatePasswordField, string>>;
+
+// Si todo sale bien la acción redirige, así que no hay resultado de éxito
+export type CreatePasswordResult =
+  | { status: "invalid"; errors: CreatePasswordErrors }
+  | { status: "error"; message: string };

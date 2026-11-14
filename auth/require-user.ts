@@ -24,6 +24,24 @@ async function requireActiveUser(): Promise<CurrentUser> {
   redirect("/auth/end-session");
 }
 
+type PendingStaff = { firstName: string; email: string };
+
+// Para /create-password: solo entra un staff invitado que aún no activó su cuenta
+export async function requirePendingStaff(): Promise<PendingStaff> {
+  const user = await getCurrentUser();
+  if (user) redirect(user.role === "relative" ? RELATIVE_HOME : TEAM_HOME);
+
+  const claims = await getSessionClaims();
+  if (!claims) redirect("/login");
+  if (!(await isPendingStaff())) redirect("/auth/end-session");
+
+  // Solo para mostrarlos: la activación usa la sesión, no estos datos
+  return {
+    firstName: claims.user_metadata?.first_name ?? "",
+    email: claims.email ?? "",
+  };
+}
+
 export async function requireTeamUser(): Promise<CurrentUser> {
   const user = await requireActiveUser();
   if (user.role === "relative") redirect(RELATIVE_HOME);
