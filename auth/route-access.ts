@@ -1,4 +1,5 @@
-const PUBLIC_ROUTES = ["/login", "/activate-account"];
+// /accept-invite recibe la sesión en el fragmento, así que llega sin sesión
+const PUBLIC_ROUTES = ["/login", "/activate-account", "/accept-invite"];
 const LOGIN_ROUTE = "/login";
 const HOME_ROUTE = "/";
 
