@@ -14,7 +14,7 @@ SPEC 20 dejó las pantallas de staff con un mock y estado local, y planificó es
 Hay dos cambios respecto de SPEC 20, decididos por el usuario:
 
 - **Un staff `pending` no se puede vincular.** La policy `staff_elderly_insert_admin` exige `status = 'active'`, y se mantiene así. En el perfil de un pendiente, la tarjeta de vinculados es de solo lectura.
-- **Reenviar invitación entra aquí.** El link de Supabase vence en 24 h como máximo, así que sin reenvío un staff que no lo abrió a tiempo queda bloqueado.
+- **Reenviar invitación entra aquí.** El link de Supabase vence en 2 h (decisión del usuario; Supabase permite hasta 24 h), así que sin reenvío un staff que no lo abrió a tiempo queda bloqueado.
 
 > **Temporal: correo con el SMTP gratuito de Supabase.** Por ahora el correo de invitación lo envía Supabase con su SMTP por defecto (plan gratuito). Ese SMTP solo entrega a los emails de los miembros de la organización de Supabase (para la demo, el Gmail del usuario) y **no permite editar la plantilla**: el correo sale en inglés ("You've been invited") con el link por defecto (`{{ .ConfirmationURL }}`), que devuelve la sesión en el fragmento de la URL. Por eso esta spec usa una página cliente, `/accept-invite`, que lee ese fragmento. **Más adelante se cambiará a Resend** (SMTP propio con dominio verificado): plantilla en español, link con `token_hash` a un Route Handler `/auth/confirm` y se elimina `/accept-invite`. Queda en BACKLOG ("Correo de invitación de staff con Resend").
 
@@ -100,7 +100,7 @@ Una sola spec con DB, Auth, correo y la pantalla nueva: decisión del usuario, a
 - **Se elimina el mock:** `mock-staff.ts`, `build-new-staff-item.ts`, `isLink`, la adulta mayor Teresa y el estado local de vínculos de `linked-elderly-changes.ts`, o la parte que quede sin uso.
 - **Pasos manuales del usuario en el dashboard de Supabase** (detalle en el paso 4 del plan):
   - "Site URL" y "Redirect URLs" (con `http://localhost:3000/**`).
-  - "Email OTP Expiration" en 86400 s (24 h).
+  - "Email OTP Expiration" en 7200 s (2 h, decisión del usuario).
   - Comprobar que el email de la demo es miembro de la organización de Supabase.
   - **No** se edita la plantilla: con el SMTP gratuito no se puede.
 - **Documentación:**
@@ -251,7 +251,7 @@ specs/BACKLOG.md
 
 ## Plan de implementación
 
-Antes de los pasos 1 y 2, cargar los skills `supabase` y `supabase-postgres-best-practices`. Antes de los pasos de UI (5, 6, 8 y 12), cargar `frontend-design:frontend-design`; gana el mockup. Antes de los pasos 5, 7, 8 y 11, consultar Context7 (supabase-js `setSession`, `updateUser`, `auth.admin.inviteUserByEmail`, `resetPasswordForEmail` y el código de error de email ya registrado) y `node_modules/next/dist/docs/` (Server Actions, `refresh`, `redirect`, Client Components).
+Antes de los pasos 1 y 2, cargar los skills `supabase` y `supabase-postgres-best-practices`. Antes de los pasos de UI (5, 6, 8 y 12), cargar `frontend-design:frontend-design`; gana el mockup. Antes de los pasos 5, 7, 8 y 9, consultar Context7 (supabase-js `setSession`, `updateUser`, `auth.admin.inviteUserByEmail`, `resetPasswordForEmail` y el código de error de email ya registrado) y `node_modules/next/dist/docs/` (Server Actions, `refresh`, `redirect`, Client Components).
 
 1. **Migración.** Funciones, excepción del trigger y grants. Pedir permiso, aplicarla con `apply_migration` y correr `get_advisors`. Prueba por SQL: `anon` no ejecuta ninguna; un staff no recibe filas de `get_staff_emails()`; un `update` directo de `status` hecho por un staff sigue fallando.
 2. **Lectura real.** `fetch-staff-emails.ts`, `get-staff-source.ts`, `get-staff-profile-source.ts` y builders sin `isLink`, con `canManageLinks` y `canResendInvitation`. Se elimina el mock. Prueba: `npm run build`; `/staff` muestra los staff reales (o ninguna sección si no hay) sin errores en consola.
@@ -260,25 +260,29 @@ Antes de los pasos 1 y 2, cargar los skills `supabase` y `supabase-postgres-best
    - **Authentication → URL Configuration:**
      - "Site URL" = `http://localhost:3000` (el valor de `APP_URL`).
      - "Redirect URLs": agregar `http://localhost:3000/**`. Sin esto, Supabase ignora el `redirectTo` y manda a la Site URL.
-   - **Authentication → Sign In / Providers → Email:** "Email OTP Expiration" = `86400` (24 h; el valor por defecto es 1 h).
+   - **Authentication → Sign In / Providers → Email:** "Email OTP Expiration" = `7200` (2 h, decisión del usuario; el valor por defecto es 1 h).
    - **Organization → Team:** el email que se usará para la demo (el Gmail del usuario) figura como miembro. El SMTP gratuito solo entrega a esos emails, y no sirve un alias como `nombre+staff@gmail.com`.
-   - **Authentication → Rate Limits:** anotar el límite de correos por hora; cada invitación y cada reenvío cuentan.
+   - **Authentication → Rate Limits:** anotar el límite de correos por hora; cada invitación y cada reenvío cuentan. El usuario confirmó que es 2 por hora, por lo que la prueba real se une en una sola (paso 10).
    - **Authentication → Emails:** no se toca. Con el SMTP gratuito la plantilla no se puede editar ("Set up custom SMTP to edit templates"); el correo sale en inglés y eso es aceptado para esta etapa.
    - Los nombres de los menús pueden variar según la versión del dashboard. Prueba: el usuario confirma los puntos.
 5. **`/accept-invite` y acceso.** Página cliente, `route-access.ts`, mensaje de `/login` y `requireActiveUser()` con `is_pending_staff()`. Prueba: `/accept-invite` sin fragmento y con `#error=access_denied` redirige a `/login?error=invalid_invitation_link` con el mensaje.
 6. **`/create-password`.** Página, `*Content`, vista, formulario, validación y mensajes. Prueba: sin sesión redirige a `/login`; con la sesión del admin redirige a `/`.
 7. **Action de crear contraseña.** `createStaffPassword` con `updateUser` y `activate_staff_account`. Prueba: `npm run build`.
 8. **"Agregar staff" real.** `inviteStaff` con `redirectTo`, errores del servidor, pendiente y toasts. Prueba: `npm run build`; agregar el email del admin muestra "Ya hay alguien del equipo con este email." sin crear nada.
-9. **Prueba real de punta a punta: invitar y crear contraseña** (escribe en el remoto y envía un correo real; **pedir permiso antes**). Es la prueba que asegura que el flujo con el SMTP gratuito funciona:
-   1. Con la app en `npm run dev` y la sesión del admin, agregar al staff con el Gmail del usuario (miembro de la organización).
+9. **Reenviar invitación (solo código).** Action con `inviteUserByEmail` y el plan B `resetPasswordForEmail`, botón y toasts. Prueba: `npm run build`; el botón aparece solo en un staff `pending`. La prueba real va en el paso 10.
+10. **Prueba real combinada de punta a punta: invitar, reenviar y crear contraseña** (la hace el usuario manualmente; escribe en el remoto y envía 2 correos reales, que es el límite por hora del SMTP gratuito: **no repetirla dentro de la misma hora**). Es la prueba que asegura que el flujo con el SMTP gratuito funciona:
+   1. Con la app en `npm run dev` y la sesión del admin, agregar al staff con el Gmail del usuario (miembro de la organización). Llega el correo 1, "You've been invited"; **no abrirlo todavía**.
    2. Comprobar en `/staff` la tarjeta en PENDIENTES y, por SQL, la fila en `users` con `role = 'staff'`, `status = 'pending'` y el `daycare_id` del admin.
-   3. El usuario abre el correo "You've been invited" **en la misma PC** y el link **en una ventana privada** (para no reemplazar la sesión del admin).
-   4. Comprobar que llega a `/accept-invite`, pasa a `/create-password` con "Hola, {nombres}" y el email correcto.
-   5. Crear la contraseña: termina en `/` con la sesión del staff y, por SQL, `status = 'active'`.
-   6. Con esa sesión, `/staff` redirige a `/`. Cerrar sesión y entrar en `/login` con el email y la contraseña nueva.
-   - Si algún punto falla, **detenerse y preguntar** antes de seguir con el paso 10. El usuario decide si la cuenta se conserva para la demo o se borra (con permiso, `auth.admin.deleteUser`).
-10. **Reenviar invitación.** Action con `inviteUserByEmail` y el plan B `resetPasswordForEmail`, botón y toasts. Prueba real (**pedir permiso**): con un staff `pending` que no abrió el link, "Reenviar invitación" envía un correo nuevo y el link anterior deja de servir. Si hay un staff `pending` con el email confirmado (abrió el link pero no creó la contraseña), confirmar el error de Auth y que el plan B lleva a `/create-password`. Si no se puede reproducir, queda revisado en el código y anotado en BACKLOG.
-11. **Vincular y desvincular con un staff real.** Con el staff activo del paso 9: vincular y desvincular persisten tras recargar (completa la prueba del paso 3).
+   3. En el perfil del staff, usar "Reenviar invitación" (correo 2).
+      - Si Auth lo acepta: el link del correo 1 ya no debe servir (al abrirlo lleva a `/login` con el mensaje de enlace no válido).
+      - Si Auth responde que el email ya está registrado: el código usa `resetPasswordForEmail` y el correo 2 es "Reset your password". Se anota el error exacto de Auth (confirma o corrige el supuesto del plan B).
+   4. El usuario abre el correo 2 **en la misma PC** y su link **en una ventana privada** (para no reemplazar la sesión del admin).
+   5. Comprobar que llega a `/accept-invite`, pasa a `/create-password` con "Hola, {nombres}" y el email correcto.
+   6. Crear la contraseña: termina en `/` con la sesión del staff y, por SQL, `status = 'active'`.
+   7. Con esa sesión, `/staff` redirige a `/`. Cerrar sesión y entrar en `/login` con el email y la contraseña nueva.
+   - El caso "abrió el link pero no creó la contraseña" no se prueba por separado (haría falta un tercer correo): queda cubierto si el punto 3 cae en el plan B, y si no, queda revisado en el código y anotado en BACKLOG.
+   - Si algún punto falla, **detenerse y preguntar**. El usuario decide si la cuenta se conserva para la demo o se borra (con permiso, `auth.admin.deleteUser`).
+11. **Vincular y desvincular con un staff real.** Con el staff activo del paso 10: vincular y desvincular persisten tras recargar (completa la prueba del paso 3).
 12. **Móvil y accesibilidad.** A 390×844 y 360 px: `/create-password`, `/accept-invite`, el botón "Reenviar invitación" en la cabecera y los modales en estado pendiente. Capturas en `.playwright-mcp/`.
 13. **Documentación y BACKLOG.** `database-schema.md`, `flujos-de-procesos.md`, `pantallas-pendientes.md`, `CLAUDE.md` y `BACKLOG.md` (incluida la entrada "Correo de invitación de staff con Resend").
 
@@ -331,9 +335,11 @@ Antes de los pasos 1 y 2, cargar los skills `supabase` y `supabase-postgres-best
 - [ ] `/create-password` no define componentes propios de campo, botón ni marca: usa los de `auth/components/`, y su contenedor y encabezado se ven igual que los de `/activate-account` a 1440×900 y 390×844.
 - [ ] `createStaffPassword` llama a `is_pending_staff()` antes de `updateUser`, y a `activate_staff_account()` después; no recibe ningún id del cliente.
 
-**Prueba real con el SMTP gratuito (paso 9, con permiso)**
+**Prueba real con el SMTP gratuito (paso 10, manual del usuario, 2 correos)**
 
 - [ ] El correo de invitación llega al Gmail del usuario.
+- [ ] "Reenviar invitación" envía un correo nuevo, y se anota si Auth lo aceptó o si se usó el plan B (con el error exacto de Auth).
+- [ ] Si el reenvío fue aceptado, el link del primer correo ya no sirve.
 - [ ] El link lleva a `/accept-invite` y luego a `/create-password` con los nombres y el email del staff.
 - [ ] Crear la contraseña deja `status = 'active'`, inicia sesión en `/` y el staff puede volver a entrar por `/login`.
 - [ ] Con la sesión del staff, `/staff` redirige a `/`.
@@ -362,12 +368,12 @@ Antes de los pasos 1 y 2, cargar los skills `supabase` y `supabase-postgres-best
 - **Sí:** ruta `/create-password` y no `/crear-contrasena` (nombre de los flujos y de SPEC 20). Todas las rutas del proyecto están en inglés (`/activate-account`, `/staff`); se actualiza `flujos-de-procesos.md`.
 - **Sí, temporal:** página cliente `/accept-invite` que lee el fragmento y llama a `setSession`. Verificado: con la plantilla por defecto la sesión vuelve en el fragmento (guía "Email templates" de Supabase), y el cliente PKCE de `@supabase/ssr` no lo procesa solo (`GoTrueClient.js`). **No:** `/auth/confirm` con `token_hash`, porque necesita editar la plantilla; se hará al pasar a Resend. **No:** cambiar el cliente del navegador a flujo implícito, que afectaría a toda la app.
 - **Sí:** un staff `pending` con sesión que abre otra ruta va a `/create-password`. **No:** cerrarle la sesión, porque el link ya se usó y tendría que pedir un reenvío.
-- **Sí:** "Reenviar invitación" en esta spec (decisión del usuario), con OTP de 24 h. No borra nada en la DB: solo cambia el token interno de Supabase.
+- **Sí:** "Reenviar invitación" en esta spec (decisión del usuario), con OTP de 2 h. No borra nada en la DB: solo cambia el token interno de Supabase.
 - **Sí:** plan B del reenvío con `resetPasswordForEmail` cuando el email ya está confirmado. El cliente admin de `supabase-js` usa flujo implícito por defecto, así que su link también vuelve con el fragmento y sirve la misma página.
 - **Sí:** el email que ya tiene cuenta muestra un mensaje bajo Email (decisión del usuario).
 - **Sí:** el duplicado del equipo se valida en el servidor con `is_team_email`. **No:** pasar los emails de la lista al cliente.
 - **Sí:** el botón "Reenviar invitación" va en la cabecera, junto a "Editar". Supuesto de esta spec: no hay mockup.
-- **Sí:** prueba real de punta a punta en la implementación (pasos 9 y 10), con permiso, para asegurar que el flujo con el SMTP gratuito funciona (pedido del usuario). Cambia lo decidido antes (verificación manual en BACKLOG).
+- **Sí:** prueba real de punta a punta en la implementación (paso 10, una sola prueba combinada que hace el usuario manualmente, porque el límite del SMTP gratuito es de 2 correos por hora), para asegurar que el flujo con el SMTP gratuito funciona (pedido del usuario). Cambia lo decidido antes (verificación manual en BACKLOG).
 
 ---
 
@@ -375,14 +381,14 @@ Antes de los pasos 1 y 2, cargar los skills `supabase` y `supabase-postgres-best
 
 | Riesgo | Mitigación |
 | --- | --- |
-| El SMTP gratuito de Supabase envía pocos correos por hora y solo a los miembros de la organización | La demo usa el Gmail del usuario (miembro); el paso 4 revisa el límite. Entrada "Correo de invitación de staff con Resend" en BACKLOG. |
-| Abrir el link en el navegador donde está el admin reemplaza su sesión | El paso 9 abre el link en una ventana privada. |
+| El SMTP gratuito de Supabase envía pocos correos por hora (2, confirmado por el usuario) y solo a los miembros de la organización | La demo usa el Gmail del usuario (miembro); la prueba del paso 10 usa exactamente los 2 correos, así que no se repite dentro de la misma hora. Entrada "Correo de invitación de staff con Resend" en BACKLOG. |
+| Abrir el link en el navegador donde está el admin reemplaza su sesión | El paso 10 abre el link en una ventana privada. |
 | Abrir el correo en otro dispositivo: `localhost` no carga | Para la demo, abrir el correo en la misma PC donde corre `npm run dev`. |
-| El correo cae en spam o en "Promociones" | Revisar esas carpetas en el paso 9. |
+| El correo cae en spam o en "Promociones" | Revisar esas carpetas en el paso 10. |
 | `inviteUserByEmail` falla al reenviar si el staff ya abrió el link (email confirmado) sin crear la contraseña | Plan B con `resetPasswordForEmail`; se prueba en el paso 10. Si el error de Auth no es el esperado, detenerse y preguntar. |
 | `inviteUserByEmail` falla por el SMTP después de crear el usuario | Toast de error y `refresh()`: si la cuenta quedó creada, aparece en PENDIENTES y se puede reenviar. |
 | `updateUser({ password })` exige reautenticación si está activado "Secure password change" | Revisar el ajuste en el paso 7; en una sesión recién creada por el link no debería aplicar. |
-| Falta `http://localhost:3000/**` en Redirect URLs o la Site URL es otra | Paso 4: la implementación no sigue hasta que el usuario lo confirme. Si igual falta, el link termina en la Site URL y el paso 9 lo detecta. |
+| Falta `http://localhost:3000/**` en Redirect URLs o la Site URL es otra | Paso 4: la implementación no sigue hasta que el usuario lo confirme. Si igual falta, el link termina en la Site URL y el paso 10 lo detecta. |
 | La página cliente muestra en consola "Not a valid PKCE flow url." | Esperado e inofensivo (el cliente PKCE rechaza el fragmento antes de que se llame a `setSession`); desaparece al pasar a Resend con `/auth/confirm`. |
 
 ---
