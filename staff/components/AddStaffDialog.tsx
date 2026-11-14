@@ -17,10 +17,9 @@ function successToast(fullName: string): ToastMessage {
 
 type AddStaffDialogProps = {
   existingEmails: string[];
-  onAdd: (input: NewStaffInput) => void;
 };
 
-export function AddStaffDialog({ existingEmails, onAdd }: AddStaffDialogProps) {
+export function AddStaffDialog({ existingEmails }: AddStaffDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   // Cambiar la key remonta el formulario: vacío y sin errores
@@ -38,7 +37,6 @@ export function AddStaffDialog({ existingEmails, onAdd }: AddStaffDialogProps) {
   }
 
   function save(input: NewStaffInput) {
-    onAdd(input);
     dialogRef.current?.close();
     setToast((current) => ({
       id: (current?.id ?? 0) + 1,

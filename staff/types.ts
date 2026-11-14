@@ -9,9 +9,9 @@ import type { ElderlyIndicator } from "@/elderly/types";
 
 export type StaffMember = User & { email: string }; // role = staff; el email viene de auth.users
 
-// Lo que devolvería la consulta: filas del esquema + datos de UI.
+// Filas del esquema leídas con la sesión del admin + datos de UI.
 export type StaffSource = {
-  referenceDate: string; // "2025-06-17": fija en el mock, para calcular edades
+  referenceDate: string; // hoy en Lima ("2025-06-17"), para calcular edades
   staff: StaffMember[];
   elderly: Elderly[];
   rooms: Room[];
@@ -31,7 +31,6 @@ export type StaffListItem = {
   tone: AvatarTone;
   summary: string; // "3 adultos mayores vinculados"
   indicator: StaffIndicator;
-  isLink: boolean; // false en las tarjetas agregadas desde el modal
 };
 
 export type StaffList = {
@@ -69,7 +68,8 @@ export type StaffProfile = {
   email: string;
   statusLabel: "Activo" | "Pendiente" | "Archivado";
   joinedAtLabel: string; // "feb 2025"
-  canManageLinks: boolean; // status active o pending
+  canManageLinks: boolean; // status = active
+  canResendInvitation: boolean; // status = pending
   linkedElderly: LinkedElderly[];
   availableElderly: ElderlyOption[]; // activos y no vinculados
 };

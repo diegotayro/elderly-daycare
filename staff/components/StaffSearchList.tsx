@@ -1,11 +1,9 @@
 "use client";
 
-import { useId, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { SearchIcon } from "@/shared/components/icons/SearchIcon";
 import { normalizeSearch } from "@/shared/text/normalize-search";
-import { buildNewStaffItem } from "../build-new-staff-item";
-import type { NewStaffInput, StaffList, StaffListItem } from "../types";
-import type { AvatarTone } from "@/elderly/avatar-tones";
+import type { StaffList, StaffListItem } from "../types";
 import { AddStaffDialog } from "./AddStaffDialog";
 import { StaffCard } from "./StaffCard";
 
@@ -14,14 +12,6 @@ type StaffSearchListProps = {
   list: StaffList;
   existingEmails: string[];
 };
-
-const NEW_STAFF_TONES: AvatarTone[] = [
-  "blue",
-  "pink",
-  "green",
-  "yellow",
-  "purple",
-];
 
 function formatCount(count: number): string {
   return count === 1 ? "1 persona" : `${count} personas`;
@@ -61,32 +51,16 @@ export function StaffSearchList({
   existingEmails,
 }: StaffSearchListProps) {
   const [query, setQuery] = useState("");
-  // Staff agregado en esta sesión: estado local, sin persistir
-  const [added, setAdded] = useState<StaffListItem[]>([]);
-  const [addedEmails, setAddedEmails] = useState<string[]>([]);
-  const idPrefix = useId();
-
-  function addStaff(input: NewStaffInput) {
-    const tone = NEW_STAFF_TONES[added.length % NEW_STAFF_TONES.length];
-    const item = buildNewStaffItem(input, `${idPrefix}-${added.length}`, tone);
-    setAdded((current) => [...current, item]);
-    setAddedEmails((current) => [...current, input.email]);
-  }
-
-  const fullList: StaffList = { ...list, pending: [...list.pending, ...added] };
   const normalizedQuery = normalizeSearch(query.trim());
   const matchesQuery = (item: StaffListItem) =>
     normalizeSearch(item.fullName).includes(normalizedQuery);
   const visible = {
-    active: fullList.active.filter(matchesQuery),
-    pending: fullList.pending.filter(matchesQuery),
-    archived: fullList.archived.filter(matchesQuery),
+    active: list.active.filter(matchesQuery),
+    pending: list.pending.filter(matchesQuery),
+    archived: list.archived.filter(matchesQuery),
   };
   const hasAnyItem =
-    fullList.active.length +
-      fullList.pending.length +
-      fullList.archived.length >
-    0;
+    list.active.length + list.pending.length + list.archived.length > 0;
   const hasAnyMatch =
     visible.active.length + visible.pending.length + visible.archived.length >
     0;
@@ -95,10 +69,7 @@ export function StaffSearchList({
     <>
       <header className="mb-[22px] flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
         {title}
-        <AddStaffDialog
-          existingEmails={[...existingEmails, ...addedEmails]}
-          onAdd={addStaff}
-        />
+        <AddStaffDialog existingEmails={existingEmails} />
       </header>
       <label className="mb-[22px] flex items-center gap-[11px] rounded-[14px] border border-line bg-surface px-4 py-3 focus-within:border-coral">
         <SearchIcon size={18} className="flex-none text-[#B0A290]" />
