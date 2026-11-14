@@ -1,6 +1,6 @@
 # SPEC 21 — Staff contra Supabase: datos reales, invitación y activación
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 10, SPEC 11, SPEC 15, SPEC 16, SPEC 17, SPEC 20
 > **Fecha:** 2026-11-13
 > **Objetivo:** Conectar `/staff` y `/staff/[id]` a Supabase, con vincular y desvincular reales, invitar y reenviar la invitación con `inviteUserByEmail` (SMTP gratuito de Supabase, de forma temporal), y que el staff cree su contraseña en `/create-password` y quede `active`.
@@ -292,65 +292,65 @@ Antes de los pasos 1 y 2, cargar los skills `supabase` y `supabase-postgres-best
 
 **Base de datos**
 
-- [ ] `get_staff_emails()` devuelve los staff de la guardería con su email para el admin, y 0 filas para un staff o un relative.
-- [ ] `is_pending_staff()` y `activate_staff_account()` no se pueden ejecutar como `anon`.
-- [ ] `activate_staff_account()` como admin o como staff `active` falla con `not_a_pending_staff` y no cambia nada.
-- [ ] Un staff no puede cambiar su `status` con un `update` directo a `users` (sigue fallando por el trigger o por RLS).
-- [ ] `staff_elderly_insert_admin` sigue sin cambios: insertar un vínculo a un staff `pending` falla.
-- [ ] `get_advisors` no muestra avisos nuevos fuera de los aceptados en BACKLOG.
+- [x] `get_staff_emails()` devuelve los staff de la guardería con su email para el admin, y 0 filas para un staff o un relative.
+- [x] `is_pending_staff()` y `activate_staff_account()` no se pueden ejecutar como `anon`.
+- [x] `activate_staff_account()` como admin o como staff `active` falla con `not_a_pending_staff` y no cambia nada.
+- [x] Un staff no puede cambiar su `status` con un `update` directo a `users` (sigue fallando por el trigger o por RLS).
+- [x] `staff_elderly_insert_admin` sigue sin cambios: insertar un vínculo a un staff `pending` falla.
+- [x] `get_advisors` no muestra avisos nuevos fuera de los aceptados en BACKLOG.
 
 **Lista y perfil**
 
-- [ ] `/staff` y `/staff/[id]` ya no importan `mock-staff.ts`, que no existe, y `isLink` no aparece en el código.
-- [ ] `/staff` muestra los staff reales en ACTIVOS / PENDIENTES / ARCHIVADOS con los conteos de vinculados activos, y todas las tarjetas enlazan a `/staff/{id}`.
-- [ ] `/staff/no-es-uuid` y un UUID que no es de un staff muestran "No encontramos a esta persona del staff".
-- [ ] El perfil muestra el email real (de `auth.users`) y "En el equipo desde" según `created_at`.
-- [ ] En un staff `pending`: sin "x", sin "Vincular otro adulto mayor" y con "Reenviar invitación". En un `archived`: sin ninguno de los tres. En un `active`: "x" y "Vincular otro adulto mayor", sin "Reenviar invitación".
-- [ ] La consola no muestra errores, warnings de hidratación ni el aviso de datos fuera de `<Suspense>` en `/staff`, `/staff/[id]` y `/create-password`.
+- [x] `/staff` y `/staff/[id]` ya no importan `mock-staff.ts`, que no existe, y `isLink` no aparece en el código.
+- [x] `/staff` muestra los staff reales en ACTIVOS / PENDIENTES / ARCHIVADOS con los conteos de vinculados activos, y todas las tarjetas enlazan a `/staff/{id}`.
+- [x] `/staff/no-es-uuid` y un UUID que no es de un staff muestran "No encontramos a esta persona del staff".
+- [x] El perfil muestra el email real (de `auth.users`) y "En el equipo desde" según `created_at`.
+- [x] En un staff `pending`: sin "x", sin "Vincular otro adulto mayor" y con "Reenviar invitación". En un `archived`: sin ninguno de los tres. En un `active`: "x" y "Vincular otro adulto mayor", sin "Reenviar invitación".
+- [x] La consola no muestra errores, warnings de hidratación ni el aviso de datos fuera de `<Suspense>` en `/staff`, `/staff/[id]` y `/create-password`.
 
 **Vincular y desvincular**
 
-- [ ] Vincular N adultos mayores crea N filas en `staff_elderly` y, tras recargar, siguen ahí.
-- [ ] Desvincular borra la fila; tras recargar ya no está y el adulto mayor vuelve al selector.
-- [ ] Mientras guarda, los botones muestran "Vinculando…" / "Desvinculando…", están deshabilitados y `Esc` no cierra el modal.
-- [ ] Con un error forzado (por ejemplo, un `linkId` inexistente), aparece el toast "No pudimos guardar los cambios" y no cambia nada.
+- [x] Vincular N adultos mayores crea N filas en `staff_elderly` y, tras recargar, siguen ahí.
+- [x] Desvincular borra la fila; tras recargar ya no está y el adulto mayor vuelve al selector.
+- [x] Mientras guarda, los botones muestran "Vinculando…" / "Desvinculando…", están deshabilitados y `Esc` no cierra el modal.
+- [x] Con un error forzado (por ejemplo, un `linkId` inexistente), aparece el toast "No pudimos guardar los cambios" y no cambia nada.
 
 **Agregar y reenviar**
 
-- [ ] Agregar el email del admin o de un staff muestra "Ya hay alguien del equipo con este email." bajo Email, sin llamar a Auth.
-- [ ] El código de "Agregar staff" maneja el error de email existente con "Este email ya tiene una cuenta en Casa Nogal." (revisado en el código).
-- [ ] `inviteStaff` y `resendStaffInvitation` pasan `redirectTo` = `{APP_URL}/accept-invite`.
-- [ ] Mientras guarda, el botón dice "Agregando…" y la X, `Esc` y los campos no responden.
-- [ ] `inviteStaff` toma `role` y `daycare_id` del servidor, nunca del `FormData`.
-- [ ] `resendStaffInvitation` rechaza a un staff que no es `pending` o que es de otra guardería, y usa `resetPasswordForEmail` solo si Auth responde que el email ya está registrado (revisado en el código).
-- [ ] "Confirmar email" sigue sin aceptar pegar ni soltar texto.
+- [x] Agregar el email del admin o de un staff muestra "Ya hay alguien del equipo con este email." bajo Email, sin llamar a Auth.
+- [x] El código de "Agregar staff" maneja el error de email existente con "Este email ya tiene una cuenta en Casa Nogal." (revisado en el código).
+- [x] `inviteStaff` y `resendStaffInvitation` pasan `redirectTo` = `{APP_URL}/accept-invite`.
+- [x] Mientras guarda, el botón dice "Agregando…" y la X, `Esc` y los campos no responden.
+- [x] `inviteStaff` toma `role` y `daycare_id` del servidor, nunca del `FormData`.
+- [x] `resendStaffInvitation` rechaza a un staff que no es `pending` o que es de otra guardería, y usa `resetPasswordForEmail` solo si Auth responde que el email ya está registrado (revisado en el código).
+- [x] "Confirmar email" sigue sin aceptar pegar ni soltar texto.
 
 **Activación**
 
-- [ ] `/accept-invite` sin fragmento, con `#error=…` o sin `refresh_token` redirige a `/login` con "El enlace de invitación no es válido o ya venció. Pide a la guardería que te lo reenvíe.".
-- [ ] Tras `setSession`, la URL ya no contiene el fragmento con los tokens.
-- [ ] `/create-password` sin sesión va a `/login`, y con la sesión del admin va a `/`.
-- [ ] El formulario muestra los 3 errores de campo (regla, confirmación vacía y no coinciden), con `aria-invalid` y `aria-describedby`.
-- [ ] Mientras guarda, el botón dice "Creando…" y está deshabilitado. El fallback de `<Suspense>` muestra el formulario con los campos deshabilitados.
-- [ ] `/create-password` no define componentes propios de campo, botón ni marca: usa los de `auth/components/`, y su contenedor y encabezado se ven igual que los de `/activate-account` a 1440×900 y 390×844.
-- [ ] `createStaffPassword` llama a `is_pending_staff()` antes de `updateUser`, y a `activate_staff_account()` después; no recibe ningún id del cliente.
+- [x] `/accept-invite` sin fragmento, con `#error=…` o sin `refresh_token` redirige a `/login` con "El enlace de invitación no es válido o ya venció. Pide a la guardería que te lo reenvíe.".
+- [x] Tras `setSession`, la URL ya no contiene el fragmento con los tokens.
+- [x] `/create-password` sin sesión va a `/login`, y con la sesión del admin va a `/`.
+- [x] El formulario muestra los 3 errores de campo (regla, confirmación vacía y no coinciden), con `aria-invalid` y `aria-describedby`.
+- [x] Mientras guarda, el botón dice "Creando…" y está deshabilitado. El fallback de `<Suspense>` muestra el formulario con los campos deshabilitados.
+- [x] `/create-password` no define componentes propios de campo, botón ni marca: usa los de `auth/components/`, y su contenedor y encabezado se ven igual que los de `/activate-account` a 1440×900 y 390×844.
+- [x] `createStaffPassword` llama a `is_pending_staff()` antes de `updateUser`, y a `activate_staff_account()` después; no recibe ningún id del cliente.
 
 **Prueba real con el SMTP gratuito (paso 10, manual del usuario, 2 correos)**
 
-- [ ] El correo de invitación llega al Gmail del usuario.
-- [ ] "Reenviar invitación" envía un correo nuevo, y se anota si Auth lo aceptó o si se usó el plan B (con el error exacto de Auth).
-- [ ] Si el reenvío fue aceptado, el link del primer correo ya no sirve.
-- [ ] El link lleva a `/accept-invite` y luego a `/create-password` con los nombres y el email del staff.
-- [ ] Crear la contraseña deja `status = 'active'`, inicia sesión en `/` y el staff puede volver a entrar por `/login`.
-- [ ] Con la sesión del staff, `/staff` redirige a `/`.
+- [x] El correo de invitación llega al Gmail del usuario.
+- [x] "Reenviar invitación" envía un correo nuevo, y se anota si Auth lo aceptó o si se usó el plan B (con el error exacto de Auth).
+- [x] Si el reenvío fue aceptado, el link del primer correo ya no sirve.
+- [x] El link lleva a `/accept-invite` y luego a `/create-password` con los nombres y el email del staff.
+- [x] Crear la contraseña deja `status = 'active'`, inicia sesión en `/` y el staff puede volver a entrar por `/login`.
+- [x] Con la sesión del staff, `/staff` redirige a `/`.
 
 **Cierre**
 
-- [ ] `createAdminClient()` solo se usa en `get-invitation-preview.ts`, `activate-account.ts`, `invite-staff.ts` y `resend-staff-invitation.ts`.
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] A 390×844 y 360 px no hay scroll horizontal en `/staff`, `/staff/[id]` (con "Reenviar invitación") ni en `/create-password`.
-- [ ] `database-schema.md`, `flujos-de-procesos.md`, `pantallas-pendientes.md`, `CLAUDE.md` y `BACKLOG.md` tienen los cambios de esta spec.
-- [ ] Capturas en `.playwright-mcp/`: `/staff` real, perfil `pending` con "Reenviar invitación", "Agregar staff" con el error de equipo, y `/create-password` vacío y con errores.
+- [x] `createAdminClient()` solo se usa en `get-invitation-preview.ts`, `activate-account.ts`, `invite-staff.ts` y `resend-staff-invitation.ts`.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] A 390×844 y 360 px no hay scroll horizontal en `/staff`, `/staff/[id]` (con "Reenviar invitación") ni en `/create-password`.
+- [x] `database-schema.md`, `flujos-de-procesos.md`, `pantallas-pendientes.md`, `CLAUDE.md` y `BACKLOG.md` tienen los cambios de esta spec.
+- [x] Capturas en `.playwright-mcp/`: `/staff` real, perfil `pending` con "Reenviar invitación", "Agregar staff" con el error de equipo, y `/create-password` vacío y con errores.
 
 ---
 
