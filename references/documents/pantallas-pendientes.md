@@ -25,10 +25,10 @@ Lista de pantallas, modales y componentes que faltan. Marcar cada uno al termina
 
 ### Gestión de personal (admin)
 
-- [ ] **8. Pantalla "Personal"**: lista del staff con su estado (Pendiente / Activo / Archivado) y acciones de reenviar invitación, archivar y reactivar. (SPEC 20, UI con datos mock)
-- [ ] **9. Modal "Agregar personal"**: nombres, apellidos y email (flujo Staff, paso 1). (SPEC 20, UI con datos mock)
+- [ ] **8. Pantalla "Personal"**: lista del staff con su estado (Pendiente / Activo / Archivado) y acciones de reenviar invitación, archivar y reactivar. (SPEC 20, datos mock; reenviar invitación: SPEC 21; archivar y reactivar: SPEC 22)
+- [x] **9. Modal "Agregar personal"**: nombres, apellidos y email (flujo Staff, paso 1). (SPEC 20, UI; SPEC 21, invitación real)
 - [ ] **10. Modal de confirmación para archivar o reactivar**: sirve para staff y familiares. Al archivar a un staff, avisa qué adultos mayores quedan sin cuidador.
-- [ ] **11. Asignar staff ↔ adulto mayor** (`staff_elderly`): no hay ninguna UI para esto. Puede ser una sección "Personal asignado" en el perfil del adulto mayor, o en el detalle del staff, con un modal para asignar o quitar. (SPEC 20, UI con datos mock)
+- [x] **11. Asignar staff ↔ adulto mayor** (`staff_elderly`): desde el detalle del staff, con un modal para vincular y otro para desvincular. (SPEC 20, UI; SPEC 21, datos reales)
 
 ### Adultos mayores (admin)
 
@@ -49,7 +49,7 @@ Lista de pantallas, modales y componentes que faltan. Marcar cada uno al termina
 
 ### Auth / cuenta
 
-- [ ] **20. `/crear-contrasena`**: donde el staff llega desde el correo de invitación (flujo Staff, paso 4).
+- [x] **20. `/create-password`**: donde el staff llega desde el correo de invitación, pasando por `/accept-invite` (flujo Staff, paso 4). (SPEC 21)
 - [ ] **21. "Vincular adulto mayor"**: para un familiar que ya tiene cuenta. Pide código y consentimiento.
 - [ ] **22. Recuperar contraseña**: el login tiene "¿Olvidaste tu contraseña?", pero falta la pantalla para pedir el correo y la de nueva contraseña.
 - [ ] **23. Modales "Cambiar contraseña" y "Editar perfil" (avatar)**: los abren los botones de "Mi cuenta".
