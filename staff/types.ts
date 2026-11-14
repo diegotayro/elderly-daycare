@@ -83,3 +83,5 @@ export type NewStaffInput = {
 };
 export type NewStaffField = keyof NewStaffInput;
 export type NewStaffErrors = Partial<Record<NewStaffField, string>>;
+
+export type StaffActionResult = { status: "success" } | { status: "error" };

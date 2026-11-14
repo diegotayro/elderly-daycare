@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState, type Ref } from "react";
+import { useId, useRef, useState, useTransition, type Ref } from "react";
 import { avatarTones } from "@/elderly/avatar-tones";
 import { Avatar } from "@/shared/components/Avatar";
 import { PlusIcon } from "@/shared/components/icons/PlusIcon";
@@ -11,12 +11,17 @@ import type { ElderlyOption } from "../types";
 type LinkElderlyDialogProps = {
   staffFullName: string;
   options: ElderlyOption[]; // activos y no vinculados, por nombre
-  onLink: (selected: ElderlyOption[]) => void;
+  onLink: (selected: ElderlyOption[]) => Promise<boolean>; // true: guardó
   triggerRef: Ref<HTMLButtonElement>;
 };
 
-type LinkElderlyPickerProps = Omit<LinkElderlyDialogProps, "triggerRef"> & {
+type LinkElderlyPickerProps = Omit<
+  LinkElderlyDialogProps,
+  "triggerRef" | "onLink"
+> & {
   titleId: string;
+  isPending: boolean;
+  onLink: (selected: ElderlyOption[]) => void;
   onCancel: () => void;
 };
 
@@ -24,6 +29,7 @@ function LinkElderlyPicker({
   staffFullName,
   options,
   titleId,
+  isPending,
   onLink,
   onCancel,
 }: LinkElderlyPickerProps) {
@@ -89,6 +95,7 @@ function LinkElderlyPicker({
                   type="checkbox"
                   checked={selectedIds.includes(option.id)}
                   onChange={() => toggle(option.id)}
+                  disabled={isPending}
                   className="size-[18px] flex-none cursor-pointer accent-[#D9583C]"
                 />
                 <Avatar
@@ -114,17 +121,18 @@ function LinkElderlyPicker({
         <button
           type="button"
           onClick={onCancel}
-          className="cursor-pointer rounded-[14px] border-[1.5px] border-line bg-surface px-[18px] py-[11px] text-[14.5px] font-bold text-nav focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral"
+          disabled={isPending}
+          className="cursor-pointer rounded-[14px] border-[1.5px] border-line bg-surface px-[18px] py-[11px] text-[14.5px] font-bold text-nav focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral disabled:cursor-default disabled:opacity-50"
         >
           Cancelar
         </button>
         <button
           type="button"
           onClick={link}
-          disabled={selectedIds.length === 0}
+          disabled={selectedIds.length === 0 || isPending}
           className="cursor-pointer rounded-[14px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-[18px] py-[11px] text-[14.5px] font-extrabold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral-strong disabled:cursor-default disabled:opacity-50"
         >
-          Vincular ({selectedIds.length})
+          {isPending ? "Vinculando…" : `Vincular (${selectedIds.length})`}
         </button>
       </footer>
     </div>
@@ -141,10 +149,12 @@ export function LinkElderlyDialog({
   const titleId = useId();
   // Cambiar la key remonta el selector: sin selección ni texto de búsqueda
   const [pickerKey, setPickerKey] = useState(0);
+  const [isPending, startTransition] = useTransition();
 
   function link(selected: ElderlyOption[]) {
-    dialogRef.current?.close();
-    onLink(selected);
+    startTransition(async () => {
+      if (await onLink(selected)) dialogRef.current?.close();
+    });
   }
 
   return (
@@ -166,6 +176,8 @@ export function LinkElderlyDialog({
         ref={dialogRef}
         aria-labelledby={titleId}
         onClose={() => setPickerKey((key) => key + 1)}
+        // Mientras guarda, Esc no cierra el modal
+        onCancel={(event) => isPending && event.preventDefault()}
         className="m-auto max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-[480px] overflow-hidden rounded-3xl border border-line bg-auth-bg p-0 text-ink shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)] backdrop:bg-ink/40 open:flex open:flex-col"
       >
         <LinkElderlyPicker
@@ -173,6 +185,7 @@ export function LinkElderlyDialog({
           staffFullName={staffFullName}
           options={options}
           titleId={titleId}
+          isPending={isPending}
           onLink={link}
           onCancel={() => dialogRef.current?.close()}
         />
