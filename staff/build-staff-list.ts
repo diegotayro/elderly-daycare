@@ -29,7 +29,6 @@ function buildItem(source: StaffSource, staff: StaffMember): StaffListItem {
     tone: source.avatarTones[staff.id] ?? "blue",
     summary: formatLinkedElderlyCount(activeLinksCount),
     indicator: resolveIndicator(staff, activeLinksCount),
-    isLink: true,
   };
 }
 

@@ -11,13 +11,8 @@ const messages = {
   lastNameTooLong: `Máximo ${NAME_MAX_LENGTH} caracteres.`,
   emailRequired: "Escribe el email.",
   emailInvalid: "Escribe un email válido.",
-  emailTaken: "Ya hay alguien del equipo con este email.",
   confirmationRequired: "Vuelve a escribir el email.",
   confirmationMismatch: "Los emails no coinciden.",
-};
-
-type ValidationRules = {
-  existingEmails: string[];
 };
 
 // Los emails se comparan sin espacios a los extremos y sin distinguir mayúsculas
@@ -40,10 +35,7 @@ function validateName(
   if (length > NAME_MAX_LENGTH) return tooLongMessage;
 }
 
-function validateEmail(
-  email: string,
-  existingEmails: string[],
-): string | undefined {
+function validateEmail(email: string): string | undefined {
   const normalized = normalizeEmail(email);
   if (normalized === "") return messages.emailRequired;
   if (
@@ -51,11 +43,6 @@ function validateEmail(
     !BASIC_EMAIL_PATTERN.test(normalized)
   ) {
     return messages.emailInvalid;
-  }
-  if (
-    existingEmails.some((existing) => normalizeEmail(existing) === normalized)
-  ) {
-    return messages.emailTaken;
   }
 }
 
@@ -69,10 +56,7 @@ function validateConfirmation(
   }
 }
 
-export function validateNewStaff(
-  input: NewStaffInput,
-  { existingEmails }: ValidationRules,
-): NewStaffErrors {
+export function validateNewStaff(input: NewStaffInput): NewStaffErrors {
   const candidates: NewStaffErrors = {
     firstName: validateName(
       input.firstName,
@@ -84,7 +68,7 @@ export function validateNewStaff(
       messages.lastNameRequired,
       messages.lastNameTooLong,
     ),
-    email: validateEmail(input.email, existingEmails),
+    email: validateEmail(input.email),
     emailConfirmation: validateConfirmation(
       input.email,
       input.emailConfirmation,

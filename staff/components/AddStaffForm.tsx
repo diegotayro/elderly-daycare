@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   FormField,
   fieldControlClassName,
@@ -9,7 +9,7 @@ import {
 import { NAME_MAX_LENGTH } from "@/elderly/validate-new-elderly";
 import { readNewStaffInput } from "../read-new-staff-input";
 import { validateNewStaff } from "../validate-new-staff";
-import type { NewStaffErrors, NewStaffField, NewStaffInput } from "../types";
+import type { NewStaffErrors, NewStaffField } from "../types";
 
 const FIELD_ORDER: NewStaffField[] = [
   "firstName",
@@ -21,36 +21,54 @@ const CONFIRMATION_HELP_ID = "emailConfirmation-help";
 
 type AddStaffFormProps = {
   titleId: string;
-  existingEmails: string[];
+  isPending: boolean;
   onCancel: () => void;
-  onSave: (input: NewStaffInput) => void;
+  // El padre guarda y, si el servidor rechaza campos, los devuelve por showFieldErrors
+  onSave: (
+    formData: FormData,
+    showFieldErrors: (errors: NewStaffErrors) => void,
+  ) => void;
 };
 
 export function AddStaffForm({
   titleId,
-  existingEmails,
+  isPending,
   onCancel,
   onSave,
 }: AddStaffFormProps) {
   const [errors, setErrors] = useState<NewStaffErrors>({});
   const formRef = useRef<HTMLFormElement>(null);
+  // Los campos siguen deshabilitados mientras se guarda: el foco se mueve al terminar
+  const mustFocusInvalidField = useRef(false);
 
-  function focusField(field: NewStaffField) {
-    formRef.current?.querySelector<HTMLElement>(`[name="${field}"]`)?.focus();
+  useEffect(() => {
+    if (isPending || !mustFocusInvalidField.current) return;
+    mustFocusInvalidField.current = false;
+    const firstInvalidField = FIELD_ORDER.find((field) => errors[field]);
+    if (firstInvalidField) {
+      formRef.current
+        ?.querySelector<HTMLElement>(`[name="${firstInvalidField}"]`)
+        ?.focus();
+    }
+  }, [isPending, errors]);
+
+  function showErrors(nextErrors: NewStaffErrors) {
+    mustFocusInvalidField.current = true;
+    setErrors(nextErrors);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const input = readNewStaffInput(new FormData(event.currentTarget));
-    const nextErrors = validateNewStaff(input, { existingEmails });
-    setErrors(nextErrors);
+    if (isPending) return;
+    const formData = new FormData(event.currentTarget);
+    const clientErrors = validateNewStaff(readNewStaffInput(formData));
 
-    const firstInvalidField = FIELD_ORDER.find((field) => nextErrors[field]);
-    if (firstInvalidField) {
-      focusField(firstInvalidField);
+    if (Object.keys(clientErrors).length > 0) {
+      showErrors(clientErrors);
       return;
     }
-    onSave(input);
+    setErrors({});
+    onSave(formData, showErrors);
   }
 
   function clearFieldError(event: FormEvent<HTMLFormElement>) {
@@ -81,7 +99,8 @@ export function AddStaffForm({
         <button
           type="button"
           onClick={onCancel}
-          className="cursor-pointer text-[15px] font-bold text-muted-strong"
+          disabled={isPending}
+          className="cursor-pointer text-[15px] font-bold text-muted-strong disabled:cursor-default disabled:opacity-50"
         >
           Cancelar
         </button>
@@ -93,12 +112,16 @@ export function AddStaffForm({
         </h2>
         <button
           type="submit"
-          className="cursor-pointer text-[15px] font-extrabold text-coral-strong"
+          disabled={isPending}
+          className="cursor-pointer text-[15px] font-extrabold text-coral-strong disabled:cursor-default disabled:opacity-50"
         >
-          Guardar
+          {isPending ? "Agregando…" : "Guardar"}
         </button>
       </header>
-      <div className="flex min-h-0 min-w-0 flex-col gap-[18px] overflow-y-auto px-[26px] py-6">
+      <fieldset
+        disabled={isPending}
+        className="m-0 flex min-h-0 min-w-0 flex-col gap-[18px] overflow-y-auto border-0 px-[26px] py-6"
+      >
         <FormField id="firstName" label="NOMBRES" error={errors.firstName}>
           <input
             {...controlProps("firstName")}
@@ -145,7 +168,7 @@ export function AddStaffForm({
             Escríbelo de nuevo, sin copiar y pegar.
           </p>
         </FormField>
-      </div>
+      </fieldset>
     </form>
   );
 }

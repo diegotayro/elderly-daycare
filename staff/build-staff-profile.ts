@@ -69,7 +69,8 @@ export function buildStaffProfile(
     email: staff.email,
     statusLabel: formatStaffStatus(staff.status),
     joinedAtLabel: formatEnrolledAt(staff.created_at),
-    canManageLinks: staff.status !== "archived",
+    canManageLinks: staff.status === "active",
+    canResendInvitation: staff.status === "pending",
     linkedElderly: sortLinkedElderly(linked),
     availableElderly: source.elderly
       .filter(

@@ -9,10 +9,11 @@
 ### Staff
 
 1. El admin llena "Agregar personal" (first_name, last_name, email).
-2. Server Action → `auth.admin.inviteUserByEmail(email, { data: { first_name, last_name, role: 'staff', daycare_id } })`.
+2. Server Action (`inviteStaff`): verifica que quien llama es admin, repite la validación y comprueba con `is_team_email` que el email no sea de alguien del equipo. Luego llama a `auth.admin.inviteUserByEmail(email, { data: { first_name, last_name, role: 'staff', daycare_id }, redirectTo: '{APP_URL}/accept-invite' })`. `role` y `daycare_id` salen del servidor, nunca del formulario. Si el email ya tiene cuenta (un familiar), se avisa bajo Email.
 3. El usuario se crea en auth.users en ESTE momento; el trigger crea su fila en users (status = pending).
-4. El staff abre el link del correo y crea su contraseña en "/crear-contrasena" (`auth.updateUser({ password })`).
-5. Server Action: con el cliente con sesión obtiene quién es el usuario logueado y verifica que es staff con status = pending. Recién ahí, con `service_role`, pasa SU propio status de `pending` a `active`. Nunca recibe el id del usuario desde el cliente.
+4. El staff abre el link del correo (vence a las 2 h, "Email OTP Expiration" = 7200 s). Supabase valida el token y redirige a `/accept-invite#access_token=…&refresh_token=…`. Esa página cliente guarda la sesión con `setSession`, borra el fragmento y lleva al staff a `/create-password`, donde crea su contraseña.
+    - Es temporal mientras se use el SMTP gratuito de Supabase (solo entrega a miembros de la organización, 2 correos por hora y plantilla en inglés). Con Resend como SMTP propio se pasará a `/auth/confirm` con `token_hash` y se eliminará `/accept-invite` (ver BACKLOG).
+5. Server Action (`createStaffPassword`): con la sesión del staff verifica con `is_pending_staff()` que es staff con status = pending, guarda la contraseña con `auth.updateUser({ password })` y llama a `activate_staff_account()`, que pasa SU propio status de `pending` a `active`. No usa `service_role` ni recibe el id del usuario desde el cliente. Termina con la sesión iniciada en la home del equipo (`/`). Mientras el staff está `pending`, cualquier otra ruta lo lleva a `/create-password`.
 
 ### Familiar
 
@@ -52,10 +53,10 @@ Un adulto mayor puede tener varios familiares, y siempre gana el "no":
 ### Reenviar invitación a staff pendiente
 
 1. En la lista de personal, el admin ve al staff con status = pending ("Pendiente").
-2. Botón "Reenviar invitación" → Server Action verifica que quien llama es admin y que el staff sigue pending.
-3. Con `service_role`, se vuelve a enviar el correo de invitación.
-
-> Verificar qué función de Supabase permite reenviar la invitación a un usuario que ya existe en `auth.users` (el staff pendiente ya fue creado en el paso 3 de su flujo).
+2. Botón "Reenviar invitación" en el perfil del staff → Server Action (`resendStaffInvitation`) verifica que quien llama es admin y que el staff es de su guardería y sigue pending.
+3. Con `service_role`, se llama de nuevo a `inviteUserByEmail` con la misma metadata y el mismo `redirectTo`. Supabase genera un token nuevo y el link anterior deja de funcionar. Verificado con el SMTP gratuito: con el email sin confirmar, Auth acepta el reenvío.
+4. Si Auth responde `email_exists` (el staff abrió el link anterior, su email quedó confirmado, pero no creó la contraseña), se usa `auth.resetPasswordForEmail(email, { redirectTo })`. Llega el correo "Reset your password" y su link lleva al mismo flujo (`/accept-invite` y luego `/create-password`). Este camino se revisó en el código, no se probó con un correo real.
+5. No se borra nada de la base de datos: el staff no tiene fila en `invitations`.
 
 ### Archivar usuario (staff o familiar)
 

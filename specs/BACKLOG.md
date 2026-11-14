@@ -31,12 +31,13 @@ Formato de cada entrada:
 ### Avisos del linter aceptados tras la spec 10
 
 - [ ] **Estado:** pendiente
-- **Qué:** `get_advisors` marca (1) `authenticated_security_definer_function_executable` en `current_user_daycare_id()`, `current_user_role()`, `is_admin()`, `current_user_elderly_ids()`, `current_user_relative_ids()`, `is_email_linked_to_elderly()`, `is_team_email()` y `accept_invitation()`, (2) `multiple_permissive_policies` en `users` para select y update, y en `elderly`, `staff_elderly` y `guardian_elderly` para select, y (3) `auth_leaked_password_protection`.
-- **Origen:** SPEC 10 (`10-users-table`), SPEC 15 (`current_user_elderly_ids()`, `current_user_relative_ids()` y las tablas nuevas) y SPEC 17 (`is_email_linked_to_elderly()`, `is_team_email()` y `accept_invitation()`).
+- **Qué:** `get_advisors` marca (1) `authenticated_security_definer_function_executable` en `current_user_daycare_id()`, `current_user_role()`, `is_admin()`, `current_user_elderly_ids()`, `current_user_relative_ids()`, `is_email_linked_to_elderly()`, `is_team_email()`, `accept_invitation()`, `get_staff_emails()`, `is_pending_staff()` y `activate_staff_account()`, (2) `multiple_permissive_policies` en `users` para select y update, y en `elderly`, `staff_elderly` y `guardian_elderly` para select, y (3) `auth_leaked_password_protection`.
+- **Origen:** SPEC 10 (`10-users-table`), SPEC 15 (`current_user_elderly_ids()`, `current_user_relative_ids()` y las tablas nuevas) y SPEC 17 (`is_email_linked_to_elderly()`, `is_team_email()` y `accept_invitation()`) y SPEC 21 (`get_staff_emails()`, `is_pending_staff()` y `activate_staff_account()`).
 - **Se resuelve en:** no se resuelve; (1) y (2) son aceptados. (3) es un ajuste del dashboard de Auth.
 - **Notas:**
   - (1) Las policies evalúan los helpers con el rol del usuario, así que necesitan `EXECUTE`; solo devuelven datos del propio usuario. `current_user_elderly_ids()` y `current_user_relative_ids()` solo devuelven ids ligados a `auth.uid()` y vacío para otros roles. Alternativa descartada: moverlos a un esquema privado.
   - Las tres funciones de SPEC 17 deben ser ejecutables por `authenticated` (el admin las llama al invitar y el familiar al activar) y validan el rol y la guardería de quien llama dentro de la función. `get_invitation_preview()` es solo para `service_role` y no genera aviso.
+  - Las tres funciones de SPEC 21 también deben ser ejecutables por `authenticated` (el admin llama a `get_staff_emails()`, y el staff invitado a las otras dos con su sesión) y validan el rol de quien llama dentro de la función.
   - (2) Consecuencia de policies separadas por regla (`own`, `admin`, `team`, `staff`/`relative`). Alternativa descartada: unirlas en una sola.
   - (3) Revisar en el dashboard (Auth > Password security) si el plan lo permite.
 
@@ -185,6 +186,19 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 - **Se resuelve en:** antes del primer uso real con familiares (puesta en producción).
 - **Notas:** verificar el dominio en Resend y cambiar `RESEND_FROM_EMAIL`; no requiere cambios de código.
 
+### Correo de invitación de staff con Resend
+
+- [ ] **Estado:** pendiente
+- **Qué:** hoy se usa el SMTP gratuito de Supabase para invitar al staff: solo entrega a miembros de la organización, permite pocos correos por hora (2 en este proyecto), sale en inglés con la plantilla no editable, y el link vence en 2 h según lo configurado.
+- **Origen:** SPEC 21.
+- **Se resuelve en:** antes del primer uso real con staff (junto con "Dominio verificado en Resend").
+- **Notas:**
+  - Configurar Resend como SMTP propio en Supabase (requiere dominio verificado).
+  - Editar las plantillas "Invite user" y "Reset password" en español con `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite` (o `recovery`).
+  - Crear el Route Handler `/auth/confirm` con `verifyOtp` y eliminar `/accept-invite`.
+  - `inviteStaff` y `resendStaffInvitation` no cambian, salvo el `redirectTo`.
+  - Revisar entonces el valor de "Email OTP Expiration" (hoy 2 h).
+
 ### Cancelar y reenviar invitaciones de familiares
 
 - [ ] **Estado:** pendiente
@@ -206,7 +220,7 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 - [ ] **Estado:** pendiente
 - **Qué:** el trigger `handle_new_auth_user()` rechaza `role = 'admin'` si `session_user <> 'postgres'`, pero no se pudo probar como `supabase_auth_admin`: `set session authorization` da `permission denied` y `set role` no cambia `session_user`.
 - **Origen:** SPEC 10 (`10-users-table`), criterio "insertar con `role = 'admin'` como `supabase_auth_admin` falla".
-- **Se resuelve en:** la spec de invitación de staff.
+- **Se resuelve en:** pendiente; no se probó en SPEC 21 (la prueba real con el SMTP gratuito tenía un cupo de 2 correos por hora y se usó en el flujo normal). Probar con un SMTP propio.
 - **Notas:**
   - Probar con `auth.admin.inviteUserByEmail` pasando `role: 'admin'` en la metadata: debe fallar y no crear la cuenta.
   - Verificado: como `postgres` (`execute_sql`) crear un admin funciona.
@@ -214,7 +228,7 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 ### Pruebas pendientes con `staff`, `pending`, `archived` y `relative`
 
 - [ ] **Estado:** pendiente
-- **Qué:** SPEC 11 solo se probó con la cuenta admin. Quedan sin comprobar: `staff` activa entra a `/`; `staff` `pending` con contraseña termina en `/login` con `inactive_account`; usuario `archived` (ban) recibe `user_banned` y `inactive_account`; archivado con sesión abierta pasa por `/auth/end-session`; `relative` activo entra a `/family`; `relative` en una ruta de `(app)` redirige a `/family`; `staff` que abre `/staff` o `/staff/[id]` redirige a `/` y `relative` a `/family` (SPEC 20, `requireAdminUser()`).
+- **Qué:** SPEC 11 solo se probó con la cuenta admin. Quedan sin comprobar: `staff` `pending` con contraseña termina en `/login` con `inactive_account` (ojo: con SPEC 21, un staff `pending` con sesión va a `/create-password`); usuario `archived` (ban) recibe `user_banned` y `inactive_account`; archivado con sesión abierta pasa por `/auth/end-session`; `relative` activo entra a `/family`; `relative` en una ruta de `(app)` redirige a `/family`; `relative` que abre `/staff` o `/staff/[id]` redirige a `/family` (SPEC 20, `requireAdminUser()`). Verificados en SPEC 21 (prueba real): `staff` activa entra a `/` y un `staff` que abre `/staff` redirige a `/`.
 - **Origen:** SPEC 11, sección "Casos sin verificar"; SPEC 20 (redirección de `/staff`).
 - **Se resuelve en:** antes de crear cuentas reales de esos roles (specs de invitación de staff y familiares).
 - **Notas:** no agregar cuentas a `seed.sql`, para no dejar contraseñas de prueba en el repositorio.
@@ -226,9 +240,9 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 - **Origen:** conversación al diseñar SPEC 14; `references/documents/database-schema.md`, regla 4.
 - **Se resuelve en:** cada spec que implemente una de esas tareas (invitación de staff, aceptar invitaciones, archivar usuarios, resumen diario).
 - **Notas:**
-  - **Necesario:** crear cuentas (incluida la del familiar nuevo al activar su invitación), reenviar la invitación al staff (`inviteUserByEmail`/`generateLink`) y bloquear el login (`auth.admin.updateUserById` con ban).
+  - **Necesario:** crear cuentas (incluida la del familiar nuevo al activar su invitación), invitar y reenviar la invitación al staff (`inviteUserByEmail` y, si su email ya está confirmado, `resetPasswordForEmail`; en SPEC 21 usan `service_role` `staff/actions/invite-staff.ts` y `staff/actions/resend-staff-invitation.ts`) y bloquear el login (`auth.admin.updateUserById` con ban).
   - **Aceptar una invitación:** resuelto en SPEC 17 con `accept_invitation(code, photo_consent)` (`SECURITY DEFINER`), llamada con la sesión del familiar. `service_role` solo se usa para leer la vista previa de la invitación sin sesión (`get_invitation_preview`) y para `auth.admin.createUser`.
-  - **Activar al staff:** trigger en `auth.users` que pasa su fila de `users` a `active` cuando crea su contraseña.
+  - **Activar al staff:** resuelto en SPEC 21 con `activate_staff_account()` (`SECURITY DEFINER`), llamada con la sesión del staff al crear su contraseña. Sin trigger en `auth.users`, que también se dispararía al recuperar la contraseña.
   - **Archivar o reactivar (`status`):** ya lo permite la policy de update del admin.
   - **Ban:** opcional. Un usuario `archived` ya no ve nada (los helpers solo reconocen `active`) y la app lo saca con `/auth/end-session`; el ban es una capa extra.
   - **Cron del resumen diario:** con `pg_cron` corre como `postgres` y no lo necesita; desde un cron de Next.js sí.
@@ -433,11 +447,27 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 
 ### Reenviar invitación a staff pendiente
 
-- [ ] **Estado:** pendiente
-- **Qué:** el perfil y la lista de un staff `pending` no permiten reenviar la invitación (punto 8 de `pantallas-pendientes.md`).
+- [x] **Estado:** resuelto en SPEC 21
+- **Qué:** el perfil de un staff `pending` no permitía reenviar la invitación (punto 8 de `pantallas-pendientes.md`).
 - **Origen:** SPEC 20.
-- **Se resuelve en:** una spec de invitación de staff posterior a SPEC 21 (sin asignar).
-- **Notas:** requiere el cliente `service_role` (`inviteUserByEmail` o `generateLink`). Cancelar la invitación va en SPEC 22.
+- **Se resuelve en:** SPEC 21 (botón "Reenviar invitación" en el perfil).
+- **Notas:** verificado con un correo real: con el email sin confirmar, `inviteUserByEmail` acepta el reenvío y el link anterior deja de servir. Cancelar la invitación va en SPEC 22.
+
+### Reenvío a un staff con el email ya confirmado (plan B)
+
+- [ ] **Estado:** pendiente
+- **Qué:** si el staff abrió el link, su email quedó confirmado pero no creó la contraseña, "Reenviar invitación" cae en el plan B (`resetPasswordForEmail`). Ese camino solo se revisó en el código: no se confirmó el código de error exacto de Auth (`email_exists`) ni que el correo "Reset your password" lleve a `/create-password`.
+- **Origen:** SPEC 21, paso 10 (el cupo de 2 correos por hora no alcanzaba para probarlo).
+- **Se resuelve en:** la primera prueba con un SMTP propio (ver "Correo de invitación de staff con Resend").
+- **Notas:** abrir el link de una invitación sin crear la contraseña, reenviar y comprobar que llega el correo de recuperación y que su link lleva a `/accept-invite` y luego a `/create-password`.
+
+### Vincular a un staff `pending` (preasignar)
+
+- [ ] **Estado:** pendiente
+- **Qué:** SPEC 20 permitía vincular a un staff `pending` (`canManageLinks` con `active` o `pending`), pero `staff_elderly_insert_admin` exige `status = 'active'`. SPEC 21 corrige a SPEC 20: la tarjeta de vinculados de un `pending` es de solo lectura y la policy no se toca.
+- **Origen:** SPEC 21.
+- **Se resuelve en:** una spec de gestión de staff (sin asignar), si se quiere preasignar.
+- **Notas:** cambiar la policy a `status in ('pending', 'active')` con su migración y volver a habilitar `canManageLinks` con `pending`.
 
 ---
 

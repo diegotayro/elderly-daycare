@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { requireAdminUser } from "@/auth/require-user";
 import { buildStaffProfile } from "../build-staff-profile";
-import { getStaffSource } from "../get-staff-source";
+import { getStaffProfileSource } from "../get-staff-profile-source";
 import { StaffProfileView } from "./StaffProfileView";
 
 type StaffProfileContentProps = {
@@ -13,7 +13,8 @@ export async function StaffProfileContent({
 }: StaffProfileContentProps) {
   await requireAdminUser();
   const { id } = await params;
-  const profile = buildStaffProfile(await getStaffSource(), id);
+  const source = await getStaffProfileSource(id);
+  const profile = source && buildStaffProfile(source, id);
   if (!profile) notFound();
 
   return <StaffProfileView profile={profile} />;

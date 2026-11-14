@@ -48,7 +48,7 @@ Diccionario de tablas para PostgreSQL. Tipos en notación Postgres. Convención:
 1. **RLS activado en todas las tablas.** Una tabla con RLS y sin policies queda cerrada; cada policy abre solo lo que un rol necesita.
 2. **Todas las policies son `to authenticated`.** El rol `anon` (sin login) no tiene ninguna policy.
 3. **Todo `insert` y `update` lleva `with check`** (además del `using` en `update`).
-4. **Cliente con sesión (`@supabase/ssr`) para todo.** El cliente admin (`service_role`) solo se usa para: crear cuentas (`auth.admin.*`), leer la invitación sin sesión y crear la cuenta del familiar, reenviar invitaciones al staff, activar al staff (de `pending` a `active`), archivar y reactivar usuarios (incluye bloquear o desbloquear su login) y el cron del resumen diario. Antes de usarlo, el código verifica que quien llama tiene permiso.
+4. **Cliente con sesión (`@supabase/ssr`) para todo.** El cliente admin (`service_role`) solo se usa para: crear cuentas (`auth.admin.*`), leer la invitación sin sesión y crear la cuenta del familiar, invitar y reenviar la invitación al staff (`inviteUserByEmail`, o `resetPasswordForEmail` si su email ya está confirmado), archivar y reactivar usuarios (incluye bloquear o desbloquear su login) y el cron del resumen diario. Antes de usarlo, el código verifica que quien llama tiene permiso.
 5. **Nombres de policies en inglés:** `<tabla>_<acción>_<quién>` (ej. `posts_select_visible`).
 6. **Sin policy de `delete`** donde hay borrado lógico (`elderly`, `invitations`) o donde lo maneja Supabase Auth (`users`).
 7. **Funciones helper.** Usar funciones helper en las policies siempre que se pueda, para no repetir lógica. Deben ser `SECURITY DEFINER`, `STABLE` y con `search_path` fijo, para evitar la recursión al leer `users`. Solo pueden devolver datos del propio usuario logueado (`auth.uid()`) o un `true/false`, nunca filas de otras personas. Dentro de las policies, envolverlas en un `select` (ej. `(select is_staff())`) para que se calculen una vez por consulta.
@@ -83,6 +83,18 @@ Todas con `search_path` vacío y `EXECUTE` revocado a `public` y `anon`.
 |`accept_invitation(p_code, p_photo_consent)`|`SECURITY DEFINER`, `volatile`|`authenticated`|`uuid` del adulto mayor. Con la sesión del familiar: valida que sea `relative` activo, y que la invitación sea `pending`, vigente, de su guardería y con su email. Crea el vínculo en `guardian_elderly`, aplica el consentimiento de fotos (solo `false` cambia algo) y marca la invitación `accepted`, todo en una transacción. Errores: `not_a_relative`, `invitation_not_found`, `invitation_email_mismatch`.|
 
 > El linter marca `is_email_linked_to_elderly`, `is_team_email` y `accept_invitation` como "ejecutables por `authenticated`": es esperado. Las tres validan el rol y la guardería de quien llama dentro de la función.
+
+### Funciones de staff
+
+Todas `SECURITY DEFINER`, con `search_path` vacío, nombres calificados y `EXECUTE` revocado a `public` y `anon`.
+
+|Función|Tipo|EXECUTE|Devuelve|
+|---|---|---|---|
+|`get_staff_emails()`|`STABLE`|`authenticated`|`table (id uuid, email text)`: los staff (`role = 'staff'`, cualquier `status`) de la guardería de quien llama, con el email de `auth.users`. Sin filas si quien llama no es admin.|
+|`is_pending_staff()`|`STABLE`|`authenticated`|`true` si quien llama es staff `pending`. Los helpers de arriba solo reconocen a los `active`, así que esta es la única forma de saber que un usuario sin fila visible es un staff invitado.|
+|`activate_staff_account()`|`volatile`|`authenticated`|`void`. Si quien llama no es staff `pending`, `raise exception 'not_a_pending_staff'`. Si lo es, activa el flag local `app.staff_activation` y pasa su propia fila de `users` a `active`.|
+
+> `get_staff_emails()` no es un helper de policy (regla 7): devuelve filas de otras personas, solo al admin y solo de su guardería. Es la misma idea que `is_team_email`, pero para leer. El linter marca las tres como "ejecutables por `authenticated`": es esperado, porque validan el rol de quien llama dentro de la función.
 
 ### Regla del feed: ¿quién puede ver un post?
 
@@ -163,6 +175,7 @@ Perfil de aplicación vinculado a **Supabase Auth**. Relatives y staff comparten
 > - Nadie puede cambiar `id`, `daycare_id` ni `role` desde la app, **ni siquiera el admin**. Para agregar o quitar un admin, se hace a mano en la base de datos.
 > - Solo un admin puede cambiar `first_name`, `last_name` y `status`.
 > - El admin **no** puede cambiar el `status` de un usuario con `role = 'admin'`, incluido él mismo.
+> - Excepción: un staff `pending` puede pasar su propio `status` a `active`, y solo si lo hace `activate_staff_account()` (que activa el flag local `app.staff_activation` dentro de la transacción) sin tocar `first_name` ni `last_name`. Ninguna otra vía deja a un staff cambiar su `status`.
 > - Los cambios hechos con `service_role` o desde el SQL Editor (sin `auth.uid()`) se permiten.
 
 > **Usuarios archivados:** su fila sigue visible para los demás (según las reglas de select de arriba), para que sus posts y comentarios antiguos sigan mostrando su nombre en el feed.
@@ -277,6 +290,8 @@ Tabla intermedia. Un staff puede tener varios ancianos asignados y un anciano va
 |||UNIQUE (`staff_id`, `elderly_id`).|
 
 > Un anciano recién inscrito no lo ve ningún staff hasta que el admin lo asigne. Si un staff se archiva, sus asignaciones se conservan (no ve nada porque no está `active`) y el admin debe reasignar a sus ancianos.
+>
+> Un staff `pending` todavía no se puede vincular: `staff_elderly_insert_admin` exige `status = 'active'`. Los vínculos se crean después de que el staff crea su contraseña.
 
 ### RLS
 

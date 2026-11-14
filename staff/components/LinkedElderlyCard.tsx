@@ -3,21 +3,25 @@
 import { useRef, useState } from "react";
 import { Toast } from "@/shared/components/toast/Toast";
 import type { ToastMessage } from "@/shared/components/toast/types";
-import {
-  addLinks,
-  sortOptionsByName,
-  toElderlyOption,
-} from "../linked-elderly-changes";
+import { linkElderlyToStaff } from "../actions/link-elderly-to-staff";
+import { unlinkElderlyFromStaff } from "../actions/unlink-elderly-from-staff";
 import type { ElderlyOption, LinkedElderly } from "../types";
 import { LinkElderlyDialog } from "./LinkElderlyDialog";
 import { LinkedElderlyRow } from "./LinkedElderlyRow";
 import { UnlinkElderlyDialog } from "./UnlinkElderlyDialog";
 
 type LinkedElderlyCardProps = {
+  staffId: string;
   staffFullName: string;
   linkedElderly: LinkedElderly[];
   availableElderly: ElderlyOption[];
   canManageLinks: boolean;
+};
+
+const errorToast: ToastMessage = {
+  tone: "error",
+  title: "No pudimos guardar los cambios",
+  description: "Inténtalo de nuevo.",
 };
 
 function unlinkedToast(elderlyName: string, staffName: string): ToastMessage {
@@ -41,14 +45,12 @@ function linkedToast(count: number, staffName: string): ToastMessage {
 }
 
 export function LinkedElderlyCard({
+  staffId,
   staffFullName,
   linkedElderly,
   availableElderly,
   canManageLinks,
 }: LinkedElderlyCardProps) {
-  // Estado local: no se refleja en /staff ni sobrevive a la navegación
-  const [linked, setLinked] = useState(linkedElderly);
-  const [available, setAvailable] = useState(availableElderly);
   const [pendingUnlink, setPendingUnlink] = useState<LinkedElderly | null>(
     null,
   );
@@ -63,28 +65,28 @@ export function LinkedElderlyCard({
     setToast((current) => ({ id: (current?.id ?? 0) + 1, message }));
   }
 
-  function unlink(elderly: LinkedElderly) {
-    setLinked((current) =>
-      current.filter((item) => item.linkId !== elderly.linkId),
-    );
-    // Solo los activos se pueden volver a vincular
-    if (elderly.status === "active") {
-      setAvailable((current) =>
-        sortOptionsByName([...current, toElderlyOption(elderly)]),
-      );
+  // true si se guardó: el diálogo se cierra solo en ese caso
+  async function unlink(elderly: LinkedElderly): Promise<boolean> {
+    const result = await unlinkElderlyFromStaff(elderly.linkId);
+    if (result.status === "error") {
+      showToast(errorToast);
+      return false;
     }
-    setPendingUnlink(null);
     showToast(unlinkedToast(elderly.fullName, staffFullName));
-    linkTriggerRef.current?.focus();
+    return true;
   }
 
-  function link(selected: ElderlyOption[]) {
-    const selectedIds = new Set(selected.map((option) => option.id));
-    setLinked((current) => addLinks(current, selected));
-    setAvailable((current) =>
-      current.filter((option) => !selectedIds.has(option.id)),
+  async function link(selected: ElderlyOption[]): Promise<boolean> {
+    const result = await linkElderlyToStaff(
+      staffId,
+      selected.map((option) => option.id),
     );
+    if (result.status === "error") {
+      showToast(errorToast);
+      return false;
+    }
     showToast(linkedToast(selected.length, staffFullName));
+    return true;
   }
 
   return (
@@ -93,12 +95,12 @@ export function LinkedElderlyCard({
         ADULTOS MAYORES VINCULADOS
       </h2>
       <div className="flex flex-col gap-3.5">
-        {linked.length === 0 && (
+        {linkedElderly.length === 0 && (
           <p className="m-0 text-[14.5px] text-muted-strong">
             Todavía no hay adultos mayores vinculados.
           </p>
         )}
-        {linked.map((elderly) => (
+        {linkedElderly.map((elderly) => (
           <LinkedElderlyRow
             key={elderly.linkId}
             elderly={elderly}
@@ -109,7 +111,7 @@ export function LinkedElderlyCard({
         {canManageLinks && (
           <LinkElderlyDialog
             staffFullName={staffFullName}
-            options={available}
+            options={availableElderly}
             onLink={link}
             triggerRef={linkTriggerRef}
           />
@@ -119,6 +121,7 @@ export function LinkedElderlyCard({
         elderly={pendingUnlink}
         staffFullName={staffFullName}
         onConfirm={unlink}
+        onUnlinked={() => linkTriggerRef.current?.focus()}
         onClose={() => setPendingUnlink(null)}
       />
       {toast && (
