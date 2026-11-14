@@ -1,8 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+  type FormEvent,
+} from "react";
+import { createStaffPassword } from "@/auth/actions/create-staff-password";
+import { createPasswordMessages as messages } from "@/auth/create-password-messages";
 import { readCreatePasswordInput } from "@/auth/read-create-password-input";
-import type { CreatePasswordErrors, CreatePasswordField } from "@/auth/types";
+import type {
+  CreatePasswordErrors,
+  CreatePasswordField,
+  CreatePasswordResult,
+} from "@/auth/types";
 import { validateCreatePassword } from "@/auth/validate-create-password";
 import { AuthField } from "./AuthField";
 import { AuthSubmitButton } from "./AuthSubmitButton";
@@ -20,7 +32,7 @@ export function CreatePasswordForm({
 }: CreatePasswordFormProps) {
   const [errors, setErrors] = useState<CreatePasswordErrors>({});
   const [generalError, setGeneralError] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
   // Los campos siguen deshabilitados mientras se guarda: el foco se mueve al terminar
   const mustFocusInvalidField = useRef(false);
@@ -39,8 +51,9 @@ export function CreatePasswordForm({
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (isPending || disabled) return;
+    const formData = new FormData(event.currentTarget);
     const clientErrors = validateCreatePassword(
-      readCreatePasswordInput(new FormData(event.currentTarget)),
+      readCreatePasswordInput(formData),
     );
     setGeneralError(null);
     setErrors(clientErrors);
@@ -49,8 +62,22 @@ export function CreatePasswordForm({
       mustFocusInvalidField.current = true;
       return;
     }
-    // El envío a la acción createStaffPassword se conecta en el paso 7
-    setIsPending(false);
+
+    // Si la acción tiene éxito redirige, así que solo llegan resultados de error
+    startTransition(async () => {
+      const result = await createStaffPassword(formData).catch(
+        (): CreatePasswordResult => ({
+          status: "error",
+          message: messages.unexpected, // fallo de red
+        }),
+      );
+      mustFocusInvalidField.current = true;
+      if (result.status === "invalid") {
+        setErrors(result.errors);
+      } else {
+        setGeneralError(result.message);
+      }
+    });
   }
 
   function clearFieldError(event: FormEvent<HTMLFormElement>) {
