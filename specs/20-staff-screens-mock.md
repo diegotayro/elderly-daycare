@@ -299,61 +299,61 @@ staff/
 
 **Build, rutas y acceso**
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] La consola no muestra errores, warnings de hidratación ni el aviso de datos fuera de `<Suspense>` en `/staff` y `/staff/[id]`.
-- [ ] Los títulos son "Staff · Casa Nogal" en `/staff` y "Carolina Paz · Casa Nogal" en el perfil de Carolina.
-- [ ] Un id inexistente en `/staff/[id]` muestra "No encontramos a esta persona del staff" con el enlace "Volver a Staff".
-- [ ] `requireAdminUser()` redirige con `TEAM_HOME` / `RELATIVE_HOME`, sin literales.
-- [ ] Con sesión de admin, `/staff` y `/staff/[id]` cargan. Con una cuenta `staff` de prueba (si existe), abrir `/staff` redirige a `/`; si no hay cuenta, se deja indicado y queda en la entrada de pruebas pendientes del BACKLOG.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] La consola no muestra errores, warnings de hidratación ni el aviso de datos fuera de `<Suspense>` en `/staff` y `/staff/[id]`.
+- [x] Los títulos son "Staff · Casa Nogal" en `/staff` y "Carolina Paz · Casa Nogal" en el perfil de Carolina.
+- [x] Un id inexistente en `/staff/[id]` muestra "No encontramos a esta persona del staff" con el enlace "Volver a Staff".
+- [x] `requireAdminUser()` redirige con `TEAM_HOME` / `RELATIVE_HOME`, sin literales.
+- [x] Con sesión de admin, `/staff` y `/staff/[id]` cargan. Con una cuenta `staff` de prueba (si existe), abrir `/staff` redirige a `/`; si no hay cuenta, se deja indicado y queda en la entrada de pruebas pendientes del BACKLOG.
 
 **Navegación**
 
-- [ ] El admin ve "Staff" después de "Adultos mayores" en el sidebar y en la barra inferior móvil, activo en `/staff` y `/staff/[id]`.
-- [ ] Un staff ve el mismo menú que antes de la spec (4 ítems), y el fallback de `<Suspense>` no muestra "Staff".
-- [ ] Fuera de `/staff`, el área del equipo se ve igual que antes de la spec a 1440×900 y 390×844, incluido `/elderly/[id]` tras el refactor de `DetailsList`.
+- [x] El admin ve "Staff" después de "Adultos mayores" en el sidebar y en la barra inferior móvil, activo en `/staff` y `/staff/[id]`.
+- [x] Un staff ve el mismo menú que antes de la spec (4 ítems), y el fallback de `<Suspense>` no muestra "Staff".
+- [x] Fuera de `/staff`, el área del equipo se ve igual que antes de la spec a 1440×900 y 390×844, incluido `/elderly/[id]` tras el refactor de `DetailsList`.
 
 **Lista `/staff`**
 
-- [ ] Se ven "ACTIVOS" (2 personas), "PENDIENTES" (1 persona) y "ARCHIVADOS" (1 persona) con los resúmenes e indicadores de la tabla del mock.
-- [ ] Miguel Torres muestra "Sin adultos mayores vinculados" y "VINCULAR"; Carolina Paz muestra "2 adultos mayores vinculados" (Teresa archivada no cuenta) y la flecha.
-- [ ] El buscador encuentra "Lucía" escribiendo "lucia" y muestra "No encontramos a nadie del staff con ese nombre." sin coincidencias.
-- [ ] Cada tarjeta del mock lleva a `/staff/{id}`.
+- [x] Se ven "ACTIVOS" (2 personas), "PENDIENTES" (1 persona) y "ARCHIVADOS" (1 persona) con los resúmenes e indicadores de la tabla del mock.
+- [x] Miguel Torres muestra "Sin adultos mayores vinculados" y "VINCULAR"; Carolina Paz muestra "2 adultos mayores vinculados" (Teresa archivada no cuenta) y la flecha.
+- [x] El buscador encuentra "Lucía" escribiendo "lucia" y muestra "No encontramos a nadie del staff con ese nombre." sin coincidencias.
+- [x] Cada tarjeta del mock lleva a `/staff/{id}`.
 
 **Modal "Agregar staff"**
 
-- [ ] Tiene solo Nombres, Apellidos, Email y Confirmar email, sin habitación, alergias ni notas médicas.
-- [ ] Guardar vacío muestra los 4 mensajes de campo obligatorio y pone el foco en "Nombres".
-- [ ] Emails distintos muestran "Los emails no coinciden."; `Carolina.Paz@casanogal.pe ` muestra "Ya hay alguien del equipo con este email.".
-- [ ] Pegar o soltar texto en "Confirmar email" no cambia su valor; en "Email" sí se puede pegar.
-- [ ] Un guardado válido cierra el modal, agrega la tarjeta en "PENDIENTES" (contador "2 personas") con "VINCULAR" y muestra el toast "Staff agregado".
-- [ ] Al reabrir, el formulario está vacío y sin errores.
+- [x] Tiene solo Nombres, Apellidos, Email y Confirmar email, sin habitación, alergias ni notas médicas.
+- [x] Guardar vacío muestra los 4 mensajes de campo obligatorio y pone el foco en "Nombres".
+- [x] Emails distintos muestran "Los emails no coinciden."; `Carolina.Paz@casanogal.pe ` muestra "Ya hay alguien del equipo con este email.".
+- [x] Pegar o soltar texto en "Confirmar email" no cambia su valor; en "Email" sí se puede pegar.
+- [x] Un guardado válido cierra el modal, agrega la tarjeta en "PENDIENTES" (contador "2 personas") con "VINCULAR" y muestra el toast "Staff agregado".
+- [x] Al reabrir, el formulario está vacío y sin errores.
 
 **Perfil `/staff/[id]`**
 
-- [ ] No tiene "Resumen del día" ni notas médicas; el subtítulo es "Staff" sin badge; "Editar" no navega.
-- [ ] Los detalles son Email, Estado y "En el equipo desde" con los valores del mock.
-- [ ] La tarjeta se titula "ADULTOS MAYORES VINCULADOS" y cada fila muestra "{edad} · Habitación {sala}", el badge "ACTIVO"/"ARCHIVADO" y la "x" roja con `aria-label="Desvincular a {nombre}"`.
-- [ ] Miguel Torres muestra "Todavía no hay adultos mayores vinculados.".
-- [ ] En el perfil de Andrés Silva (archivado) no hay "x" ni "Vincular otro adulto mayor"; en el de Lucía Ramos (pendiente) sí.
+- [x] No tiene "Resumen del día" ni notas médicas; el subtítulo es "Staff" sin badge; "Editar" no navega.
+- [x] Los detalles son Email, Estado y "En el equipo desde" con los valores del mock.
+- [x] La tarjeta se titula "ADULTOS MAYORES VINCULADOS" y cada fila muestra "{edad} · Habitación {sala}", el badge "ACTIVO"/"ARCHIVADO" y la "x" roja con `aria-label="Desvincular a {nombre}"`.
+- [x] Miguel Torres muestra "Todavía no hay adultos mayores vinculados.".
+- [x] En el perfil de Andrés Silva (archivado) no hay "x" ni "Vincular otro adulto mayor"; en el de Lucía Ramos (pendiente) sí.
 
 **Desvincular y vincular**
 
-- [ ] La "x" abre la confirmación con el título y el texto de Alcance y el foco en "Cancelar"; "Cancelar" y `Esc` no cambian nada.
-- [ ] "Desvincular" quita la fila, muestra el toast "Adulto mayor desvinculado" y devuelve el foco a "Vincular otro adulto mayor".
-- [ ] El selector solo lista adultos mayores activos no vinculados (en Carolina: sin Luis, Carmen ni Teresa), ordenados por nombre, y filtra con el buscador.
-- [ ] "Vincular (N)" está deshabilitado con N = 0; con 2 seleccionados agrega 2 filas "ACTIVO" y muestra "2 adultos mayores vinculados a Carolina Paz.".
-- [ ] Un adulto mayor desvinculado vuelve a aparecer en el selector.
+- [x] La "x" abre la confirmación con el título y el texto de Alcance y el foco en "Cancelar"; "Cancelar" y `Esc` no cambian nada.
+- [x] "Desvincular" quita la fila, muestra el toast "Adulto mayor desvinculado" y devuelve el foco a "Vincular otro adulto mayor".
+- [x] El selector solo lista adultos mayores activos no vinculados (en Carolina: sin Luis, Carmen ni Teresa), ordenados por nombre, y filtra con el buscador.
+- [x] "Vincular (N)" está deshabilitado con N = 0; con 2 seleccionados agrega 2 filas "ACTIVO" y muestra "2 adultos mayores vinculados a Carolina Paz.".
+- [x] Un adulto mayor desvinculado vuelve a aparecer en el selector.
 
 **Móvil y accesibilidad**
 
-- [ ] A 390×844 y a 360px no hay scroll horizontal en `/staff`, `/staff/[id]` ni en los modales.
-- [ ] Tarjetas, "x", checkboxes y botones tienen foco visible, y se puede vincular y desvincular solo con teclado.
-- [ ] Los esqueletos tienen `role="status"` y texto `sr-only`.
+- [x] A 390×844 y a 360px no hay scroll horizontal en `/staff`, `/staff/[id]` ni en los modales.
+- [x] Tarjetas, "x", checkboxes y botones tienen foco visible, y se puede vincular y desvincular solo con teclado.
+- [x] Los esqueletos tienen `role="status"` y texto `sr-only`.
 
 **Documentos**
 
-- [ ] `pantallas-pendientes.md` anota los puntos 8, 9 y 11 con "(SPEC 20, UI con datos mock)" sin marcarlos.
-- [ ] `specs/BACKLOG.md` tiene las dos entradas nuevas de la sección "Staff" y ninguna para lo que cubren SPEC 21 y SPEC 22.
+- [x] `pantallas-pendientes.md` anota los puntos 8, 9 y 11 con "(SPEC 20, UI con datos mock)" sin marcarlos.
+- [x] `specs/BACKLOG.md` tiene las dos entradas nuevas de la sección "Staff" y ninguna para lo que cubren SPEC 21 y SPEC 22.
 
 ---
 
