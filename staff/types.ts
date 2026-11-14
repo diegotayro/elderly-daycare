@@ -47,6 +47,7 @@ export type LinkedElderly = {
   initial: string;
   tone: AvatarTone;
   detail: string; // "78 años · Habitación Roble"
+  roomName: string; // "Roble"
   status: "active" | "archived";
   statusLabel: "ACTIVO" | "ARCHIVADO";
 };
@@ -57,6 +58,7 @@ export type ElderlyOption = {
   initial: string;
   tone: AvatarTone;
   roomName: string;
+  detail: string; // "78 años · Habitación Roble", para la fila al vincular
 };
 
 export type StaffProfile = {

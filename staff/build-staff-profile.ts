@@ -1,6 +1,7 @@
 import { formatAge, formatEnrolledAt } from "@/elderly/elderly-formatters";
 import type { Elderly } from "@/shared/database/types";
 import { getLinkedElderlyRows } from "./get-linked-elderly";
+import { sortLinkedElderly } from "./sort-linked-elderly";
 import { formatStaffStatus } from "./staff-formatters";
 import type {
   ElderlyOption,
@@ -11,6 +12,10 @@ import type {
 
 function findRoomName(source: StaffSource, elderly: Elderly): string {
   return source.rooms.find((room) => room.id === elderly.room_id)?.name ?? "";
+}
+
+function formatElderlyDetail(source: StaffSource, elderly: Elderly): string {
+  return `${formatAge(elderly.birth_date, source.referenceDate)} · Habitación ${findRoomName(source, elderly)}`;
 }
 
 function toLinkedElderly(
@@ -25,7 +30,8 @@ function toLinkedElderly(
     fullName: elderly.full_name,
     initial: elderly.first_name[0],
     tone: source.avatarTones[elderly.id] ?? "blue",
-    detail: `${formatAge(elderly.birth_date, source.referenceDate)} · Habitación ${findRoomName(source, elderly)}`,
+    detail: formatElderlyDetail(source, elderly),
+    roomName: findRoomName(source, elderly),
     status: elderly.status,
     statusLabel: isActive ? "ACTIVO" : "ARCHIVADO",
   };
@@ -38,6 +44,7 @@ function toOption(source: StaffSource, elderly: Elderly): ElderlyOption {
     initial: elderly.first_name[0],
     tone: source.avatarTones[elderly.id] ?? "blue",
     roomName: findRoomName(source, elderly),
+    detail: formatElderlyDetail(source, elderly),
   };
 }
 
@@ -63,11 +70,7 @@ export function buildStaffProfile(
     statusLabel: formatStaffStatus(staff.status),
     joinedAtLabel: formatEnrolledAt(staff.created_at),
     canManageLinks: staff.status !== "archived",
-    // Activos primero; Array.sort es estable y conserva el orden por fecha de vínculo
-    linkedElderly: linked.sort(
-      (a, b) =>
-        Number(a.status === "archived") - Number(b.status === "archived"),
-    ),
+    linkedElderly: sortLinkedElderly(linked),
     availableElderly: source.elderly
       .filter(
         (elderly) => elderly.status === "active" && !linkedIds.has(elderly.id),

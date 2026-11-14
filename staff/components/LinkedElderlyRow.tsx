@@ -6,6 +6,7 @@ import type { LinkedElderly } from "../types";
 type LinkedElderlyRowProps = {
   elderly: LinkedElderly;
   canUnlink: boolean;
+  onUnlink: () => void;
 };
 
 const statusBadgeClassNames: Record<LinkedElderly["status"], string> = {
@@ -16,6 +17,7 @@ const statusBadgeClassNames: Record<LinkedElderly["status"], string> = {
 export function LinkedElderlyRow({
   elderly,
   canUnlink,
+  onUnlink,
 }: LinkedElderlyRowProps) {
   const unlinkLabel = `Desvincular a ${elderly.fullName}`;
 
@@ -43,6 +45,7 @@ export function LinkedElderlyRow({
           type="button"
           aria-label={unlinkLabel}
           title={unlinkLabel}
+          onClick={onUnlink}
           className="flex size-8 flex-none cursor-pointer items-center justify-center rounded-lg text-[#D9684A] hover:bg-[#FBD8CC] focus-visible:bg-[#FBD8CC] focus-visible:outline-2 focus-visible:outline-[#D9684A]"
         >
           <CloseIcon size={16} />

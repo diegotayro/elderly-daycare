@@ -32,7 +32,9 @@ export function StaffProfileView({ profile }: StaffProfileViewProps) {
         </div>
         <div className="flex w-full flex-col gap-3.5 lg:w-[300px] lg:flex-none">
           <LinkedElderlyCard
+            staffFullName={profile.fullName}
             linkedElderly={profile.linkedElderly}
+            availableElderly={profile.availableElderly}
             canManageLinks={profile.canManageLinks}
           />
         </div>
