@@ -31,8 +31,8 @@ Formato de cada entrada:
 ### Avisos del linter aceptados tras la spec 10
 
 - [ ] **Estado:** pendiente
-- **Qué:** `get_advisors` marca (1) `authenticated_security_definer_function_executable` en `current_user_daycare_id()`, `current_user_role()`, `is_admin()`, `current_user_elderly_ids()`, `current_user_relative_ids()`, `is_email_linked_to_elderly()`, `is_team_email()`, `accept_invitation()`, `get_staff_emails()`, `is_pending_staff()` y `activate_staff_account()`, (2) `multiple_permissive_policies` en `users` para select y update, y en `elderly`, `staff_elderly` y `guardian_elderly` para select, y (3) `auth_leaked_password_protection`.
-- **Origen:** SPEC 10 (`10-users-table`), SPEC 15 (`current_user_elderly_ids()`, `current_user_relative_ids()` y las tablas nuevas) y SPEC 17 (`is_email_linked_to_elderly()`, `is_team_email()` y `accept_invitation()`) y SPEC 21 (`get_staff_emails()`, `is_pending_staff()` y `activate_staff_account()`).
+- **Qué:** `get_advisors` marca (1) `authenticated_security_definer_function_executable` en `current_user_daycare_id()`, `current_user_role()`, `is_admin()`, `current_user_elderly_ids()`, `current_user_relative_ids()`, `is_email_linked_to_elderly()`, `is_team_email()`, `accept_invitation()`, `get_staff_emails()`, `is_pending_staff()`, `activate_staff_account()`, `can_view_post()`, `can_post_to_room()` y `post_has_tag_without_photo_consent()`, (2) `multiple_permissive_policies` en `users` para select y update, en `posts`, `post_elderly`, `post_photos` y `comments` para delete, y en `elderly`, `staff_elderly` y `guardian_elderly` para select, y (3) `auth_leaked_password_protection`.
+- **Origen:** SPEC 10 (`10-users-table`), SPEC 15 (`current_user_elderly_ids()`, `current_user_relative_ids()` y las tablas nuevas) y SPEC 17 (`is_email_linked_to_elderly()`, `is_team_email()` y `accept_invitation()`), SPEC 21 (`get_staff_emails()`, `is_pending_staff()` y `activate_staff_account()`) y SPEC 22 (`can_view_post()`, `can_post_to_room()` y `post_has_tag_without_photo_consent()`; `multiple_permissive_policies` de delete en `posts`, `post_elderly`, `post_photos` y `comments`, e índices sin uso mientras las tablas están vacías).
 - **Se resuelve en:** no se resuelve; (1) y (2) son aceptados. (3) es un ajuste del dashboard de Auth.
 - **Notas:**
   - (1) Las policies evalúan los helpers con el rol del usuario, así que necesitan `EXECUTE`; solo devuelven datos del propio usuario. `current_user_elderly_ids()` y `current_user_relative_ids()` solo devuelven ids ligados a `auth.uid()` y vacío para otros roles. Alternativa descartada: moverlos a un esquema privado.
@@ -483,10 +483,21 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 
 ### Selects de `users` que dependen de tablas futuras
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 22
 - **Qué:** falta la policy de select en `users` para staff/relative sobre los autores de comentarios en posts que pueden ver. La de staff sobre los familiares de sus ancianos asignados se resolvió en SPEC 15 (`users_select_staff_relatives`).
 - **Origen:** SPEC 10 (`10-users-table`), `supabase/migrations/20261108061914_create_users.sql`.
 - **Se resuelve en:** la spec de `comments`.
 - **Notas:**
   - Hoy staff y relative ven solo su fila y la de staff/admin de su guardería (`users_select_own` y `users_select_team`).
   - Marcar como resuelta cuando la policy de autores de comentarios exista.
+
+## Feed
+
+### Borrar los archivos de Storage al borrar un post o una foto
+
+- [ ] **Estado:** pendiente
+- **Qué:** al borrar un post o una fila de `post_photos`, los archivos del bucket `post-photos` no se borran solos.
+- **Origen:** SPEC 22 (`database/22-feed-tables-and-visibility`).
+- **Se resuelve en:** la spec de "Nueva publicación" o la de edición de posts.
+- **Notas:**
+  - Lo hace la app: primero borra los archivos de `{post_id}/` (mientras el post existe, para que pase la policy de Storage) y después el post o la foto.

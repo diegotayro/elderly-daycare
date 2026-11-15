@@ -66,6 +66,12 @@ Viven en `public`, son `SECURITY DEFINER STABLE` con `search_path` vacío y `EXE
 |`current_user_elderly_ids()`|`setof uuid`: ids de los ancianos asignados (`staff_elderly`, si es staff) o vinculados (`guardian_elderly`, si es relative) al usuario logueado. Vacío para admin. Es la única fuente de "qué ancianos son del usuario": la usan las policies de `elderly`, `staff_elderly`, `guardian_elderly` y `users`, y la reusarán las del feed.|
 |`current_user_relative_ids()`|`setof uuid`: ids de los familiares (`guardian_elderly`) de los ancianos del usuario logueado, solo si es staff de su guardería. Vacío para los demás roles. Existe para que la policy de `users` no lea `guardian_elderly` directamente: `guardian_elderly_insert_admin` lee `users`, y leerse mutuamente da recursión infinita entre policies.|
 
+|`can_view_post(p_post_id)`|`boolean`: única implementación de la regla del feed (ver abajo). `false` si el post no existe o su autor no es de la guardería del usuario. Admin: `true`. Staff y relative: según `audience` (nunca `type`); staff además si es el autor. La usan las policies de `posts`, `post_elderly`, `post_photos`, `reactions`, `comments` y Storage. Para un admin equivale a "el autor del post es de su guardería", por eso las policies de borrado del admin la reusan en vez de leer `users` (leerla con RLS produce recursión con `users_select_comment_authors`).|
+|`can_post_to_room(p_room_id)`|`boolean`: admin, la habitación es de su guardería; staff, la habitación es la de alguno de sus asignados. Lo usan `posts_insert_team` y `posts_update_author`.|
+|`post_has_tag_without_photo_consent(p_post_id)`|`boolean`: algún adulto mayor etiquetado en el post tiene `photo_consent = false`. `SECURITY DEFINER` para que no dependa de qué adultos mayores ve quien sube la foto.|
+
+Además existe `post_id_from_path(p_path)`, `IMMUTABLE` y no `SECURITY DEFINER`: devuelve la primera carpeta de una ruta de Storage como `uuid`, o `null` si no tiene formato UUID (así una ruta inválida se niega sin error).
+
 Además existe `set_updated_at()`, trigger genérico `BEFORE UPDATE` para mantener `updated_at` en cualquier tabla.
 
 También existe `are_valid_allergy_tags(text[])`, `IMMUTABLE` y no `SECURITY DEFINER`, que usa el `check` `elderly_allergy_tags_valid`.
@@ -165,6 +171,9 @@ Perfil de aplicación vinculado a **Supabase Auth**. Relatives y staff comparten
 |select|admin|todos los usuarios de su guardería|
 |select|staff|admin y staff de su guardería, familiares de sus ancianos asignados y autores de comentarios en posts que puede ver|
 |select|relative|staff/admin de su guardería (para ver quién publica) y autores de comentarios en posts que puede ver|
+
+> Los autores de comentarios los resuelve `users_select_comment_authors`: `id in (select author_id from comments)`. La subconsulta pasa por la RLS de `comments`, así que solo cuenta los comentarios de posts visibles. No hay recursión porque `can_view_post()` es `SECURITY DEFINER`; en cambio, ninguna policy de `comments` puede leer `users` con RLS.
+
 |update|cualquiera|su propia fila, **solo** sus preferencias: `avatar_url`, `notify_on_post`, `daily_summary_enabled`|
 |update|admin|usuarios de su guardería: nombres y preferencias de cualquiera; `status` solo de staff y relatives|
 |insert|nadie|lo hace el trigger de `auth.users`|
@@ -350,16 +359,16 @@ Una publicación tiene un tipo (qué es) y una audiencia (para quién es).
 |Campo|Tipo|Notas|
 |---|---|---|
 |`id`|`uuid` PK||
-|`author_id`|`uuid` FK → `users`|Staff o admin que publica.|
+|`author_id`|`uuid` FK → `users`|Staff o admin que publica. `ON DELETE RESTRICT`. Inmutable (trigger `protect_posts_columns`).|
 |`audience`|`post_audience`|`elderly`: adultos mayores etiquetados en `post_elderly`. `room`: toda una habitación. `daycare`: toda la guardería.|
-|`room_id`|`uuid` FK → `rooms`|Obligatorio si `audience = room`; `null` en los demás casos.|
+|`room_id`|`uuid` FK → `rooms`|Obligatorio si `audience = room`; `null` en los demás casos (`posts_room_id_matches_audience`). `ON DELETE RESTRICT`.|
 |`type`|`post_type`|Qué es el post. Cualquier tipo puede ir con cualquier audiencia.|
-|`title`|`text`|Nullable (ej. "Anuncio general").|
-|`body`|`text`|Descripción.|
+|`title`|`text`|Nullable (ej. "Anuncio general"). Si existe, de 1 a 120 caracteres sin contar espacios de los extremos (`posts_title_length`).|
+|`body`|`text`|Descripción. De 1 a 2000 caracteres sin contar espacios de los extremos (`posts_body_length`).|
 |`published_at`|`timestamptz`||
 |`created_at` / `updated_at`|`timestamptz`||
 
-> **Reglas de audiencia:** con `audience = elderly`, el post se crea junto con sus adultos mayores etiquetados (al menos uno), en una sola operación. Al editar un post `elderly`, los cambios de adultos mayores etiquetados se guardan juntos en una sola operación. **Un post `elderly` siempre debe tener al menos un adulto mayor etiquetado mientras exista.** Con `room` o `daycare`, no lleva adultos mayores etiquetados. La audiencia no se puede cambiar después de crear el post.
+> **Reglas de audiencia:** con `audience = elderly`, el post se crea junto con sus adultos mayores etiquetados (al menos uno), en una sola operación. Al editar un post `elderly`, los cambios de adultos mayores etiquetados se guardan juntos en una sola operación. **Un post `elderly` siempre debe tener al menos un adulto mayor etiquetado mientras exista.** Con `room` o `daycare`, no lleva adultos mayores etiquetados. La audiencia no se puede cambiar después de crear el post (ni el autor): lo garantiza el trigger `protect_posts_columns`. La regla "al menos un etiquetado" la validan constraint triggers `deferrable initially deferred` (`posts_require_elderly_tag`, `post_elderly_keep_one_tag`): el error llega al hacer commit, así que post y etiquetas deben insertarse en la misma transacción.
 
 > **Al borrar un post:** sus filas en `post_elderly`, `post_photos`, `reactions` y `comments` se borran en cascada. Los archivos de Storage no se borran solos: primero se borran los archivos de `{post_id}/` (mientras el post existe, para que pase la regla de Storage) y después el post.
 
@@ -381,7 +390,7 @@ Tabla intermedia. Es la clave para filtrar el feed del relative.
 |Campo|Tipo|Notas|
 |---|---|---|
 |`post_id`|`uuid` FK → `posts` ON DELETE CASCADE||
-|`elderly_id`|`uuid` FK → `elderly`||
+|`elderly_id`|`uuid` FK → `elderly`|`ON DELETE RESTRICT`. Solo se etiquetan adultos mayores `active`; los posts viejos de uno archivado se conservan.|
 |||PK compuesta (`post_id`, `elderly_id`).|
 
 > Ver _Regla del feed_.
@@ -404,9 +413,9 @@ Fotos adjuntas a una publicación, con soporte para vista a pantalla completa.
 |---|---|---|
 |`id`|`uuid` PK||
 |`post_id`|`uuid` FK → `posts` ON DELETE CASCADE||
-|`url`|`text`|Ruta del archivo en Storage (`{post_id}/archivo`).|
+|`url`|`text`|Ruta del archivo en Storage (`{post_id}/archivo`). Debe empezar con `{post_id}/` (`post_photos_url_in_post_folder`).|
 |`width` / `height`|`int`|Nullable — útil para la vista a pantalla completa.|
-|`position`|`int`|Orden de la foto en la publicación.|
+|`position`|`int`|Orden de la foto en la publicación. `>= 0` y único por post (`post_photos_post_id_position_key`).|
 |`created_at`|`timestamptz`||
 
 ### RLS
@@ -433,8 +442,8 @@ Reacciones a publicaciones (ej. "Me encanta"). Solo se reacciona a posts, no a c
 |---|---|---|
 |`id`|`uuid` PK||
 |`post_id`|`uuid` FK → `posts` ON DELETE CASCADE||
-|`user_id`|`uuid` FK → `users`|Usuario que reacciona (admin, staff o relative).|
-|`type`|`text`|Ej. `love`.|
+|`user_id`|`uuid` FK → `users`|Usuario que reacciona (admin, staff o relative). `ON DELETE RESTRICT`.|
+|`type`|`text`|Solo `love` (`check (type = 'love')`).|
 |`created_at`|`timestamptz`||
 |||UNIQUE (`post_id`, `user_id`) — una reacción por usuario.|
 
@@ -457,8 +466,8 @@ Comentarios en publicaciones.
 |---|---|---|
 |`id`|`uuid` PK||
 |`post_id`|`uuid` FK → `posts` ON DELETE CASCADE||
-|`author_id`|`uuid` FK → `users`|Admin, staff o relative.|
-|`body`|`text`||
+|`author_id`|`uuid` FK → `users`|Admin, staff o relative. `ON DELETE RESTRICT`.|
+|`body`|`text`|De 1 a 1000 caracteres sin contar espacios de los extremos.|
 |`created_at` / `updated_at`|`timestamptz`||
 
 ### RLS

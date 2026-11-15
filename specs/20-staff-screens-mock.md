@@ -28,7 +28,7 @@ Planificadas por el usuario; no van en `specs/BACKLOG.md`.
   - "Agregar staff" invita de verdad (`inviteUserByEmail`, correo y `/crear-contrasena`).
   - Vincular y desvincular con Server Actions sobre `staff_elderly`.
   - Quita el mock, `isLink` y la adulta mayor archivada propia del mock (Teresa).
-- **SPEC 22 — Estado del staff (UI):** archivar, reactivar, cancelar invitación y eliminar sin historial.
+- **SPEC 23 — Estado del staff (UI):** (SPEC 22 pasó a ser la base de datos del feed) archivar, reactivar, cancelar invitación y eliminar sin historial.
   - Archivar: avisa qué adultos mayores quedan sin cuidador (`flujos-de-procesos.md`).
   - Cancelar invitación: solo staff `pending`; borra la cuenta (no hay historial), para corregir un email equivocado antes de que lo acepten.
   - Eliminar sin historial: solo si no tiene posts, comentarios ni reacciones; si tiene, solo se archiva (`posts.author_id` no tiene `ON DELETE CASCADE`). Así un staff aceptado por error no queda en "ARCHIVADOS".
@@ -100,13 +100,13 @@ Planificadas por el usuario; no van en `specs/BACKLOG.md`.
   - Se reusan `Avatar`, `avatarTones`, `ElderlyCardIndicator`, `FormField`, `Toast`, `CloseIcon`, `normalizeSearch`, `formatAge` y `formatEnrolledAt`.
 - **Móvil (bajo `lg`):** mismo patrón que `/elderly` y `/elderly/[id]`; la barra inferior del admin muestra 5 ítems sin scroll horizontal a 360px. Los modales ocupan el ancho con margen de 16px y la lista del selector hace scroll interno.
 - **Foco visible** en tarjetas, botón "x", checkboxes y botones de los modales; los modales atrapan el foco (`<dialog>` nativo) y devuelven el foco al botón que los abrió.
-- **Documentos:** `pantallas-pendientes.md` anota en los puntos 8, 9 y 11 "(SPEC 20, UI con datos mock)" sin marcarlos (falta lo real y las acciones de estado); entradas nuevas en `specs/BACKLOG.md` (ver Modelo de datos). SPEC 21 y SPEC 22 no van al BACKLOG.
+- **Documentos:** `pantallas-pendientes.md` anota en los puntos 8, 9 y 11 "(SPEC 20, UI con datos mock)" sin marcarlos (falta lo real y las acciones de estado); entradas nuevas en `specs/BACKLOG.md` (ver Modelo de datos). SPEC 21 y SPEC 23 no van al BACKLOG.
 
 **Fuera de alcance (para specs futuras):**
 
 - Invitar al staff de verdad, datos reales y Server Actions de vincular y desvincular → SPEC 21.
 - Botón "Editar" del staff.
-- Archivar, reactivar, cancelar invitación y eliminar staff sin historial → SPEC 22.
+- Archivar, reactivar, cancelar invitación y eliminar staff sin historial → SPEC 23.
 - Reenviar invitación (sin spec asignada; entrada en BACKLOG).
 - Gestionar el staff desde el perfil del adulto mayor ("Personal asignado").
 - Que el admin aparezca en la lista o se pueda asignar a sí mismo.
@@ -222,7 +222,7 @@ Reusa `mockElderly` (adultos mayores, habitaciones, tonos y `referenceDate`) y a
 - **Staff** (sección nueva): "Botón Editar del perfil de staff" (hoy sin acción).
 - **Staff:** "Reenviar invitación a staff pendiente" (punto 8 de `pantallas-pendientes.md`).
 
-Conectar a Supabase y las acciones de estado no van al BACKLOG: son SPEC 21 y SPEC 22 (ver "Specs siguientes").
+Conectar a Supabase y las acciones de estado no van al BACKLOG: son SPEC 21 y SPEC 23 (ver "Specs siguientes").
 
 ---
 
@@ -353,7 +353,7 @@ staff/
 **Documentos**
 
 - [x] `pantallas-pendientes.md` anota los puntos 8, 9 y 11 con "(SPEC 20, UI con datos mock)" sin marcarlos.
-- [x] `specs/BACKLOG.md` tiene las dos entradas nuevas de la sección "Staff" y ninguna para lo que cubren SPEC 21 y SPEC 22.
+- [x] `specs/BACKLOG.md` tiene las dos entradas nuevas de la sección "Staff" y ninguna para lo que cubren SPEC 21 y SPEC 23.
 
 ---
 
@@ -394,7 +394,7 @@ staff/
 ## Lo que **no** entra en esta spec
 
 - Invitación real, datos reales y Server Actions de vincular y desvincular (SPEC 21).
-- Archivar, reactivar, cancelar invitación y eliminar sin historial (SPEC 22).
+- Archivar, reactivar, cancelar invitación y eliminar sin historial (SPEC 23).
 - Editar y reenviar invitación.
 - Gestión del staff desde el perfil del adulto mayor.
 - Menú "Staff" del familiar y dark mode.
