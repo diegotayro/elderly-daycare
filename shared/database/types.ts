@@ -78,6 +78,25 @@ export type PostPhoto = {
   created_at: string;
 };
 
+export type ReactionType = "love";
+
+export type Reaction = {
+  id: string;
+  post_id: string;
+  user_id: string;
+  type: ReactionType;
+  created_at: string;
+};
+
+export type Comment = {
+  id: string;
+  post_id: string;
+  author_id: string;
+  body: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type RelationshipType = "son" | "daughter" | "guardian";
 export type InvitationStatus = "pending" | "accepted" | "expired" | "cancelled";
 
