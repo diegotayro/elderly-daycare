@@ -1,6 +1,6 @@
 # SPEC 23 — Estado del staff: archivar, reactivar, cancelar invitación y eliminar sin historial
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 10, SPEC 15, SPEC 20, SPEC 21, SPEC 22
 > **Fecha:** 2026-11-15
 > **Objetivo:** Permitir al admin, desde `/staff/[id]`, archivar y reactivar a un staff (status + bloqueo de login), cancelar la invitación de un staff `pending` y eliminar a un staff sin historial, con la DB limitando las transiciones de `status` a `active` ↔ `archived`.
