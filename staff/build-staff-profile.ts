@@ -1,5 +1,6 @@
 import { formatAge, formatEnrolledAt } from "@/elderly/elderly-formatters";
 import type { Elderly } from "@/shared/database/types";
+import { getUncoveredElderly } from "./get-uncovered-elderly";
 import { getLinkedElderlyRows } from "./get-linked-elderly";
 import { sortLinkedElderly } from "./sort-linked-elderly";
 import { formatStaffStatus } from "./staff-formatters";
@@ -7,19 +8,22 @@ import type {
   ElderlyOption,
   LinkedElderly,
   StaffProfile,
-  StaffSource,
+  StaffProfileSource,
 } from "./types";
 
-function findRoomName(source: StaffSource, elderly: Elderly): string {
+function findRoomName(source: StaffProfileSource, elderly: Elderly): string {
   return source.rooms.find((room) => room.id === elderly.room_id)?.name ?? "";
 }
 
-function formatElderlyDetail(source: StaffSource, elderly: Elderly): string {
+function formatElderlyDetail(
+  source: StaffProfileSource,
+  elderly: Elderly,
+): string {
   return `${formatAge(elderly.birth_date, source.referenceDate)} · Habitación ${findRoomName(source, elderly)}`;
 }
 
 function toLinkedElderly(
-  source: StaffSource,
+  source: StaffProfileSource,
   linkId: string,
   elderly: Elderly,
 ): LinkedElderly {
@@ -37,7 +41,7 @@ function toLinkedElderly(
   };
 }
 
-function toOption(source: StaffSource, elderly: Elderly): ElderlyOption {
+function toOption(source: StaffProfileSource, elderly: Elderly): ElderlyOption {
   return {
     id: elderly.id,
     fullName: elderly.full_name,
@@ -49,7 +53,7 @@ function toOption(source: StaffSource, elderly: Elderly): ElderlyOption {
 }
 
 export function buildStaffProfile(
-  source: StaffSource,
+  source: StaffProfileSource,
   id: string,
 ): StaffProfile | null {
   const staff = source.staff.find((item) => item.id === id);
@@ -57,9 +61,10 @@ export function buildStaffProfile(
 
   const rows = getLinkedElderlyRows(source, staff.id);
   const linkedIds = new Set(rows.map(({ elderly }) => elderly.id));
-  const linked = rows.map(({ linkId, elderly }) =>
-    toLinkedElderly(source, linkId, elderly),
+  const linkedElderly = sortLinkedElderly(
+    rows.map(({ linkId, elderly }) => toLinkedElderly(source, linkId, elderly)),
   );
+  const isArchivable = staff.status === "active" || staff.status === "archived";
 
   return {
     id: staff.id,
@@ -71,7 +76,15 @@ export function buildStaffProfile(
     joinedAtLabel: formatEnrolledAt(staff.created_at),
     canManageLinks: staff.status === "active",
     canResendInvitation: staff.status === "pending",
-    linkedElderly: sortLinkedElderly(linked),
+    canArchive: staff.status === "active",
+    canReactivate: staff.status === "archived",
+    canCancelInvitation: staff.status === "pending",
+    canDelete: isArchivable && !source.hasHistory,
+    uncoveredElderly: getUncoveredElderly(
+      linkedElderly,
+      source.otherActiveLinks,
+    ),
+    linkedElderly,
     availableElderly: source.elderly
       .filter(
         (elderly) => elderly.status === "active" && !linkedIds.has(elderly.id),

@@ -13,29 +13,64 @@ import type {
 } from "@/shared/database/types";
 import { buildAvatarTones } from "./build-avatar-tones";
 import { fetchStaffEmails } from "./fetch-staff-emails";
-import type { StaffSource } from "./types";
+import type { StaffProfileSource } from "./types";
+
+// Vínculos de esos adultos mayores con otros staff en estado active
+async function fetchOtherActiveLinks(
+  supabase: ReturnType<typeof createClient>,
+  staffId: string,
+  elderlyIds: string[],
+): Promise<StaffElderly[]> {
+  if (elderlyIds.length === 0) return [];
+
+  const linksResult = await supabase
+    .from("staff_elderly")
+    .select("*")
+    .in("elderly_id", elderlyIds)
+    .neq("staff_id", staffId);
+  if (linksResult.error) throw linksResult.error;
+  const links: StaffElderly[] = linksResult.data;
+  if (links.length === 0) return [];
+
+  const activeStaffResult = await supabase
+    .from("users")
+    .select("id")
+    .eq("role", "staff")
+    .eq("status", "active")
+    .in("id", [...new Set(links.map((link) => link.staff_id))]);
+  if (activeStaffResult.error) throw activeStaffResult.error;
+  const activeIds = new Set(
+    (activeStaffResult.data as { id: string }[]).map((row) => row.id),
+  );
+
+  return links.filter((link) => activeIds.has(link.staff_id));
+}
 
 // React cache evita consultar dos veces entre generateMetadata y la página
 export const getStaffProfileSource = cache(
-  async (id: string): Promise<StaffSource | null> => {
+  async (id: string): Promise<StaffProfileSource | null> => {
     if (!isUuid(id)) return null;
 
     // La fecha de hoy debe quedar fuera del prerender
     await io();
 
     const supabase = createClient(await cookies());
-    const [staffResult, linksResult, emails] = await Promise.all([
-      supabase
-        .from("users")
-        .select("*")
-        .eq("role", "staff")
-        .eq("id", id)
-        .maybeSingle(),
-      supabase.from("staff_elderly").select("*").eq("staff_id", id),
-      fetchStaffEmails(supabase),
-    ]);
+    const [staffResult, linksResult, emails, historyResult] = await Promise.all(
+      [
+        supabase
+          .from("users")
+          .select("*")
+          .eq("role", "staff")
+          .eq("id", id)
+          .maybeSingle(),
+        supabase.from("staff_elderly").select("*").eq("staff_id", id),
+        fetchStaffEmails(supabase),
+        supabase.rpc("staff_has_history", { p_staff_id: id }),
+      ],
+    );
     if (staffResult.error) throw staffResult.error;
     if (linksResult.error) throw linksResult.error;
+    if (historyResult.error) throw historyResult.error;
 
     const user: User | null = staffResult.data;
     const email = emails.get(id);
@@ -55,6 +90,12 @@ export const getStaffProfileSource = cache(
     if (elderlyResult.error) throw elderlyResult.error;
     if (roomsResult.error) throw roomsResult.error;
 
+    const otherActiveLinks = await fetchOtherActiveLinks(
+      supabase,
+      id,
+      linkedIds,
+    );
+
     const staff = [{ ...user, email }];
     const elderly: Elderly[] = elderlyResult.data;
     const rooms: Room[] = roomsResult.data;
@@ -65,6 +106,8 @@ export const getStaffProfileSource = cache(
       elderly,
       rooms,
       staffElderly,
+      hasHistory: historyResult.data === true,
+      otherActiveLinks,
       avatarTones: buildAvatarTones([...staff, ...elderly]),
     };
   },
