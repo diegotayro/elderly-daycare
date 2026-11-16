@@ -48,7 +48,7 @@ Diccionario de tablas para PostgreSQL. Tipos en notación Postgres. Convención:
 1. **RLS activado en todas las tablas.** Una tabla con RLS y sin policies queda cerrada; cada policy abre solo lo que un rol necesita.
 2. **Todas las policies son `to authenticated`.** El rol `anon` (sin login) no tiene ninguna policy.
 3. **Todo `insert` y `update` lleva `with check`** (además del `using` en `update`).
-4. **Cliente con sesión (`@supabase/ssr`) para todo.** El cliente admin (`service_role`) solo se usa para: crear cuentas (`auth.admin.*`), leer la invitación sin sesión y crear la cuenta del familiar, invitar y reenviar la invitación al staff (`inviteUserByEmail`, o `resetPasswordForEmail` si su email ya está confirmado), archivar y reactivar usuarios (incluye bloquear o desbloquear su login) y el cron del resumen diario. Antes de usarlo, el código verifica que quien llama tiene permiso.
+4. **Cliente con sesión (`@supabase/ssr`) para todo.** El cliente admin (`service_role`) solo se usa para: crear cuentas (`auth.admin.*`), leer la invitación sin sesión y crear la cuenta del familiar, invitar y reenviar la invitación al staff (`inviteUserByEmail`, o `resetPasswordForEmail` si su email ya está confirmado), archivar y reactivar usuarios (incluye bloquear o desbloquear su login), cancelar la invitación y eliminar staff sin historial (`auth.admin.deleteUser`) y el cron del resumen diario. Antes de usarlo, el código verifica que quien llama tiene permiso.
 5. **Nombres de policies en inglés:** `<tabla>_<acción>_<quién>` (ej. `posts_select_visible`).
 6. **Sin policy de `delete`** donde hay borrado lógico (`elderly`, `invitations`) o donde lo maneja Supabase Auth (`users`).
 7. **Funciones helper.** Usar funciones helper en las policies siempre que se pueda, para no repetir lógica. Deben ser `SECURITY DEFINER`, `STABLE` y con `search_path` fijo, para evitar la recursión al leer `users`. Solo pueden devolver datos del propio usuario logueado (`auth.uid()`) o un `true/false`, nunca filas de otras personas. Dentro de las policies, envolverlas en un `select` (ej. `(select is_staff())`) para que se calculen una vez por consulta.
@@ -69,6 +69,7 @@ Viven en `public`, son `SECURITY DEFINER STABLE` con `search_path` vacío y `EXE
 |`can_view_post(p_post_id)`|`boolean`: única implementación de la regla del feed (ver abajo). `false` si el post no existe o su autor no es de la guardería del usuario. Admin: `true`. Staff y relative: según `audience` (nunca `type`); staff además si es el autor. La usan las policies de `posts`, `post_elderly`, `post_photos`, `reactions`, `comments` y Storage. Para un admin equivale a "el autor del post es de su guardería", por eso las policies de borrado del admin la reusan en vez de leer `users` (leerla con RLS produce recursión con `users_select_comment_authors`).|
 |`can_post_to_room(p_room_id)`|`boolean`: admin, la habitación es de su guardería; staff, la habitación es la de alguno de sus asignados. Lo usan `posts_insert_team` y `posts_update_author`.|
 |`post_has_tag_without_photo_consent(p_post_id)`|`boolean`: algún adulto mayor etiquetado en el post tiene `photo_consent = false`. `SECURITY DEFINER` para que no dependa de qué adultos mayores ve quien sube la foto.|
+|`staff_has_history(p_staff_id)`|`boolean`: el staff tiene alguna fila en `posts` (`author_id`), `comments` (`author_id`) o `reactions` (`user_id`). `false` si quien llama no es admin o si `p_staff_id` no es un staff de su guardería. Lo usa el perfil de `/staff/[id]` (mostrar "Eliminar") y `deleteStaff` (validar); la FK `on delete restrict` sigue siendo la protección final.|
 
 Además existe `post_id_from_path(p_path)`, `IMMUTABLE` y no `SECURITY DEFINER`: devuelve la primera carpeta de una ruta de Storage como `uuid`, o `null` si no tiene formato UUID (así una ruta inválida se niega sin error).
 
@@ -183,6 +184,7 @@ Perfil de aplicación vinculado a **Supabase Auth**. Relatives y staff comparten
 > 
 > - Nadie puede cambiar `id`, `daycare_id` ni `role` desde la app, **ni siquiera el admin**. Para agregar o quitar un admin, se hace a mano en la base de datos.
 > - Solo un admin puede cambiar `first_name`, `last_name` y `status`.
+> - El admin solo cambia el `status` de un usuario no admin entre `active` y `archived`. `pending` → `active` solo lo hace `activate_staff_account()`; se rechazan, entre otros, `pending` → `archived`, `archived` → `pending` y `active` → `pending`.
 > - El admin **no** puede cambiar el `status` de un usuario con `role = 'admin'`, incluido él mismo.
 > - Excepción: un staff `pending` puede pasar su propio `status` a `active`, y solo si lo hace `activate_staff_account()` (que activa el flag local `app.staff_activation` dentro de la transacción) sin tocar `first_name` ni `last_name`. Ninguna otra vía deja a un staff cambiar su `status`.
 > - Los cambios hechos con `service_role` o desde el SQL Editor (sin `auth.uid()`) se permiten.

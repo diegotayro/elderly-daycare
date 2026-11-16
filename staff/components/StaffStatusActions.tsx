@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { unstable_rethrow, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Toast } from "@/shared/components/toast/Toast";
 import type { ToastMessage } from "@/shared/components/toast/types";
@@ -70,7 +70,11 @@ export function StaffStatusActions({ profile }: StaffStatusActionsProps) {
     const handler = confirmHandlers[openAction];
     const result = await handler
       .run(profile.id)
-      .catch((): DeleteStaffResult => ({ status: "error" })); // fallo de red
+      .catch((error: unknown): DeleteStaffResult => {
+        // Si la acción redirige, Next rechaza la promesa: no es un fallo
+        unstable_rethrow(error);
+        return { status: "error" }; // fallo de red
+      });
 
     if (result.status === "success") {
       if (handler.successToast)

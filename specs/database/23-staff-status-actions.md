@@ -206,49 +206,49 @@ CLAUDE.md
 
 **Base de datos**
 
-- [ ] Existe `supabase/migrations/<version>_staff_status_actions.sql` y su versión coincide con `list_migrations`.
-- [ ] Como admin: `active` → `archived` y `archived` → `active` de un staff funcionan; `pending` → `active`, `pending` → `archived`, `archived` → `pending` y `active` → `pending` fallan.
-- [ ] Como admin: cambiar el `status` de otro admin sigue fallando.
-- [ ] `activate_staff_account()` sigue pasando a un staff `pending` a `active`.
-- [ ] Como `postgres` (sin `auth.uid()`) cualquier cambio de `status` sigue funcionando.
-- [ ] `staff_has_history()` es `SECURITY DEFINER STABLE`, con `search_path` vacío y `EXECUTE` solo para `authenticated`.
-- [ ] `staff_has_history()` devuelve `true` con un post, un comentario o una reacción del staff, y `false` sin ninguno.
-- [ ] `staff_has_history()` devuelve `false` si quien llama es staff o relative, o si el staff es de otra guardería.
-- [ ] `get_advisors` sin avisos nuevos fuera de los aceptados en el BACKLOG.
+- [x] Existe `supabase/migrations/<version>_staff_status_actions.sql` y su versión coincide con `list_migrations`.
+- [x] Como admin: `active` → `archived` y `archived` → `active` de un staff funcionan; `pending` → `active`, `pending` → `archived`, `archived` → `pending` y `active` → `pending` fallan.
+- [x] Como admin: cambiar el `status` de otro admin sigue fallando.
+- [x] `activate_staff_account()` sigue pasando a un staff `pending` a `active`.
+- [x] Como `postgres` (sin `auth.uid()`) cualquier cambio de `status` sigue funcionando.
+- [x] `staff_has_history()` es `SECURITY DEFINER STABLE`, con `search_path` vacío y `EXECUTE` solo para `authenticated`.
+- [x] `staff_has_history()` devuelve `true` con un post, un comentario o una reacción del staff, y `false` sin ninguno.
+- [x] `staff_has_history()` devuelve `false` si quien llama es staff o relative, o si el staff es de otra guardería.
+- [x] `get_advisors` sin avisos nuevos fuera de los aceptados en el BACKLOG.
 
 **Perfil `/staff/[id]`**
 
-- [ ] `active` sin historial: "Archivar", "Eliminar" y "Editar". Con historial: sin "Eliminar".
-- [ ] `pending`: "Reenviar invitación", "Cancelar invitación" y "Editar".
-- [ ] `archived`: "Reactivar", "Eliminar" solo sin historial, y "Editar".
-- [ ] "Cancelar invitación" y "Eliminar" tienen texto rojo `#D9684A`.
-- [ ] El modal de Archivar lista solo a los adultos mayores activos vinculados que no tienen otro staff `active`; sin ninguno, no muestra la lista.
-- [ ] Los modales tienen el título y el texto de Alcance, foco inicial en "Cancelar"/"Volver" y devuelven el foco al botón que los abrió; "Cancelar"/"Volver" y `Esc` no cambian nada.
+- [x] `active` sin historial: "Archivar", "Eliminar" y "Editar". Con historial: sin "Eliminar".
+- [x] `pending`: "Reenviar invitación", "Cancelar invitación" y "Editar".
+- [x] `archived`: "Reactivar", "Eliminar" solo sin historial, y "Editar".
+- [x] "Cancelar invitación" y "Eliminar" tienen texto rojo `#D9684A`.
+- [x] El modal de Archivar lista solo a los adultos mayores activos vinculados que no tienen otro staff `active`; sin ninguno, no muestra la lista.
+- [x] Los modales tienen el título y el texto de Alcance, foco inicial en "Cancelar"/"Volver" y devuelven el foco al botón que los abrió; "Cancelar"/"Volver" y `Esc` no cambian nada.
 - [ ] Mientras guarda, el texto del botón cambia, los botones se deshabilitan y `Esc` no cierra el modal.
 
 **Acciones**
 
-- [ ] Archivar: el staff pasa a "ARCHIVADOS" en `/staff`, su `banned_until` queda en el futuro y aparece el toast "Staff archivado".
-- [ ] Si el ban falla (probado forzando el error en desarrollo), el `status` vuelve a `active` y aparece el toast de error.
-- [ ] Reactivar: el staff pasa a "ACTIVOS", `banned_until` queda vacío o en el pasado, sus vínculos siguen y aparece el toast "Staff reactivado".
-- [ ] Cancelar invitación: se borra la fila de `auth.users` y `users`, se llega a `/staff` con el toast "Invitación cancelada" y la URL queda en `/staff`.
-- [ ] Eliminar sin historial: se borran `auth.users`, `users` y sus `staff_elderly`; se llega a `/staff` con el toast "Staff eliminado".
-- [ ] `deleteStaff` con un staff con historial devuelve `has-history` y no borra nada (probado llamando a la acción).
-- [ ] Las cuatro acciones devuelven error sin efectos si quien llama no es admin, si el id no es UUID, si el staff es de otra guardería o si su estado no corresponde (ej. `archiveStaff` con un `pending`).
-- [ ] `/staff?notice=otro` no muestra toast.
+- [x] Archivar: el staff pasa a "ARCHIVADOS" en `/staff`, su `banned_until` queda en el futuro y aparece el toast "Staff archivado".
+- [x] Si el ban falla (probado forzando el error en desarrollo), el `status` vuelve a `active` y aparece el toast de error.
+- [x] Reactivar: el staff pasa a "ACTIVOS", `banned_until` queda vacío o en el pasado, sus vínculos siguen y aparece el toast "Staff reactivado".
+- [x] Cancelar invitación: se borra la fila de `auth.users` y `users`, se llega a `/staff` con el toast "Invitación cancelada" y la URL queda en `/staff`.
+- [x] Eliminar sin historial: se borran `auth.users`, `users` y sus `staff_elderly`; se llega a `/staff` con el toast "Staff eliminado".
+- [x] `deleteStaff` con un staff con historial devuelve `has-history` y no borra nada (probado llamando a la acción).
+- [x] Las cuatro acciones devuelven error sin efectos si quien llama no es admin, si el id no es UUID, si el staff es de otra guardería o si su estado no corresponde (ej. `archiveStaff` con un `pending`).
+- [x] `/staff?notice=otro` no muestra toast.
 
 **Prueba real**
 
-- [ ] La cuenta staff de SPEC 21 archivada no puede iniciar sesión y ve "Tu cuenta no está activa. Comunícate con la guardería.".
-- [ ] Con su sesión abierta antes de archivarla, la siguiente navegación lleva a `/login?error=inactive_account`.
-- [ ] Reactivada, vuelve a iniciar sesión y entra a `/`.
-- [ ] Los usuarios de prueba de cancelar y eliminar no quedan en el remoto al terminar.
+- [x] La cuenta staff de SPEC 21 archivada no puede iniciar sesión y ve "Tu cuenta no está activa. Comunícate con la guardería.".
+- [x] Con su sesión abierta antes de archivarla, la siguiente navegación lleva a `/login?error=inactive_account`.
+- [x] Reactivada, vuelve a iniciar sesión y entra a `/`.
+- [x] Los usuarios de prueba de cancelar y eliminar no quedan en el remoto al terminar.
 
 **Cierre**
 
-- [ ] `npm run build` y `npm run lint` sin errores; la consola no muestra errores ni avisos de `<Suspense>` en `/staff` y `/staff/[id]`.
-- [ ] A 390×844 y 360px, la cabecera del perfil con tres botones y los modales no tienen scroll horizontal.
-- [ ] Documentos y BACKLOG actualizados según "Cambios en documentos" y "Entradas de BACKLOG".
+- [x] `npm run build` y `npm run lint` sin errores; la consola no muestra errores ni avisos de `<Suspense>` en `/staff` y `/staff/[id]`.
+- [x] A 390×844 y 360px, la cabecera del perfil con tres botones y los modales no tienen scroll horizontal.
+- [x] Documentos y BACKLOG actualizados según "Cambios en documentos" y "Entradas de BACKLOG".
 
 ---
 

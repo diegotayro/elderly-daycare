@@ -7,10 +7,11 @@ export const metadata: Metadata = {
   title: "Staff · Casa Nogal",
 };
 
-export default function StaffPage() {
+// searchParams es dinámico: se lee dentro de Suspense para que el shell sea estático
+export default function StaffPage(props: PageProps<"/staff">) {
   return (
     <Suspense fallback={<StaffListSkeleton />}>
-      <StaffListContent />
+      <StaffListContent searchParams={props.searchParams} />
     </Suspense>
   );
 }

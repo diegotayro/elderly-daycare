@@ -63,15 +63,31 @@ Un adulto mayor puede tener varios familiares, y siempre gana el "no":
 1. El admin elige "Archivar" en un staff o familiar. No puede archivar a un admin (ni a sí mismo).
 2. Server Action verifica que quien llama es admin y que el usuario es de su guardería.
     - Si es staff y tiene adultos mayores asignados (`staff_elderly`), avisarle al admin cuáles quedarán sin cuidador/a, para que los reasigne.
-3. Se marca status = archived.
-4. Con `service_role`, se bloquea su login en Supabase Auth (ban), para que no pueda iniciar sesión.
+3. Se marca status = archived con la sesión del admin.
+4. Con `service_role`, se bloquea su login en Supabase Auth (ban), para que no pueda iniciar sesión. Si el ban falla, se revierte el status a active y se avisa del error.
 5. Sus posts, comentarios y reacciones se conservan.
 
 ### Reactivar usuario
 
 1. El admin elige "Reactivar" en un usuario archivado.
 2. Server Action verifica que quien llama es admin y que el usuario es de su guardería.
-3. Se marca status = active y, con `service_role`, se quita el bloqueo de login.
+3. Con `service_role`, se quita el bloqueo de login.
+4. Se marca status = active con la sesión del admin. Si falla, se vuelve a bloquear el login y se avisa del error.
+
+### Cancelar invitación de staff
+
+1. El admin elige "Cancelar invitación" en un staff pending y confirma.
+2. Server Action verifica que quien llama es admin, que el staff es de su guardería y que su status es pending.
+3. Con `service_role`, se borra la cuenta con `auth.admin.deleteUser`; la cascada borra la fila de `users`. El enlace que se le envió deja de funcionar.
+4. Se vuelve a `/staff` con el aviso "Invitación cancelada". El admin puede invitarlo de nuevo.
+
+### Eliminar staff sin historial
+
+1. El admin elige "Eliminar" en un staff active o archived y confirma. El botón solo aparece si el staff no tiene historial (`staff_has_history()`). Si tiene adultos mayores que quedarían sin otro staff activo, el aviso los lista.
+2. Server Action verifica que quien llama es admin, que el staff es de su guardería, que su status es active o archived y que no tiene historial.
+3. Con `service_role`, se borra la cuenta con `auth.admin.deleteUser`; la cascada borra `users` y `staff_elderly`.
+4. Si el staff creó historial entre la lectura y el borrado, la FK `on delete restrict` hace fallar el borrado y la acción avisa que ya no se puede eliminar.
+5. Se vuelve a `/staff` con el aviso "Staff eliminado". Un staff con historial no se elimina: se archiva.
 
 ### Cancelar invitación de familiar
 
