@@ -19,6 +19,12 @@ export type StaffSource = {
   avatarTones: Record<string, AvatarTone>; // por id de staff o elderly; solo UI
 };
 
+// Lo que solo necesita el perfil del staff (la lista no lo lee)
+export type StaffProfileSource = StaffSource & {
+  hasHistory: boolean; // staff_has_history(id)
+  otherActiveLinks: StaffElderly[]; // vínculos de los mismos adultos mayores con otros staff active
+};
+
 export type StaffIndicator = Extract<
   ElderlyIndicator,
   { kind: "link" } | { kind: "none" } | { kind: "archived" }
@@ -70,6 +76,11 @@ export type StaffProfile = {
   joinedAtLabel: string; // "feb 2025"
   canManageLinks: boolean; // status = active
   canResendInvitation: boolean; // status = pending
+  canArchive: boolean; // status = active
+  canReactivate: boolean; // status = archived
+  canCancelInvitation: boolean; // status = pending
+  canDelete: boolean; // active o archived y sin historial
+  uncoveredElderly: string[]; // nombres de los vinculados activos sin otro staff active
   linkedElderly: LinkedElderly[];
   availableElderly: ElderlyOption[]; // activos y no vinculados
 };
@@ -90,3 +101,7 @@ export type InviteStaffResult =
   | { status: "success"; email: string };
 
 export type StaffActionResult = { status: "success" } | { status: "error" };
+
+export type DeleteStaffResult = StaffActionResult | { status: "has-history" };
+
+export type StaffListNotice = "invitation-cancelled" | "staff-deleted";

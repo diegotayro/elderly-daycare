@@ -28,7 +28,7 @@ Planificadas por el usuario; no van en `specs/BACKLOG.md`.
   - "Agregar staff" invita de verdad (`inviteUserByEmail`, correo y `/crear-contrasena`).
   - Vincular y desvincular con Server Actions sobre `staff_elderly`.
   - Quita el mock, `isLink` y la adulta mayor archivada propia del mock (Teresa).
-- **SPEC 23 — Estado del staff (UI):** (SPEC 22 pasó a ser la base de datos del feed) archivar, reactivar, cancelar invitación y eliminar sin historial.
+- **SPEC 23 — Estado del staff (UI):** (SPEC 22 pasó a ser la base de datos del feed; implementada en `specs/database/23-staff-status-actions.md`) archivar, reactivar, cancelar invitación y eliminar sin historial.
   - Archivar: avisa qué adultos mayores quedan sin cuidador (`flujos-de-procesos.md`).
   - Cancelar invitación: solo staff `pending`; borra la cuenta (no hay historial), para corregir un email equivocado antes de que lo acepten.
   - Eliminar sin historial: solo si no tiene posts, comentarios ni reacciones; si tiene, solo se archiva (`posts.author_id` no tiene `ON DELETE CASCADE`). Así un staff aceptado por error no queda en "ARCHIVADOS".

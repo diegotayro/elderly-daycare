@@ -1,9 +1,21 @@
 import { requireAdminUser } from "@/auth/require-user";
 import { getStaffSource } from "../get-staff-source";
+import { readStaffListNotice } from "../read-staff-list-notice";
+import { StaffListNoticeToast } from "./StaffListNoticeToast";
 import { StaffListView } from "./StaffListView";
 
-export async function StaffListContent() {
-  await requireAdminUser();
+type StaffListContentProps = Pick<PageProps<"/staff">, "searchParams">;
 
-  return <StaffListView source={await getStaffSource()} />;
+export async function StaffListContent({
+  searchParams,
+}: StaffListContentProps) {
+  await requireAdminUser();
+  const { notice } = await searchParams;
+
+  return (
+    <>
+      <StaffListView source={await getStaffSource()} />
+      <StaffListNoticeToast notice={readStaffListNotice(notice)} />
+    </>
+  );
 }

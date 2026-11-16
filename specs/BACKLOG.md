@@ -31,15 +31,17 @@ Formato de cada entrada:
 ### Avisos del linter aceptados tras la spec 10
 
 - [ ] **Estado:** pendiente
-- **Qué:** `get_advisors` marca (1) `authenticated_security_definer_function_executable` en `current_user_daycare_id()`, `current_user_role()`, `is_admin()`, `current_user_elderly_ids()`, `current_user_relative_ids()`, `is_email_linked_to_elderly()`, `is_team_email()`, `accept_invitation()`, `get_staff_emails()`, `is_pending_staff()`, `activate_staff_account()`, `can_view_post()`, `can_post_to_room()` y `post_has_tag_without_photo_consent()`, (2) `multiple_permissive_policies` en `users` para select y update, en `posts`, `post_elderly`, `post_photos` y `comments` para delete, y en `elderly`, `staff_elderly` y `guardian_elderly` para select, y (3) `auth_leaked_password_protection`.
-- **Origen:** SPEC 10 (`10-users-table`), SPEC 15 (`current_user_elderly_ids()`, `current_user_relative_ids()` y las tablas nuevas) y SPEC 17 (`is_email_linked_to_elderly()`, `is_team_email()` y `accept_invitation()`), SPEC 21 (`get_staff_emails()`, `is_pending_staff()` y `activate_staff_account()`) y SPEC 22 (`can_view_post()`, `can_post_to_room()` y `post_has_tag_without_photo_consent()`; `multiple_permissive_policies` de delete en `posts`, `post_elderly`, `post_photos` y `comments`, e índices sin uso mientras las tablas están vacías).
-- **Se resuelve en:** no se resuelve; (1) y (2) son aceptados. (3) es un ajuste del dashboard de Auth.
+- **Qué:** `get_advisors` marca (1) `authenticated_security_definer_function_executable` en `current_user_daycare_id()`, `current_user_role()`, `is_admin()`, `current_user_elderly_ids()`, `current_user_relative_ids()`, `is_email_linked_to_elderly()`, `is_team_email()`, `accept_invitation()`, `get_staff_emails()`, `is_pending_staff()`, `activate_staff_account()`, `can_view_post()`, `can_post_to_room()`, `post_has_tag_without_photo_consent()` y `staff_has_history()`, (2) `multiple_permissive_policies` en `users` para select y update, en `posts`, `post_elderly`, `post_photos` y `comments` para delete, y en `elderly`, `staff_elderly` y `guardian_elderly` para select, y (3) `auth_leaked_password_protection` y (4) `auth_otp_long_expiry` (la expiración del OTP del proveedor de email supera la hora recomendada).
+- **Origen:** SPEC 10 (`10-users-table`), SPEC 15 (`current_user_elderly_ids()`, `current_user_relative_ids()` y las tablas nuevas) y SPEC 17 (`is_email_linked_to_elderly()`, `is_team_email()` y `accept_invitation()`), SPEC 21 (`get_staff_emails()`, `is_pending_staff()` y `activate_staff_account()`), SPEC 22 (`can_view_post()`, `can_post_to_room()` y `post_has_tag_without_photo_consent()`; `multiple_permissive_policies` de delete en `posts`, `post_elderly`, `post_photos` y `comments`, e índices sin uso mientras las tablas están vacías) y SPEC 23 (`staff_has_history()`).
+- **Se resuelve en:** no se resuelve; (1) y (2) son aceptados. (3) y (4) son ajustes del dashboard de Auth.
 - **Notas:**
   - (1) Las policies evalúan los helpers con el rol del usuario, así que necesitan `EXECUTE`; solo devuelven datos del propio usuario. `current_user_elderly_ids()` y `current_user_relative_ids()` solo devuelven ids ligados a `auth.uid()` y vacío para otros roles. Alternativa descartada: moverlos a un esquema privado.
   - Las tres funciones de SPEC 17 deben ser ejecutables por `authenticated` (el admin las llama al invitar y el familiar al activar) y validan el rol y la guardería de quien llama dentro de la función. `get_invitation_preview()` es solo para `service_role` y no genera aviso.
   - Las tres funciones de SPEC 21 también deben ser ejecutables por `authenticated` (el admin llama a `get_staff_emails()`, y el staff invitado a las otras dos con su sesión) y validan el rol de quien llama dentro de la función.
+  - `staff_has_history()` (SPEC 23) también debe ser ejecutable por `authenticated` (el perfil del staff y `deleteStaff` la llaman con la sesión del admin) y devuelve `false` si quien llama no es admin o el staff no es de su guardería.
   - (2) Consecuencia de policies separadas por regla (`own`, `admin`, `team`, `staff`/`relative`). Alternativa descartada: unirlas en una sola.
   - (3) Revisar en el dashboard (Auth > Password security) si el plan lo permite.
+  - (4) Detectado al verificar SPEC 23. No lo causa esa spec (es una configuración de Auth) y no se comprobó si ya aparecía antes. Revisar en el dashboard (Auth > Providers > Email) y bajar la expiración del OTP a menos de una hora; antes de cambiarla, comprobar si afecta la vigencia de los enlaces de invitación.
 
 ### Vulnerabilidad moderada de `deepmerge` en `@react-email/components`
 
@@ -228,7 +230,7 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 ### Pruebas pendientes con `staff`, `pending`, `archived` y `relative`
 
 - [ ] **Estado:** pendiente
-- **Qué:** SPEC 11 solo se probó con la cuenta admin. Quedan sin comprobar: `staff` `pending` con contraseña termina en `/login` con `inactive_account` (ojo: con SPEC 21, un staff `pending` con sesión va a `/create-password`); usuario `archived` (ban) recibe `user_banned` y `inactive_account`; archivado con sesión abierta pasa por `/auth/end-session`; `relative` activo entra a `/family`; `relative` en una ruta de `(app)` redirige a `/family`; `relative` que abre `/staff` o `/staff/[id]` redirige a `/family` (SPEC 20, `requireAdminUser()`). Verificados en SPEC 21 (prueba real): `staff` activa entra a `/` y un `staff` que abre `/staff` redirige a `/`.
+- **Qué:** SPEC 11 solo se probó con la cuenta admin. Quedan sin comprobar: `staff` `pending` con contraseña termina en `/login` con `inactive_account` (ojo: con SPEC 21, un staff `pending` con sesión va a `/create-password`); `relative` activo entra a `/family`; `relative` en una ruta de `(app)` redirige a `/family`; `relative` que abre `/staff` o `/staff/[id]` redirige a `/family` (SPEC 20, `requireAdminUser()`). Verificados en SPEC 21 (prueba real): `staff` activa entra a `/` y un `staff` que abre `/staff` redirige a `/`. Verificado en SPEC 23 (prueba real con la cuenta staff de SPEC 21): un usuario `archived` (ban) recibe `inactive_account` al iniciar sesión y, con la sesión abierta, la siguiente navegación pasa por `/auth/end-session` y termina en `/login?error=inactive_account`.
 - **Origen:** SPEC 11, sección "Casos sin verificar"; SPEC 20 (redirección de `/staff`).
 - **Se resuelve en:** antes de crear cuentas reales de esos roles (specs de invitación de staff y familiares).
 - **Notas:** no agregar cuentas a `seed.sql`, para no dejar contraseñas de prueba en el repositorio.
@@ -240,7 +242,7 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 - **Origen:** conversación al diseñar SPEC 14; `references/documents/database-schema.md`, regla 4.
 - **Se resuelve en:** cada spec que implemente una de esas tareas (invitación de staff, aceptar invitaciones, archivar usuarios, resumen diario).
 - **Notas:**
-  - **Necesario:** crear cuentas (incluida la del familiar nuevo al activar su invitación), invitar y reenviar la invitación al staff (`inviteUserByEmail` y, si su email ya está confirmado, `resetPasswordForEmail`; en SPEC 21 usan `service_role` `staff/actions/invite-staff.ts` y `staff/actions/resend-staff-invitation.ts`) y bloquear el login (`auth.admin.updateUserById` con ban).
+  - **Necesario:** crear cuentas (incluida la del familiar nuevo al activar su invitación), invitar y reenviar la invitación al staff (`inviteUserByEmail` y, si su email ya está confirmado, `resetPasswordForEmail`; en SPEC 21 usan `service_role` `staff/actions/invite-staff.ts` y `staff/actions/resend-staff-invitation.ts`) bloquear el login (`auth.admin.updateUserById` con ban) y borrar cuentas de Auth (`auth.admin.deleteUser`, para cancelar la invitación y eliminar staff sin historial; en SPEC 23 usan `service_role` `staff/actions/archive-staff.ts`, `reactivate-staff.ts`, `cancel-staff-invitation.ts` y `delete-staff.ts`).
   - **Aceptar una invitación:** resuelto en SPEC 17 con `accept_invitation(code, photo_consent)` (`SECURITY DEFINER`), llamada con la sesión del familiar. `service_role` solo se usa para leer la vista previa de la invitación sin sesión (`get_invitation_preview`) y para `auth.admin.createUser`.
   - **Activar al staff:** resuelto en SPEC 21 con `activate_staff_account()` (`SECURITY DEFINER`), llamada con la sesión del staff al crear su contraseña. Sin trigger en `auth.users`, que también se dispararía al recuperar la contraseña.
   - **Archivar o reactivar (`status`):** ya lo permite la policy de update del admin.
@@ -451,7 +453,7 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Qué:** el perfil de un staff `pending` no permitía reenviar la invitación (punto 8 de `pantallas-pendientes.md`).
 - **Origen:** SPEC 20.
 - **Se resuelve en:** SPEC 21 (botón "Reenviar invitación" en el perfil).
-- **Notas:** verificado con un correo real: con el email sin confirmar, `inviteUserByEmail` acepta el reenvío y el link anterior deja de servir. Cancelar la invitación va en SPEC 22.
+- **Notas:** verificado con un correo real: con el email sin confirmar, `inviteUserByEmail` acepta el reenvío y el link anterior deja de servir. Cancelar la invitación va en SPEC 23.
 
 ### Reenvío a un staff con el email ya confirmado (plan B)
 
