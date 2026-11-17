@@ -45,11 +45,14 @@ export type AudienceElderlyOption = {
   firstName: string; // "Luis"
   initial: string; // "L"
   tone: AvatarTone;
+  photoConsent: boolean;
 };
 
 export type NewPostOptions = {
   elderly: AudienceElderlyOption[];
   rooms: RoomOption[];
+  canPostToDaycare: boolean; // solo admin
+  roomsWithoutPhotoConsent: string[]; // ids con room_has_elderly_without_photo_consent = true
 };
 
 export type AudienceSelection =
@@ -66,13 +69,34 @@ export type AudienceChip =
 export type NewPostInput = {
   audience: AudienceSelection;
   type: string; // valor crudo del FormData
+  title: string; // solo cuenta con room o daycare
   body: string;
+  photoCount: number;
 };
 
-export type NewPostField = "audience" | "type" | "body";
+export type NewPostField = "audience" | "type" | "title" | "body" | "photos";
 export type NewPostErrors = Partial<Record<NewPostField, string>>;
 
 export type PhotoSelectionResult = {
   accepted: File[];
   error: string | null;
+};
+
+export type CompressedPhoto = { blob: Blob; width: number; height: number };
+
+export type FeedPhoto = {
+  url: string; // url firmada
+  width: number | null;
+  height: number | null;
+};
+
+export type FeedDay<TPost> = {
+  date: string; // "aaaa-mm-dd" (Lima)
+  label: string;
+  posts: TPost[];
+};
+
+export type FeedPage<TPost> = {
+  days: FeedDay<TPost>[];
+  hasMore: boolean;
 };
