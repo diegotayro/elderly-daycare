@@ -20,6 +20,7 @@ type AudiencePickerProps = {
   error?: string;
   elderly: AudienceElderlyOption[];
   rooms: RoomOption[];
+  canPostToDaycare: boolean;
   selection: AudienceSelection;
   onToggle: (chip: AudienceChip) => void;
   onRoomChange: (roomId: string) => void;
@@ -30,6 +31,7 @@ export function AudiencePicker({
   error,
   elderly,
   rooms,
+  canPostToDaycare,
   selection,
   onToggle,
   onRoomChange,
@@ -81,15 +83,17 @@ export function AudiencePicker({
         >
           Toda la habitación
         </button>
-        <button
-          type="button"
-          data-audience-chip
-          aria-pressed={selection.kind === "daycare"}
-          onClick={() => onToggle({ kind: "daycare" })}
-          className={`${CHIP_BASE_CLASS_NAME} px-4 py-1.5`}
-        >
-          Toda la guardería
-        </button>
+        {canPostToDaycare && (
+          <button
+            type="button"
+            data-audience-chip
+            aria-pressed={selection.kind === "daycare"}
+            onClick={() => onToggle({ kind: "daycare" })}
+            className={`${CHIP_BASE_CLASS_NAME} px-4 py-1.5`}
+          >
+            Toda la guardería
+          </button>
+        )}
       </div>
       <FieldError fieldId="audience" message={error} />
       {selection.kind === "room" && (

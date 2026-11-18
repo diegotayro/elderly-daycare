@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { MAX_BODY_LENGTH } from "../new-post-limits";
 import { selectPhotos } from "../select-photos";
 import { toggleAudience } from "../toggle-audience";
@@ -49,11 +49,20 @@ type NewPostFormProps = {
 
 export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
   const audienceLabelId = useId();
+  const formRef = useRef<HTMLFormElement>(null);
   const [audience, setAudience] = useState<AudienceSelection>({ kind: "none" });
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [errors, setErrors] = useState<NewPostErrors>({});
   const defaultRoomId = options.rooms[0]?.id ?? "";
+
+  // Si el modal se abrió mientras cargaban las opciones, el foco inicial llega ahora
+  useEffect(() => {
+    const form = formRef.current;
+    if (form?.closest("dialog")?.open) {
+      form.querySelector<HTMLElement>("[data-audience-chip]")?.focus();
+    }
+  }, []);
 
   function clearError(field: NewPostField) {
     setErrors((current) => ({ ...current, [field]: undefined }));
@@ -112,6 +121,7 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
 
   return (
     <form
+      ref={formRef}
       noValidate
       onSubmit={handleSubmit}
       onChange={handleChange}
@@ -144,6 +154,7 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
           error={errors.audience}
           elderly={options.elderly}
           rooms={options.rooms}
+          canPostToDaycare={options.canPostToDaycare}
           selection={audience}
           onToggle={(chip) =>
             changeAudience((current) =>

@@ -2,12 +2,15 @@
 
 import {
   createContext,
+  Suspense,
+  use,
   useContext,
   useId,
   useRef,
   useState,
   type ReactNode,
 } from "react";
+import { SkeletonBlock } from "@/shared/components/SkeletonBlock";
 import type { NewPostOptions } from "../types";
 import { NewPostForm } from "./NewPostForm";
 
@@ -27,13 +30,41 @@ export function useNewPostDialog(): NewPostDialogContextValue {
   return context;
 }
 
+function NewPostFormSkeleton() {
+  return (
+    <div aria-busy="true" className="flex flex-col gap-6 px-[26px] py-6">
+      <SkeletonBlock className="h-6 w-1/2 rounded-full" />
+      <SkeletonBlock className="h-24 rounded-2xl" />
+      <SkeletonBlock className="h-12 rounded-2xl" />
+      <SkeletonBlock className="h-32 rounded-2xl" />
+    </div>
+  );
+}
+
+type NewPostFormLoaderProps = {
+  optionsPromise: Promise<NewPostOptions>;
+  titleId: string;
+  onCancel: () => void;
+};
+
+function NewPostFormLoader({
+  optionsPromise,
+  titleId,
+  onCancel,
+}: NewPostFormLoaderProps) {
+  const options = use(optionsPromise);
+  return (
+    <NewPostForm options={options} titleId={titleId} onCancel={onCancel} />
+  );
+}
+
 type NewPostDialogProviderProps = {
-  options: NewPostOptions;
+  optionsPromise: Promise<NewPostOptions>;
   children: ReactNode;
 };
 
 export function NewPostDialogProvider({
-  options,
+  optionsPromise,
   children,
 }: NewPostDialogProviderProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -56,12 +87,14 @@ export function NewPostDialogProvider({
         onClose={() => setFormKey((key) => key + 1)}
         className="m-0 h-dvh max-h-none w-full max-w-none overflow-hidden border-0 border-line bg-auth-bg p-0 text-ink backdrop:bg-ink/40 open:flex open:flex-col sm:mx-auto sm:mt-10 sm:mb-auto sm:h-fit sm:max-h-[calc(100dvh-80px)] sm:max-w-[580px] sm:rounded-3xl sm:border sm:shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]"
       >
-        <NewPostForm
-          key={formKey}
-          options={options}
-          titleId={titleId}
-          onCancel={() => dialogRef.current?.close()}
-        />
+        <Suspense fallback={<NewPostFormSkeleton />}>
+          <NewPostFormLoader
+            key={formKey}
+            optionsPromise={optionsPromise}
+            titleId={titleId}
+            onCancel={() => dialogRef.current?.close()}
+          />
+        </Suspense>
       </dialog>
     </NewPostDialogContext>
   );

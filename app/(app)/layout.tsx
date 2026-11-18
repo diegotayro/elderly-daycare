@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { NewPostDialogProvider } from "@/feed/components/NewPostDialogProvider";
-import { buildNewPostOptions } from "@/feed/build-new-post-options";
-import { mockElderly } from "@/elderly/mock-elderly";
+import { getNewPostOptions } from "@/feed/get-new-post-options";
 import { CurrentUserMobileTopBar } from "@/shared/components/navigation/CurrentUserMobileTopBar";
 import { CurrentUserSidebar } from "@/shared/components/navigation/CurrentUserSidebar";
 import { CurrentUserMobileBottomNav } from "@/shared/components/navigation/CurrentUserMobileBottomNav";
@@ -10,8 +9,11 @@ import { MobileTopBar } from "@/shared/components/navigation/MobileTopBar";
 import { Sidebar } from "@/shared/components/navigation/Sidebar";
 
 export default function AppLayout({ children }: LayoutProps<"/">) {
+  // Sin await: el formulario lee la promesa con use() dentro de un Suspense
+  const optionsPromise = getNewPostOptions();
+
   return (
-    <NewPostDialogProvider options={buildNewPostOptions(mockElderly)}>
+    <NewPostDialogProvider optionsPromise={optionsPromise}>
       <div className="flex min-h-screen flex-col bg-cream lg:flex-row">
         <Suspense fallback={<Sidebar variant="team" />}>
           <CurrentUserSidebar />
