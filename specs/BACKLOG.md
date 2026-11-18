@@ -140,6 +140,16 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 
 ## Autenticación y cuentas
 
+### Activar con el consentimiento de fotos desmarcado
+
+- [ ] **Estado:** pendiente
+- **Qué:** probar a mano en `/activate-account` que activar una invitación con la casilla "Autorizo a la guardería a tomar y compartir fotos…" desmarcada deja `elderly.photo_consent = false` en el adulto mayor de la invitación. La parte B de SPEC 24 se activó con la casilla marcada (viene marcada por defecto), así que ese caso no se probó desde la UI.
+- **Origen:** SPEC 24 (parte B, puntos B.3 y B.4); criterio "Desmarcar el consentimiento deja `photo_consent = false`" de SPEC 17.
+- **Se resuelve en:** una próxima verificación manual de familiares, o SPEC 26 (confirmar la contraseña en "Activar cuenta"), que vuelve a tocar ese formulario.
+- **Notas:**
+  - La regla en la DB (`accept_invitation` con `p_photo_consent = false`) se prueba con SQL en el paso 2 de SPEC 24; falta solo comprobar que la casilla desmarcada llega como `false` a la Server Action.
+  - Hacerlo con un adulto mayor de prueba o anotar su `photo_consent` antes, para restaurarlo después (un familiar no puede volver a `true`; solo el admin).
+
 ### Mensaje de código no válido cuando la invitación ya no existe (cancelada, vencida o archivada)
 
 - [ ] **Estado:** pendiente
@@ -252,76 +262,11 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 
 ### Verificación manual de invitar y activar familiares (SPEC 17, pasos 11 y 12)
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 24
 - **Qué:** probar a mano el flujo completo de invitar a un familiar desde el perfil y activar la invitación, y luego borrar los datos de prueba. Escribe en el remoto y envía correos reales.
 - **Origen:** SPEC 17, pasos 11 (verificación con datos) y 12 (limpieza) y sus criterios de aceptación.
 - **Se resuelve en:** SPEC 17, antes de marcarla `Implementado`. Al terminar, tachar los criterios en la spec y marcar esta entrada como resuelta.
-- **Notas:**
-
-**Antes de empezar**
-
-- `.env` con `SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL=onboarding@resend.dev` y `APP_URL=http://localhost:3000`; `npm run dev` corriendo.
-- Con `onboarding@resend.dev` solo se puede enviar al email de tu cuenta de Resend. Úsalo como `TU_EMAIL` en todo lo de abajo.
-- La contraseña del admin debe tener 8 o más caracteres, con una letra y un número (si no, `/login` la rechaza).
-- Capturas en `.playwright-mcp/`.
-
-**A. Modal de invitación (como admin, en `/elderly/[id]` de Luis Fernández)**
-
-1. Entra como staff: no debe verse "Vincular otro familiar/tutor". Como admin sí; en un adulto mayor archivado no.
-2. Abre el modal: no debe verse el bloque CÓDIGO DE INVITACIÓN. Captura.
-3. Envía con datos vacíos: errores bajo cada campo y foco en el primero.
-4. Llena NOMBRES, APELLIDOS, `TU_EMAIL` (prueba con mayúsculas y espacios) y parentesco, y envía.
-   - Mientras envía: botón "Enviando…"; la X, Esc y los campos no responden.
-   - Éxito: "Invitación enviada a {email}" (en minúsculas y sin espacios), código de 5 caracteres, "Vence en 7 días" y "Listo". Captura.
-5. Llega el correo a `TU_EMAIL` con el asunto "Te invitaron a seguir a Luis Fernández en Casa Nogal", el código y el botón a `http://localhost:3000/activate-account?code={código}`.
-6. Cierra con "Listo": el perfil muestra la fila PENDIENTE y `/elderly` cuenta la invitación en Luis. Captura.
-7. Vuelve a invitar al mismo email para Luis:
-   - Al enviar no se envía: aviso de reemplazo bajo EMAIL y botón "Reemplazar invitación". Captura.
-   - Edita EMAIL: el aviso desaparece y el botón vuelve a "Enviar invitación".
-   - Vuelve a poner el email y pulsa "Reemplazar invitación": invitación nueva con otro código y correo nuevo. El perfil muestra una sola fila PENDIENTE. El código anterior ya no sirve en `/activate-account`.
-8. Invita el email del admin: "Este email pertenece al personal.".
-9. Falla del correo: pon una `RESEND_API_KEY` inválida, reinicia `npm run dev` e invita a otro email. La invitación se guarda y el éxito muestra "No pudimos enviar el correo. Comparte este código con {nombres}.". Captura. Restaura la llave.
-
-**B. Activación como familiar nuevo (ventana privada, sin sesión)**
-
-1. Abre el link del correo: tarjeta de Luis, código y email precargados, etiqueta "CREAR CONTRASEÑA". Captura.
-2. Prueba errores: contraseña `abcdefgh` y `12345678` (error de la regla), código inexistente ("El código no es válido o ya venció."), email distinto ("Este email no coincide con la invitación."). Los campos con error tienen `aria-invalid="true"` y `aria-describedby`. Captura con errores.
-3. Desmarca el consentimiento de fotos y activa con una contraseña válida (ej. `Prueba123`).
-   - Mientras activa: botón "Activando…" deshabilitado.
-   - Resultado: sesión iniciada y redirección a `/family-pending`.
-4. Comprueba en la base (SQL Editor): usuario `relative` `active`, fila en `guardian_elderly` con el parentesco elegido, invitación `accepted` con `accepted_at`, y `elderly.photo_consent = false` en Luis.
-
-**C. Activación con cuenta existente**
-
-1. Como admin, invita `TU_EMAIL` a otro adulto mayor activo (ej. Rosa Méndez).
-2. Abre el link del correo (ventana privada): etiqueta "INGRESE SU CONTRASEÑA". Captura.
-3. Contraseña incorrecta: "La contraseña no es correcta." y no se crea el vínculo.
-4. Contraseña correcta, con el consentimiento marcado: no se crea otro usuario, se crea el segundo vínculo, se inicia sesión y `photo_consent` de Rosa sigue en `true`.
-5. Cierra sesión. Abre `/activate-account` sin código, escribe a mano un código de una invitación nueva con `TU_EMAIL` y una contraseña cualquiera válida: debe mostrar "Este email ya tiene cuenta. Ingresa tu contraseña." y la etiqueta cambia a "INGRESE SU CONTRASEÑA".
-6. Reusa un código ya aceptado: "El código no es válido o ya venció.".
-
-**D. Login y otras comprobaciones**
-
-- `/login` con contraseña `abc`: "El email o la contraseña no son correctos."; el admin sigue entrando con la suya.
-- A 390×844 no hay scroll horizontal en el modal (formulario y éxito) ni en `/activate-account`. Captura.
-- Consola de `/elderly/[id]` y `/activate-account` sin errores ni warnings de hidratación.
-- Mientras carga `/activate-account?code=...`, el fallback muestra el formulario con los campos deshabilitados.
-- `npm run build` y `npm run lint` sin errores.
-
-**E. Limpieza (paso 12)** — en el SQL Editor de Supabase, reemplazando `TU_EMAIL`:
-
-```sql
--- Deja el consentimiento de Luis como estaba (si lo cambiaste en B.3)
-update public.elderly set photo_consent = true where full_name = 'Luis Fernández';
-
-delete from public.guardian_elderly
-  where relative_id in (select id from auth.users where email = 'TU_EMAIL');
-delete from public.invitations where email in ('TU_EMAIL', 'EMAIL_DEL_PASO_A9');
--- El usuario de prueba (public.users se borra en cascada)
-delete from auth.users where email = 'TU_EMAIL';
-```
-
-Después comprueba que no quedan el usuario de prueba, sus vínculos ni las invitaciones de prueba.
+- **Notas:** Checklist actualizada en SPEC 24.
 
 ### Eliminar `/family-pending` y reescribir la redirección del familiar
 

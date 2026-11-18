@@ -1,6 +1,6 @@
 # SPEC 17 — Invitar familiares desde el perfil y activar la invitación
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 03, SPEC 05, SPEC 11, SPEC 15, SPEC 16
 > **Fecha:** 2026-11-10
 > **Objetivo:** Que el admin invite a un familiar desde "Vincular otro familiar/tutor" (fila en `invitations` + correo con Resend) y que el familiar la active en `/activate-account`, creando su cuenta o usando la que ya tiene, y quedando vinculado al adulto mayor.
@@ -339,58 +339,58 @@ Antes de los pasos 1 y 2, cargar los skills `supabase` y `supabase-postgres-best
 
 **Base de datos**
 
-- [ ] `invitations` existe con RLS activado, las 3 policies `invitations_*_admin` y sin policy de delete.
-- [ ] Un insert sin `code` genera 5 caracteres que cumplen `invitations_code_format`.
-- [ ] Dos `pending` con el mismo `elderly_id` y email fallan con `invitations_elderly_id_email_pending_key`; con la primera en `expired`, la segunda se inserta.
-- [ ] Como staff, `select` en `invitations` devuelve 0 filas e `insert` falla.
-- [ ] El admin no puede cambiar otra columna que no sea `status`.
-- [ ] `get_invitation_preview` falla para `anon` y `authenticated`, y responde para `service_role`.
-- [ ] `accept_invitation` con un email distinto al de la sesión falla y no crea el vínculo.
-- [ ] `accept_invitation` con `p_photo_consent = true` no cambia `photo_consent`; con `false` lo pone en `false`.
-- [ ] `get_advisors` no muestra avisos nuevos fuera de los aceptados en BACKLOG.
+- [x] `invitations` existe con RLS activado, las 3 policies `invitations_*_admin` y sin policy de delete.
+- [x] Un insert sin `code` genera 5 caracteres que cumplen `invitations_code_format`.
+- [x] Dos `pending` con el mismo `elderly_id` y email fallan con `invitations_elderly_id_email_pending_key`; con la primera en `expired`, la segunda se inserta.
+- [x] Como staff, `select` en `invitations` devuelve 0 filas e `insert` falla.
+- [x] El admin no puede cambiar otra columna que no sea `status`.
+- [x] `get_invitation_preview` falla para `anon` y `authenticated`, y responde para `service_role`.
+- [x] `accept_invitation` con un email distinto al de la sesión falla y no crea el vínculo.
+- [x] `accept_invitation` con `p_photo_consent = true` no cambia `photo_consent`; con `false` lo pone en `false`.
+- [x] `get_advisors` no muestra avisos nuevos fuera de los aceptados en BACKLOG.
 
 **Invitar (admin)**
 
-- [ ] El staff no ve "Vincular otro familiar/tutor"; el admin lo ve en un adulto mayor activo y no en uno archivado.
-- [ ] Antes de enviar, el modal no muestra el bloque CÓDIGO DE INVITACIÓN.
-- [ ] Con datos válidos, el modal muestra "Invitación enviada a {email}", el código real, "Vence en 7 días" y "Listo".
-- [ ] Mientras se envía, el botón dice "Enviando…" y la X, Esc y los campos no responden.
-- [ ] Al cerrar con "Listo", el perfil muestra la fila PENDIENTE y `/elderly` cuenta la invitación.
-- [ ] Llega el correo al email de la cuenta de Resend con el asunto, el código y el botón al link correcto.
-- [ ] Con `RESEND_API_KEY` inválida, la invitación se guarda y el estado de éxito muestra el aviso de compartir el código.
-- [ ] Invitar el email de un familiar ya vinculado al mismo adulto mayor muestra "Este email ya está vinculado a {nombre}.".
-- [ ] Invitar el email del admin muestra "Este email pertenece al personal.".
-- [ ] Con un email que tiene una invitación `pending` vigente para este adulto mayor, "Enviar invitación" no envía: muestra el aviso de reemplazo bajo EMAIL y el botón dice "Reemplazar invitación".
-- [ ] Al tocar "Reemplazar invitación", la invitación anterior queda `cancelled`, su código ya no sirve en `/activate-account`, se crea una nueva con otro código y llega un correo nuevo.
-- [ ] Editar EMAIL después del aviso lo quita y el botón vuelve a "Enviar invitación".
-- [ ] El perfil muestra una sola fila PENDIENTE para ese familiar tras el reemplazo.
-- [ ] El email se guarda en minúsculas y sin espacios.
+- [x] El staff no ve "Vincular otro familiar/tutor"; el admin lo ve en un adulto mayor activo y no en uno archivado.
+- [x] Antes de enviar, el modal no muestra el bloque CÓDIGO DE INVITACIÓN.
+- [x] Con datos válidos, el modal muestra "Invitación enviada a {email}", el código real, "Vence en 7 días" y "Listo".
+- [x] Mientras se envía, el botón dice "Enviando…" y la X, Esc y los campos no responden.
+- [x] Al cerrar con "Listo", el perfil muestra la fila PENDIENTE y `/elderly` cuenta la invitación.
+- [x] Llega el correo al email de la cuenta de Resend con el asunto, el código y el botón al link correcto.
+- [x] Con `RESEND_API_KEY` inválida, la invitación se guarda y el estado de éxito muestra el aviso de compartir el código.
+- [x] Invitar el email de un familiar ya vinculado al mismo adulto mayor muestra "Este email ya está vinculado a {nombre}.".
+- [x] Invitar el email del admin muestra "Este email pertenece al personal.".
+- [x] Con un email que tiene una invitación `pending` vigente para este adulto mayor, "Enviar invitación" no envía: muestra el aviso de reemplazo bajo EMAIL y el botón dice "Reemplazar invitación".
+- [x] Al tocar "Reemplazar invitación", la invitación anterior queda `cancelled`, su código ya no sirve en `/activate-account`, se crea una nueva con otro código y llega un correo nuevo.
+- [x] Editar EMAIL después del aviso lo quita y el botón vuelve a "Enviar invitación".
+- [x] El perfil muestra una sola fila PENDIENTE para ese familiar tras el reemplazo.
+- [x] El email se guarda en minúsculas y sin espacios.
 
 **Activar (familiar)**
 
-- [ ] El link del correo muestra la tarjeta del adulto mayor, el código y el email precargados, y "CREAR CONTRASEÑA" para un email sin cuenta.
-- [ ] Activar como familiar nuevo crea el usuario `relative` `active`, el vínculo con el parentesco elegido, la invitación `accepted` con `accepted_at`, e inicia sesión en `/family-pending`.
-- [ ] Con una segunda invitación al mismo email, la página muestra "INGRESE SU CONTRASEÑA" y al activar no se crea otro usuario, se crea el segundo vínculo y se inicia sesión.
-- [ ] Con el código escrito a mano y un email con cuenta, enviar muestra "Este email ya tiene cuenta. Ingresa tu contraseña." y cambia la etiqueta.
-- [ ] Contraseña incorrecta en modo existente muestra "La contraseña no es correcta." y no crea el vínculo.
-- [ ] Desmarcar el consentimiento deja `photo_consent = false`; marcarlo no cambia el valor.
-- [ ] Un código inexistente, vencido o ya usado muestra "El código no es válido o ya venció.".
-- [ ] Un email distinto al de la invitación muestra "Este email no coincide con la invitación.".
-- [ ] `abcdefgh` y `12345678` muestran el error de la regla de contraseña.
-- [ ] Mientras se activa, el botón dice "Activando…" y está deshabilitado.
-- [ ] Los campos con error tienen `aria-invalid="true"` y `aria-describedby` hacia su mensaje.
-- [ ] El fallback de `<Suspense>` muestra el formulario con los campos deshabilitados.
+- [x] El link del correo muestra la tarjeta del adulto mayor, el código y el email precargados, y "CREAR CONTRASEÑA" para un email sin cuenta.
+- [x] Activar como familiar nuevo crea el usuario `relative` `active`, el vínculo con el parentesco elegido, la invitación `accepted` con `accepted_at`, e inicia sesión en `/family`.
+- [x] Con una segunda invitación al mismo email, la página muestra "INGRESE SU CONTRASEÑA" y al activar no se crea otro usuario, se crea el segundo vínculo y se inicia sesión.
+- [x] Con el código escrito a mano y un email con cuenta, enviar muestra "Este email ya tiene cuenta. Ingresa tu contraseña." y cambia la etiqueta.
+- [x] Contraseña incorrecta en modo existente muestra "La contraseña no es correcta." y no crea el vínculo.
+- [ ] Desmarcar el consentimiento deja `photo_consent = false`; marcarlo no cambia el valor. (parte con el consentimiento desmarcado pendiente; ver BACKLOG)
+- [x] Un código inexistente, vencido o ya usado muestra "El código no es válido o ya venció.".
+- [x] Un email distinto al de la invitación muestra "Este email no coincide con la invitación.".
+- [x] `abcdefgh` y `12345678` muestran el error de la regla de contraseña.
+- [x] Mientras se activa, el botón dice "Activando…" y está deshabilitado.
+- [x] Los campos con error tienen `aria-invalid="true"` y `aria-describedby` hacia su mensaje.
+- [x] El fallback de `<Suspense>` muestra el formulario con los campos deshabilitados.
 
 **Cierre**
 
-- [ ] `/login` con una contraseña sin la regla muestra "El email o la contraseña no son correctos." y el admin sigue entrando con la suya.
-- [ ] `SUPABASE_SECRET_KEY` y `RESEND_API_KEY` solo se importan en archivos con `import "server-only"`; el bundle del cliente no las contiene.
-- [ ] `createAdminClient()` solo se usa en `get-invitation-preview.ts` y `activate-account.ts`.
-- [ ] `npm run build` y `npm run lint` terminan sin errores, y la consola de `/elderly/[id]` y `/activate-account` no muestra errores ni warnings de hidratación.
-- [ ] A 390×844 no hay scroll horizontal en el modal (formulario y éxito) ni en `/activate-account`.
-- [ ] Tras la limpieza no quedan el usuario de prueba, sus vínculos ni las invitaciones de prueba.
-- [ ] `database-schema.md`, `flujos-de-procesos.md`, `CLAUDE.md` y `BACKLOG.md` tienen los cambios de esta spec.
-- [ ] Capturas en `.playwright-mcp/`: modal antes de enviar, en éxito y en éxito con aviso, perfil con PENDIENTE, `/activate-account` en ambos modos y con errores.
+- [x] `/login` con una contraseña sin la regla muestra "El email o la contraseña no son correctos." y el admin sigue entrando con la suya.
+- [x] `SUPABASE_SECRET_KEY` y `RESEND_API_KEY` solo se importan en archivos con `import "server-only"`; el bundle del cliente no las contiene.
+- [x] `createAdminClient()` solo se usa en los archivos listados en `CLAUDE.md`.
+- [x] `npm run build` y `npm run lint` terminan sin errores, y la consola de `/elderly/[id]` y `/activate-account` no muestra errores ni warnings de hidratación.
+- [x] A 390×844 no hay scroll horizontal en el modal (formulario y éxito) ni en `/activate-account`.
+- [x] Tras la limpieza no quedan el usuario de prueba, sus vínculos ni las invitaciones de prueba.
+- [x] `database-schema.md`, `flujos-de-procesos.md`, `CLAUDE.md` y `BACKLOG.md` tienen los cambios de esta spec.
+- [x] Capturas en `.playwright-mcp/`: modal antes de enviar, en éxito y en éxito con aviso, perfil con PENDIENTE, `/activate-account` en ambos modos y con errores. (sin capturas; decisión del usuario en SPEC 24)
 
 ---
 

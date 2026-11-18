@@ -22,7 +22,7 @@ Resuelve del BACKLOG:
 Planificadas por el usuario; no van en `specs/BACKLOG.md`.
 
 - **SPEC 23 — Estado del staff:** archivar, reactivar, cancelar invitación y eliminar sin historial (lo que SPEC 20 planificaba como SPEC 22).
-- **SPEC 24 — Verificar "vincular adulto mayor" para un familiar que ya tiene cuenta:** probar a mano el flujo "Familiar que ya tiene cuenta" de `flujos-de-procesos.md`, ya implementado en SPEC 17 (`/activate-account` con "INGRESE SU CONTRASEÑA" y `accept_invitation`). Caso: un familiar con un adulto mayor vinculado recibe la invitación de otro y queda vinculado a ambos, sin crear otro usuario.
+- **SPEC 24 — Verificar invitar y activar familiares, incluido "vincular adulto mayor" con una cuenta existente** (cubre las partes A a E de la entrada del BACKLOG): probar a mano el flujo "Familiar que ya tiene cuenta" de `flujos-de-procesos.md`, ya implementado en SPEC 17 (`/activate-account` con "INGRESE SU CONTRASEÑA" y `accept_invitation`). Caso: un familiar con un adulto mayor vinculado recibe la invitación de otro y queda vinculado a ambos, sin crear otro usuario.
   - Corresponde a la parte C de "Verificación manual de invitar y activar familiares (SPEC 17, pasos 11 y 12)" en `specs/BACKLOG.md`.
   - Actualiza `pantallas-pendientes.md`: punto 21 resuelto por SPEC 17 y se elimina la inconsistencia "Familiar que ya tiene cuenta".
 
