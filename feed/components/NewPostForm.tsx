@@ -45,16 +45,30 @@ function isNewPostField(name: string): name is NewPostField {
 type NewPostFormProps = {
   options: NewPostOptions;
   titleId: string;
+  isPending: boolean;
   onCancel: () => void;
+  // El padre publica y, si el servidor rechaza campos, los devuelve por showFieldErrors
+  onPublish: (
+    input: NewPostInput,
+    showFieldErrors: (errors: NewPostErrors) => void,
+  ) => void;
 };
 
-export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
+export function NewPostForm({
+  options,
+  titleId,
+  isPending,
+  onCancel,
+  onPublish,
+}: NewPostFormProps) {
   const audienceLabelId = useId();
   const formRef = useRef<HTMLFormElement>(null);
   const [audience, setAudience] = useState<AudienceSelection>({ kind: "none" });
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [errors, setErrors] = useState<NewPostErrors>({});
+  // Los campos siguen deshabilitados mientras se publica: el foco se mueve al terminar
+  const mustFocusInvalidField = useRef(false);
   const defaultRoomId = options.rooms[0]?.id ?? "";
   const hasTitleField = audience.kind === "room" || audience.kind === "daycare";
   const photoConsentWarning = findPhotoConsentWarning(
@@ -70,6 +84,22 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
       form.querySelector<HTMLElement>("[data-audience-chip]")?.focus();
     }
   }, []);
+
+  useEffect(() => {
+    if (isPending || !mustFocusInvalidField.current) return;
+    mustFocusInvalidField.current = false;
+    const firstInvalidField = FIELD_ORDER.find((field) => errors[field]);
+    if (firstInvalidField) {
+      formRef.current
+        ?.querySelector<HTMLElement>(FOCUS_SELECTORS[firstInvalidField])
+        ?.focus();
+    }
+  }, [isPending, errors]);
+
+  function showErrors(nextErrors: NewPostErrors) {
+    mustFocusInvalidField.current = true;
+    setErrors(nextErrors);
+  }
 
   function clearError(field: NewPostField) {
     setErrors((current) => ({ ...current, [field]: undefined }));
@@ -95,20 +125,20 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
-    const nextErrors = validateNewPost(readInput(new FormData(form)), {
+    if (isPending) return;
+    const input = readInput(new FormData(event.currentTarget));
+    const clientErrors = validateNewPost(input, {
       roomIds: options.rooms.map((room) => room.id),
       elderly: options.elderly,
       canPostToDaycare: options.canPostToDaycare,
     });
-    setErrors(nextErrors);
 
-    const firstInvalidField = FIELD_ORDER.find((field) => nextErrors[field]);
-    if (firstInvalidField) {
-      form
-        .querySelector<HTMLElement>(FOCUS_SELECTORS[firstInvalidField])
-        ?.focus();
+    if (Object.keys(clientErrors).length > 0) {
+      showErrors(clientErrors);
+      return;
     }
+    setErrors({});
+    onPublish(input, showErrors);
   }
 
   function handleChange(event: FormEvent<HTMLFormElement>) {
@@ -141,7 +171,8 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
         <button
           type="button"
           onClick={onCancel}
-          className="cursor-pointer text-[15px] font-bold text-muted-strong"
+          disabled={isPending}
+          className="cursor-pointer text-[15px] font-bold text-muted-strong disabled:cursor-default disabled:opacity-50"
         >
           Cancelar
         </button>
@@ -153,12 +184,16 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
         </h2>
         <button
           type="submit"
-          className="cursor-pointer text-[15px] font-extrabold text-coral-strong"
+          disabled={isPending}
+          className="cursor-pointer text-[15px] font-extrabold text-coral-strong disabled:cursor-default disabled:opacity-50"
         >
-          Publicar
+          {isPending ? "Publicando…" : "Publicar"}
         </button>
       </header>
-      <div className="flex min-h-0 flex-col gap-[22px] overflow-y-auto px-[26px] py-6">
+      <fieldset
+        disabled={isPending}
+        className="m-0 flex min-h-0 min-w-0 flex-col gap-[22px] overflow-y-auto border-0 px-[26px] py-6"
+      >
         <AudiencePicker
           labelId={audienceLabelId}
           error={errors.audience}
@@ -224,7 +259,7 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
           onAdd={addPhotos}
           onRemove={removePhoto}
         />
-      </div>
+      </fieldset>
     </form>
   );
 }

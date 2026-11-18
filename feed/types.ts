@@ -100,3 +100,8 @@ export type FeedPage<TPost> = {
   days: FeedDay<TPost>[];
   hasMore: boolean;
 };
+
+export type CreatePostResult =
+  | { status: "ok"; postId: string }
+  | { status: "invalid"; errors: NewPostErrors }
+  | { status: "error" };
