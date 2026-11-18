@@ -19,6 +19,8 @@ type PhotoSlideProps = {
 };
 
 function PhotoSlide({ photo, position, total }: PhotoSlideProps) {
+  // La primera foto de cada carrusel es la visible: carga sin esperar; las demás, diferidas
+  const loading = position === 1 ? "eager" : "lazy";
   const alt = `Foto ${position} de ${total}`;
   const { url, width, height } = photo;
 
@@ -31,10 +33,18 @@ function PhotoSlide({ photo, position, total }: PhotoSlideProps) {
           width={width}
           height={height}
           unoptimized
+          loading={loading}
           className="size-full object-cover"
         />
       ) : (
-        <Image src={url} alt={alt} fill unoptimized className="object-cover" />
+        <Image
+          src={url}
+          alt={alt}
+          fill
+          unoptimized
+          loading={loading}
+          className="object-cover"
+        />
       )}
     </div>
   );

@@ -383,67 +383,67 @@ specs/BACKLOG.md
 
 **Base de datos**
 
-- [ ] Existe `supabase/migrations/<version>_create_post_functions.sql` y su versión coincide con la de `list_migrations`.
-- [ ] `create_post`, `room_has_elderly_without_photo_consent` y `visible_post_days` tienen `search_path` vacío y `EXECUTE` solo para `authenticated`. La primera y la tercera son `SECURITY INVOKER`; la segunda es `SECURITY DEFINER STABLE`.
-- [ ] El bucket `post-photos` tiene `file_size_limit = 204800` y `allowed_mime_types = {image/webp}`, y sigue `public = false`.
-- [ ] `create_post` como staff con un adulto mayor no asignado falla y no deja filas en `posts`.
-- [ ] `create_post` como staff con `audience = daycare` falla; como admin funciona.
-- [ ] `create_post` con `audience = elderly` y `p_elderly_ids` vacío falla.
-- [ ] `room_has_elderly_without_photo_consent` como staff da `true` para una habitación donde tiene asignados y hay un adulto mayor sin consentimiento no asignado, y `false` para una habitación donde no tiene asignados (aunque haya alguien sin consentimiento).
-- [ ] `room_has_elderly_without_photo_consent` da `false` como relative, `pending` o `archived`, y para una habitación de otra guardería.
-- [ ] `visible_post_days` como relative no devuelve el día de un post que no puede ver.
-- [ ] `get_advisors` sin avisos nuevos fuera de los aceptados en el BACKLOG.
+- [x] Existe `supabase/migrations/<version>_create_post_functions.sql` y su versión coincide con la de `list_migrations`.
+- [x] `create_post`, `room_has_elderly_without_photo_consent` y `visible_post_days` tienen `search_path` vacío y `EXECUTE` solo para `authenticated`. La primera y la tercera son `SECURITY INVOKER`; la segunda es `SECURITY DEFINER STABLE`.
+- [x] El bucket `post-photos` tiene `file_size_limit = 204800` y `allowed_mime_types = {image/webp}`, y sigue `public = false`.
+- [x] `create_post` como staff con un adulto mayor no asignado falla y no deja filas en `posts`.
+- [x] `create_post` como staff con `audience = daycare` falla; como admin funciona.
+- [x] `create_post` con `audience = elderly` y `p_elderly_ids` vacío falla.
+- [x] `room_has_elderly_without_photo_consent` como staff da `true` para una habitación donde tiene asignados y hay un adulto mayor sin consentimiento no asignado, y `false` para una habitación donde no tiene asignados (aunque haya alguien sin consentimiento).
+- [x] `room_has_elderly_without_photo_consent` da `false` como relative, `pending` o `archived`, y para una habitación de otra guardería.
+- [x] `visible_post_days` como relative no devuelve el día de un post que no puede ver.
+- [x] `get_advisors` sin avisos nuevos fuera de los aceptados en el BACKLOG.
 
 **Modal**
 
-- [ ] Como admin, PARA lista a todos los adultos mayores `active` de la guardería, "Toda la habitación" (con todas las habitaciones) y "Toda la guardería".
-- [ ] Como staff, PARA lista solo a sus asignados `active`, el select HABITACIÓN solo trae habitaciones donde tiene asignados y no hay "Toda la guardería".
-- [ ] La chip de un adulto mayor sin consentimiento muestra la cámara tachada y su nombre accesible incluye "sin consentimiento de fotos". La leyenda aparece solo si hay alguno.
-- [ ] Etiquetar a un adulto mayor sin consentimiento, agregar una foto y tocar Publicar muestra el error con su nombre en FOTOS y no publica.
-- [ ] Con "Toda la habitación" (Roble, con un adulto mayor sin consentimiento no asignado al staff) y una foto, aparece "En Roble hay adultos mayores sin consentimiento de fotos. Revisa que no aparezcan.", sin nombres, y se puede publicar.
-- [ ] Con "Toda la habitación" en una habitación donde todos tienen consentimiento, el aviso no aparece.
-- [ ] Sin fotos, el aviso no aparece.
-- [ ] TÍTULO solo aparece con "Toda la habitación" o "Toda la guardería", tiene `maxlength="120"` y se vacía al pasar a adultos mayores.
-- [ ] Una foto de 15 MB se acepta y una de 21 MB se descarta con "Cada foto puede pesar hasta 20 MB.".
-- [ ] Mientras publica, el botón dice "Publicando…" y Cancelar, Esc y los campos no responden.
-- [ ] Con éxito: el modal se cierra, aparece el toast "Publicación creada" y el post se ve en `/` sin recargar.
-- [ ] Si la subida de una foto falla, no queda el post en `posts` ni archivos en `post-photos/{post_id}/`, el modal sigue abierto con los datos y aparece el toast "No pudimos publicar".
-- [ ] Cada archivo subido es `image/webp`, pesa ≤ 200 KB, tiene el lado mayor ≤ 1280 px y su fila en `post_photos` tiene `width`, `height` y `position` correctos.
-- [ ] Un post `room` sin título se guarda con `title = null`; uno `elderly` se guarda con `title = null` aunque se haya escrito un título antes de cambiar la audiencia.
-- [ ] Al enviar a `createPost` un `audience` o etiquetas manipulados (adulto mayor no asignado), responde `invalid` o `error` y no crea nada.
+- [x] Como admin, PARA lista a todos los adultos mayores `active` de la guardería, "Toda la habitación" (con todas las habitaciones) y "Toda la guardería".
+- [x] Como staff, PARA lista solo a sus asignados `active`, el select HABITACIÓN solo trae habitaciones donde tiene asignados y no hay "Toda la guardería".
+- [x] La chip de un adulto mayor sin consentimiento muestra la cámara tachada y su nombre accesible incluye "sin consentimiento de fotos". La leyenda aparece solo si hay alguno.
+- [x] Etiquetar a un adulto mayor sin consentimiento, agregar una foto y tocar Publicar muestra el error con su nombre en FOTOS y no publica.
+- [x] Con "Toda la habitación" (Roble, con un adulto mayor sin consentimiento no asignado al staff) y una foto, aparece "En Roble hay adultos mayores sin consentimiento de fotos. Revisa que no aparezcan.", sin nombres, y se puede publicar.
+- [x] Con "Toda la habitación" en una habitación donde todos tienen consentimiento, el aviso no aparece.
+- [x] Sin fotos, el aviso no aparece.
+- [x] TÍTULO solo aparece con "Toda la habitación" o "Toda la guardería", tiene `maxlength="120"` y se vacía al pasar a adultos mayores.
+- [x] Una foto de 15 MB se acepta y una de 21 MB se descarta con "Cada foto puede pesar hasta 20 MB.".
+- [x] Mientras publica, el botón dice "Publicando…" y Cancelar, Esc y los campos no responden.
+- [x] Con éxito: el modal se cierra, aparece el toast "Publicación creada" y el post se ve en `/` sin recargar.
+- [x] Si la subida de una foto falla, no queda el post en `posts` ni archivos en `post-photos/{post_id}/`, el modal sigue abierto con los datos y aparece el toast "No pudimos publicar".
+- [x] Cada archivo subido es `image/webp`, pesa ≤ 200 KB, tiene el lado mayor ≤ 1280 px y su fila en `post_photos` tiene `width`, `height` y `position` correctos.
+- [x] Un post `room` sin título se guarda con `title = null`; uno `elderly` se guarda con `title = null` aunque se haya escrito un título antes de cambiar la audiencia.
+- [x] Al enviar a `createPost` un `audience` o etiquetas manipulados (adulto mayor no asignado), responde `invalid` o `error` y no crea nada.
 
 **Feed del equipo (`/`)**
 
-- [ ] El encabezado muestra la cantidad real de adultos mayores `active` visibles y la fecha de hoy en Lima.
-- [ ] Al cargar se ven "PUBLICADO HOY" y "AYER" con sus posts, del más nuevo al más viejo, o "Sin publicaciones.".
-- [ ] "Cargar días anteriores" agrega los 2 días anteriores con posts (salta los vacíos) y desaparece cuando no hay más.
-- [ ] Los encabezados de las tarjetas siguen la tabla "Encabezado de la tarjeta" y los conteos de reacciones y comentarios son los reales.
-- [ ] Un staff no ve los posts que no le permite `can_view_post()`.
+- [x] El encabezado muestra la cantidad real de adultos mayores `active` visibles y la fecha de hoy en Lima.
+- [x] Al cargar se ven "PUBLICADO HOY" y "AYER" con sus posts, del más nuevo al más viejo, o "Sin publicaciones.".
+- [x] "Cargar días anteriores" agrega los 2 días anteriores con posts (salta los vacíos) y desaparece cuando no hay más.
+- [x] Los encabezados de las tarjetas siguen la tabla "Encabezado de la tarjeta" y los conteos de reacciones y comentarios son los reales.
+- [x] Un staff no ve los posts que no le permite `can_view_post()`.
 
 **Feed del familiar (`/family`)**
 
-- [ ] Muestra los posts que etiquetan a su adulto mayor, los de su habitación y los de la guardería, agrupados como "HOY · …" y "AYER · …", con "Cargar días anteriores".
-- [ ] Con dos vinculados, la chip de uno muestra solo sus posts etiquetados, los de su habitación y los de la guardería.
-- [ ] Con un solo vinculado no se muestran las chips.
-- [ ] Cada tarjeta muestra "{hora} · {rol} {nombre}" del autor real (por ejemplo, "Cuidador/a Caro").
-- [ ] Un post `room` de Roble muestra "Habitación Roble · Luis" a la familia de Luis; si Luis y Carmen (ambos vinculados al familiar) están en Roble, "Habitación Roble · Luis y Carmen", también con el filtro de uno solo.
-- [ ] Los posts `elderly` y `daycare` del familiar no muestran la línea de habitación.
+- [x] Muestra los posts que etiquetan a su adulto mayor, los de su habitación y los de la guardería, agrupados como "HOY · …" y "AYER · …", con "Cargar días anteriores".
+- [x] Con dos vinculados, la chip de uno muestra solo sus posts etiquetados, los de su habitación y los de la guardería.
+- [x] Con un solo vinculado no se muestran las chips.
+- [x] Cada tarjeta muestra "{hora} · {rol} {nombre}" del autor real (por ejemplo, "Cuidador/a Caro").
+- [x] Un post `room` de Roble muestra "Habitación Roble · Luis" a la familia de Luis; si Luis y Carmen (ambos vinculados al familiar) están en Roble, "Habitación Roble · Luis y Carmen", también con el filtro de uno solo.
+- [x] Los posts `elderly` y `daycare` del familiar no muestran la línea de habitación.
 
 **Carrusel y responsive**
 
-- [ ] Un post con 3 fotos muestra la primera, los puntos y, en escritorio al pasar el mouse, las flechas; las flechas cambian de foto y se deshabilitan en los extremos.
-- [ ] A 390×844 las fotos se cambian deslizando, sin scroll horizontal de la página.
-- [ ] Un post con una sola foto no muestra flechas ni puntos.
-- [ ] A 390×844 el modal muestra el ícono, la leyenda, el aviso y TÍTULO sin desbordes, y "Cargar días anteriores" ocupa el ancho completo.
+- [x] Un post con 3 fotos muestra la primera, los puntos y, en escritorio al pasar el mouse, las flechas; las flechas cambian de foto y se deshabilitan en los extremos.
+- [x] A 390×844 las fotos se cambian deslizando, sin scroll horizontal de la página.
+- [x] Un post con una sola foto no muestra flechas ni puntos.
+- [x] A 390×844 el modal muestra el ícono, la leyenda, el aviso y TÍTULO sin desbordes, y "Cargar días anteriores" ocupa el ancho completo.
 
 **Cierre**
 
-- [ ] `npm run build` y `npm run lint` sin errores. La consola no muestra errores en `/`, `/family` ni al publicar.
-- [ ] Ningún archivo nuevo usa `service_role`.
-- [ ] `feed/mock-feed.ts` no existe y ningún archivo de `feed/` importa mocks.
-- [ ] El remoto queda sin los posts ni archivos de prueba.
-- [ ] Las capturas están en `.playwright-mcp/`.
-- [ ] `database-schema.md`, `flujos-de-procesos.md` y `BACKLOG.md` actualizados según "Cambios en documentos" y "Entradas de BACKLOG".
+- [x] `npm run build` y `npm run lint` sin errores. La consola no muestra errores en `/`, `/family` ni al publicar.
+- [x] Ningún archivo nuevo usa `service_role`.
+- [x] `feed/mock-feed.ts` no existe y ningún archivo de `feed/` importa mocks.
+- [x] El remoto queda sin los posts ni archivos de prueba.
+- [x] Las capturas están en `.playwright-mcp/`.
+- [x] `database-schema.md`, `flujos-de-procesos.md` y `BACKLOG.md` actualizados según "Cambios en documentos" y "Entradas de BACKLOG".
 
 ---
 
@@ -465,6 +465,8 @@ specs/BACKLOG.md
 - "Chips con un solo adulto mayor": queda `[ ]`. El **Qué** deja solo el resumen.
 - "Borrar los archivos de Storage al borrar un post o una foto": queda `[ ]`. El **Qué** dice que falta en el borrado desde la UI; `discardPost` ya implementa el orden (archivos y después el post).
 - Nueva entrada en "Feed": "Notificar nuevas publicaciones (`notify_on_post`)".
+- Nueva entrada en "Feed": "\"Nueva publicación\" para un staff sin adultos mayores asignados".
+- Nueva entrada en "Adultos mayores": "Tratamiento (Don/Doña) de los adultos mayores".
 - "Avisos del linter aceptados tras la spec 10": sumar las funciones nuevas si el linter las marca.
 
 ---

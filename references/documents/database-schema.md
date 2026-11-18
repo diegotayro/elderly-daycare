@@ -103,6 +103,18 @@ Todas `SECURITY DEFINER`, con `search_path` vacío, nombres calificados y `EXECU
 
 > `get_staff_emails()` no es un helper de policy (regla 7): devuelve filas de otras personas, solo al admin y solo de su guardería. Es la misma idea que `is_team_email`, pero para leer. El linter marca las tres como "ejecutables por `authenticated`": es esperado, porque validan el rol de quien llama dentro de la función.
 
+### Funciones del feed
+
+Todas con `search_path` vacío y `EXECUTE` revocado a `public` y `anon` (solo `authenticated`). Las llama la app con `supabase.rpc(...)`.
+
+|Función|Tipo|Devuelve|
+|---|---|---|
+|`create_post(p_audience, p_room_id, p_type, p_title, p_body, p_elderly_ids)`|`SECURITY INVOKER`, `volatile`|`uuid` del post. Inserta en `posts` (`author_id = auth.uid()`) y una fila en `post_elderly` por cada id, en una sola transacción: si falla cualquier parte (RLS, `posts_require_elderly_tag`, etc.) no se guarda nada. Aplican `posts_insert_team` y `post_elderly_insert_author`. No usa `RETURNING`: genera el `uuid` antes, porque `posts_select_visible` (`can_view_post`) no ve la fila recién insertada y rechazaría el `RETURNING`.|
+|`room_has_elderly_without_photo_consent(p_room_id)`|`SECURITY DEFINER STABLE`|`boolean`: `true` si `can_post_to_room(p_room_id)` es `true` y en esa habitación hay algún adulto mayor `active` con `photo_consent = false`, asignado o no al usuario. `false` en cualquier otro caso (habitación donde no puede publicar, de otra guardería o inexistente, usuario `relative`, `pending` o `archived`). Cumple la regla 7: solo devuelve `true/false`, nunca nombres ni filas. Alimenta el aviso genérico de "Nueva publicación" para `room` y `daycare`.|
+|`visible_post_days(p_before, p_limit)`|`SECURITY INVOKER STABLE`|`setof date`: días distintos (hora de Lima) con posts que el usuario puede ver (RLS), anteriores a `p_before`, del más nuevo al más viejo, con `limit p_limit`. Sirve para "Cargar días anteriores".|
+
+> El linter marca `room_has_elderly_without_photo_consent` como "ejecutable por `authenticated`": es esperado, porque necesita leer adultos mayores que la RLS le oculta al staff y solo devuelve un booleano. `create_post` y `visible_post_days` son `INVOKER` y no generan aviso.
+
 ### Regla del feed: ¿quién puede ver un post?
 
 Las tablas `posts`, `post_elderly`, `post_photos`, `reactions`, `comments` y el Storage de fotos usan esta regla. Debe implementarse **en un solo lugar**.
@@ -415,7 +427,7 @@ Fotos adjuntas a una publicación, con soporte para vista a pantalla completa.
 |---|---|---|
 |`id`|`uuid` PK||
 |`post_id`|`uuid` FK → `posts` ON DELETE CASCADE||
-|`url`|`text`|Ruta del archivo en Storage (`{post_id}/archivo`). Debe empezar con `{post_id}/` (`post_photos_url_in_post_folder`).|
+|`url`|`text`|Ruta del archivo en Storage (`{post_id}/{position}.webp`). Debe empezar con `{post_id}/` (`post_photos_url_in_post_folder`).|
 |`width` / `height`|`int`|Nullable — útil para la vista a pantalla completa.|
 |`position`|`int`|Orden de la foto en la publicación. `>= 0` y único por post (`post_photos_post_id_position_key`).|
 |`created_at`|`timestamptz`||
@@ -521,8 +533,9 @@ Un registro por elderly por día.
 Las fotos viven en `storage.objects`, que tiene su **propia** RLS. Si el bucket es público, cualquiera con el link ve la foto, sin importar las policies de `post_photos`.
 
 - Bucket **privado**.
-- Ruta de cada archivo: `{post_id}/{nombre-archivo}`. La primera carpeta es el `post_id` y es lo que usan las policies.
-- Para mostrar fotos: URLs firmadas (`createSignedUrl`), generadas en el servidor.
+- Límites del bucket: `file_size_limit = 204800` (200 KB) y `allowed_mime_types = {image/webp}`. La app comprime en el navegador (WebP, lado mayor de 1280 px, hasta 200 KB) antes de subir; lo que no pasó por la compresión lo rechaza Storage.
+- Ruta de cada archivo: `{post_id}/{position}.webp` (`position` de 0 a 4). La primera carpeta es el `post_id` y es lo que usan las policies.
+- Para mostrar fotos: URLs firmadas (`createSignedUrls`, 1 hora), generadas en el servidor.
 
 |Acción|Quién|Regla|
 |---|---|---|

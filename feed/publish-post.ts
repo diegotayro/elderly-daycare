@@ -39,7 +39,9 @@ async function uploadPhotos(
 ): Promise<AttachPhotoInput[]> {
   const storage = createClient().storage.from(PHOTOS_BUCKET);
 
-  return Promise.all(
+  // allSettled: si una subida falla, las demás terminan antes de deshacer, para que
+  // discardPost no deje archivos huérfanos
+  const results = await Promise.allSettled(
     photos.map(async ({ blob, width, height }, position) => {
       const path = `${postId}/${position}.webp`;
       const { error } = await storage.upload(path, blob, {
@@ -49,6 +51,13 @@ async function uploadPhotos(
       return { path, width, height };
     }),
   );
+
+  const uploaded: AttachPhotoInput[] = [];
+  for (const result of results) {
+    if (result.status === "rejected") throw result.reason;
+    uploaded.push(result.value);
+  }
+  return uploaded;
 }
 
 async function attachPhotos(
