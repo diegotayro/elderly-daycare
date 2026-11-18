@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { MAX_BODY_LENGTH } from "../new-post-limits";
+import { findPhotoConsentWarning } from "../find-photo-consent-warning";
+import { MAX_BODY_LENGTH, MAX_TITLE_LENGTH } from "../new-post-limits";
 import { selectPhotos } from "../select-photos";
 import { toggleAudience } from "../toggle-audience";
 import { validateNewPost } from "../validate-new-post";
@@ -34,7 +35,7 @@ const FOCUS_SELECTORS: Record<NewPostField, string> = {
   type: 'input[name="type"]',
   title: 'input[name="title"]',
   body: 'textarea[name="body"]',
-  photos: "[data-photo-add]",
+  photos: "[data-photo-focus]",
 };
 
 function isNewPostField(name: string): name is NewPostField {
@@ -55,6 +56,12 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [errors, setErrors] = useState<NewPostErrors>({});
   const defaultRoomId = options.rooms[0]?.id ?? "";
+  const hasTitleField = audience.kind === "room" || audience.kind === "daycare";
+  const photoConsentWarning = findPhotoConsentWarning(
+    audience,
+    photos.length,
+    options,
+  );
 
   // Si el modal se abrió mientras cargaban las opciones, el foco inicial llega ahora
   useEffect(() => {
@@ -73,6 +80,7 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
   ) {
     setAudience(next);
     clearError("audience");
+    clearError("photos");
   }
 
   function readInput(formData: FormData): NewPostInput {
@@ -112,11 +120,13 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
     const { accepted, error } = selectPhotos(photos, incoming);
     setPhotos([...photos, ...accepted]);
     setPhotoError(error);
+    clearError("photos");
   }
 
   function removePhoto(index: number) {
     setPhotos(photos.filter((_, photoIndex) => photoIndex !== index));
     setPhotoError(null);
+    clearError("photos");
   }
 
   return (
@@ -166,6 +176,29 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
           }
         />
         <PostTypePicker error={errors.type} />
+        {hasTitleField && (
+          <div>
+            <label
+              htmlFor="title"
+              className="mb-2.5 block text-xs font-extrabold tracking-[0.7px] text-muted-strong"
+            >
+              TÍTULO (opcional)
+            </label>
+            <input
+              id="title"
+              name="title"
+              type="text"
+              maxLength={MAX_TITLE_LENGTH}
+              aria-invalid={errors.title ? true : undefined}
+              aria-describedby={
+                errors.title ? getFieldErrorId("title") : undefined
+              }
+              placeholder="Ej.: Paseo al parque"
+              className={fieldControlClassName}
+            />
+            <FieldError fieldId="title" message={errors.title} />
+          </div>
+        )}
         <div>
           <label
             htmlFor="body"
@@ -186,7 +219,8 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
         </div>
         <PhotoPicker
           photos={photos}
-          error={photoError}
+          error={errors.photos ?? photoError}
+          warning={photoConsentWarning}
           onAdd={addPhotos}
           onRemove={removePhoto}
         />

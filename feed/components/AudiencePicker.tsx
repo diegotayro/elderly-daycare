@@ -1,10 +1,12 @@
 import { avatarTones } from "@/elderly/avatar-tones";
+import { CameraOffIcon } from "@/shared/components/icons/CameraOffIcon";
 import { ChevronDownIcon } from "@/shared/components/icons/ChevronDownIcon";
 import type { RoomOption } from "@/elderly/types";
 import {
   fieldControlClassName,
   getFieldErrorId,
 } from "@/elderly/components/FormField";
+import { newPostMessages as messages } from "../new-post-messages";
 import { FieldError } from "./FieldError";
 import type {
   AudienceChip,
@@ -38,6 +40,9 @@ export function AudiencePicker({
 }: AudiencePickerProps) {
   const selectedElderlyIds =
     selection.kind === "elderly" ? selection.elderlyIds : [];
+  const hasElderlyWithoutPhotoConsent = elderly.some(
+    (option) => !option.photoConsent,
+  );
 
   return (
     <div>
@@ -63,15 +68,23 @@ export function AudiencePicker({
             className={`${CHIP_BASE_CLASS_NAME} gap-2 py-1.5 pr-3.5 pl-1.5`}
           >
             <span
-              className="flex size-[26px] items-center justify-center rounded-full font-display text-[13px] font-semibold"
+              className="relative flex size-[26px] items-center justify-center rounded-full font-display text-[13px] font-semibold"
               style={{
                 backgroundColor: avatarTones[option.tone].bg,
                 color: avatarTones[option.tone].fg,
               }}
             >
               {option.initial}
+              {!option.photoConsent && (
+                <span className="absolute -right-1 -bottom-1 flex size-[18px] items-center justify-center rounded-full bg-white text-ink">
+                  <CameraOffIcon size={14} />
+                </span>
+              )}
             </span>
             {option.firstName}
+            {!option.photoConsent && (
+              <span className="sr-only">, sin consentimiento de fotos</span>
+            )}
           </button>
         ))}
         <button
@@ -124,6 +137,12 @@ export function AudiencePicker({
             />
           </div>
         </div>
+      )}
+      {hasElderlyWithoutPhotoConsent && (
+        <p className="mt-3 flex items-center gap-1.5 text-[12.5px] text-muted">
+          <CameraOffIcon size={14} />
+          {messages.photoConsentLegend}
+        </p>
       )}
     </div>
   );
