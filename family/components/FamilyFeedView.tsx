@@ -1,13 +1,18 @@
-import { mockFamily } from "../mock-family";
+import type { FeedPage } from "@/feed/types";
+import type { FamilyFeedElderly, FamilyPost } from "../types";
 import { FamilyFeedList } from "./FamilyFeedList";
 
 type FamilyFeedViewProps = {
   firstName: string;
+  elderly: FamilyFeedElderly[];
+  initialPage: FeedPage<FamilyPost>;
 };
 
-export function FamilyFeedView({ firstName }: FamilyFeedViewProps) {
-  const { elderly, posts, todayLabel } = mockFamily;
-
+export function FamilyFeedView({
+  firstName,
+  elderly,
+  initialPage,
+}: FamilyFeedViewProps) {
   return (
     <div className="mx-auto w-full max-w-[720px] px-4 pt-5 pb-8 lg:px-10 lg:pt-[34px] lg:pb-20">
       <header className="mb-5">
@@ -21,7 +26,7 @@ export function FamilyFeedView({ firstName }: FamilyFeedViewProps) {
           Así va el día de hoy
         </p>
       </header>
-      <FamilyFeedList elderly={elderly} posts={posts} todayLabel={todayLabel} />
+      <FamilyFeedList elderly={elderly} initialPage={initialPage} />
     </div>
   );
 }

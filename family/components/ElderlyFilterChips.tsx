@@ -3,7 +3,7 @@ import { Avatar } from "@/shared/components/Avatar";
 import type { FamilyElderly } from "../types";
 
 type ElderlyFilterChipsProps = {
-  elderly: FamilyElderly[];
+  elderly: Pick<FamilyElderly, "id" | "firstName" | "initial" | "tone">[];
   selectedId: string | null; // null = "Todos"
   onSelect: (elderlyId: string | null) => void;
   includeAll?: boolean;

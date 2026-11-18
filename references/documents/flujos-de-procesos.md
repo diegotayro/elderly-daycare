@@ -116,10 +116,13 @@ Un adulto mayor puede tener varios familiares, y siempre gana el "no":
     
 2. Elige el tipo (cualquiera), escribe la descripción y, si quiere, agrega fotos.
     
-    - Si la audiencia es `room` o `daycare`, al agregar fotos se muestra una advertencia con los adultos mayores de esa audiencia que no tienen consentimiento de fotos.
-3. Server Action: arma el `audience` según lo elegido (no lo toma tal cual del cliente) y guarda el post junto con sus adultos mayores etiquetados en UNA sola operación. Si falla cualquier parte, no se guarda nada.
+    - **Título (opcional):** solo con `room` y `daycare`. Vacío se guarda como `null`. Los posts `elderly` no llevan título.
+    - **Fotos:** cada foto original puede pesar hasta 20 MB. Antes de publicar, el navegador las comprime a WebP, con el lado mayor de 1280 px y hasta 200 KB. Si alguna no se puede procesar (por ejemplo, un formato que el navegador no lee), no se publica nada y se avisa cuál foto es.
+    - **Consentimiento de fotos, `audience = elderly`:** el adulto mayor sin consentimiento se marca con una cámara tachada. Si hay fotos y algún etiquetado no tiene consentimiento, no se puede publicar: se pide quitar las fotos o quitar a esa persona.
+    - **Consentimiento de fotos, `audience = room` o `daycare`:** al agregar fotos, si hay algún adulto mayor activo sin consentimiento en esa habitación (o en cualquiera, para `daycare`), se muestra un aviso genérico, sin nombres, que no bloquea. Cuenta también a los adultos mayores no asignados al staff.
+3. Al elegir "Publicar", la app comprime las fotos y, solo si todas se procesan, sigue con la Server Action. Esta arma el `audience` según lo elegido (no lo toma tal cual del cliente), vuelve a validar las mismas reglas que el cliente y guarda el post junto con sus adultos mayores etiquetados en UNA sola operación (`create_post`). Si falla cualquier parte, no se guarda nada.
     
-4. Luego se suben las fotos a Storage (`{post_id}/archivo`) y se registran en `post_photos`.
+4. Luego se suben las fotos a Storage (`{post_id}/{position}.webp`) y se registran en `post_photos`. Si falla la subida o el registro de cualquier foto, se borran los archivos de `{post_id}/` y después el post, y se avisa que no se pudo publicar; el formulario conserva lo escrito.
     
 
 ### Editar publicación

@@ -1,5 +1,10 @@
 import type { AvatarTone } from "@/elderly/avatar-tones";
-import type { PostType, RelationshipType } from "@/shared/database/types";
+import type { FeedPhoto } from "@/feed/types";
+import type {
+  PostAudience,
+  PostType,
+  RelationshipType,
+} from "@/shared/database/types";
 
 export type FamilyElderly = {
   id: string;
@@ -16,14 +21,25 @@ export type FamilyElderly = {
 export type FamilyPost = {
   id: string;
   type: PostType;
-  elderlyIds: string[]; // vacío = anuncio general, visible con cualquier filtro
-  heading: string; // "Don Luis" | "Anuncio general"
+  audience: PostAudience;
+  roomId: string | null; // para el filtro
+  roomName: string | null; // "Roble"
+  roomElderlyNames: string[]; // solo en room: nombres de pila de sus vinculados en esa habitación
+  elderlyIds: string[]; // solo los etiquetados que el familiar puede leer
+  heading: string; // "Luis" | título | "Habitación Roble"
   time: string; // "14:20"
   authorLabel: string; // "Cuidador/a Caro"
   body: string;
-  photoCaption: string | null; // "Foto · taller de pintura"
+  photos: FeedPhoto[];
   reactionCount: number;
   commentCount: number;
+};
+
+export type FamilyFeedElderly = Pick<
+  FamilyElderly,
+  "id" | "firstName" | "initial" | "tone"
+> & {
+  roomId: string;
 };
 
 export type SummaryHighlight = {
@@ -49,9 +65,7 @@ export type ElderlyFilter =
 
 export type FamilyMock = {
   relationshipLabel: string; // "Hija", de relationshipLabels (solo perfil de "Mi cuenta")
-  todayLabel: string; // "MARTES 17 JUN"
   elderly: FamilyElderly[];
-  posts: FamilyPost[];
   summaries: DailySummary[];
 };
 

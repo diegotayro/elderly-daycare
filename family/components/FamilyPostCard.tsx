@@ -1,10 +1,20 @@
 import type { AvatarTone } from "@/elderly/avatar-tones";
+import { PhotoCarousel } from "@/feed/components/PhotoCarousel";
 import { PostAuthorAvatar } from "@/feed/components/PostAuthorAvatar";
 import { PostTypeBadge } from "@/feed/components/PostTypeBadge";
 import { CommentIcon } from "@/shared/components/icons/CommentIcon";
 import { HeartIcon } from "@/shared/components/icons/HeartIcon";
-import { ImageIcon } from "@/shared/components/icons/ImageIcon";
 import type { FamilyPost } from "../types";
+
+const listFormatter = new Intl.ListFormat("es", { type: "conjunction" });
+
+// "Habitación Roble · Luis y Carmen": cuáles de sus adultos mayores están en la habitación
+function buildRoomLine({ roomName, roomElderlyNames }: FamilyPost): string {
+  const room = `Habitación ${roomName ?? ""}`.trim();
+  return roomElderlyNames.length > 0
+    ? `${room} · ${listFormatter.format(roomElderlyNames)}`
+    : room;
+}
 
 type FamilyPostCardProps = {
   post: FamilyPost;
@@ -31,14 +41,14 @@ export function FamilyPostCard({ post, author }: FamilyPostCardProps) {
         <PostTypeBadge type={post.type} />
       </div>
 
-      <p className="m-0 text-[15.5px] leading-[1.55] text-body">{post.body}</p>
-
-      {post.photoCaption && (
-        <div className="mt-3.5 flex h-40 flex-col items-center justify-center gap-2 rounded-2xl border-[1.5px] border-dashed border-photo-line bg-photo text-photo-ink lg:h-[200px]">
-          <ImageIcon size={30} />
-          <span className="text-[13.5px]">{post.photoCaption}</span>
+      {post.audience === "room" && (
+        <div className="mb-2.5 text-[12.5px] text-muted">
+          {buildRoomLine(post)}
         </div>
       )}
+      <p className="m-0 text-[15.5px] leading-[1.55] text-body">{post.body}</p>
+
+      {post.photos.length > 0 && <PhotoCarousel photos={post.photos} />}
 
       <div className="mt-4 flex items-center gap-[18px] border-t border-line-soft pt-3.5">
         <span className="flex items-center gap-[7px] text-sm leading-[normal] font-bold text-coral-icon">

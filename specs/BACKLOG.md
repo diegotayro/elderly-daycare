@@ -31,8 +31,8 @@ Formato de cada entrada:
 ### Avisos del linter aceptados tras la spec 10
 
 - [ ] **Estado:** pendiente
-- **Qué:** `get_advisors` marca (1) `authenticated_security_definer_function_executable` en `current_user_daycare_id()`, `current_user_role()`, `is_admin()`, `current_user_elderly_ids()`, `current_user_relative_ids()`, `is_email_linked_to_elderly()`, `is_team_email()`, `accept_invitation()`, `get_staff_emails()`, `is_pending_staff()`, `activate_staff_account()`, `can_view_post()`, `can_post_to_room()`, `post_has_tag_without_photo_consent()` y `staff_has_history()`, (2) `multiple_permissive_policies` en `users` para select y update, en `posts`, `post_elderly`, `post_photos` y `comments` para delete, y en `elderly`, `staff_elderly` y `guardian_elderly` para select, y (3) `auth_leaked_password_protection` y (4) `auth_otp_long_expiry` (la expiración del OTP del proveedor de email supera la hora recomendada).
-- **Origen:** SPEC 10 (`10-users-table`), SPEC 15 (`current_user_elderly_ids()`, `current_user_relative_ids()` y las tablas nuevas) y SPEC 17 (`is_email_linked_to_elderly()`, `is_team_email()` y `accept_invitation()`), SPEC 21 (`get_staff_emails()`, `is_pending_staff()` y `activate_staff_account()`), SPEC 22 (`can_view_post()`, `can_post_to_room()` y `post_has_tag_without_photo_consent()`; `multiple_permissive_policies` de delete en `posts`, `post_elderly`, `post_photos` y `comments`, e índices sin uso mientras las tablas están vacías) y SPEC 23 (`staff_has_history()`).
+- **Qué:** `get_advisors` marca (1) `authenticated_security_definer_function_executable` en `current_user_daycare_id()`, `current_user_role()`, `is_admin()`, `current_user_elderly_ids()`, `current_user_relative_ids()`, `is_email_linked_to_elderly()`, `is_team_email()`, `accept_invitation()`, `get_staff_emails()`, `is_pending_staff()`, `activate_staff_account()`, `can_view_post()`, `can_post_to_room()`, `post_has_tag_without_photo_consent()`, `staff_has_history()` y `room_has_elderly_without_photo_consent()`, (2) `multiple_permissive_policies` en `users` para select y update, en `posts`, `post_elderly`, `post_photos` y `comments` para delete, y en `elderly`, `staff_elderly` y `guardian_elderly` para select, y (3) `auth_leaked_password_protection` y (4) `auth_otp_long_expiry` (la expiración del OTP del proveedor de email supera la hora recomendada).
+- **Origen:** SPEC 10 (`10-users-table`), SPEC 15 (`current_user_elderly_ids()`, `current_user_relative_ids()` y las tablas nuevas) y SPEC 17 (`is_email_linked_to_elderly()`, `is_team_email()` y `accept_invitation()`), SPEC 21 (`get_staff_emails()`, `is_pending_staff()` y `activate_staff_account()`), SPEC 22 (`can_view_post()`, `can_post_to_room()` y `post_has_tag_without_photo_consent()`; `multiple_permissive_policies` de delete en `posts`, `post_elderly`, `post_photos` y `comments`, e índices sin uso mientras las tablas están vacías) SPEC 23 (`staff_has_history()`) y SPEC 25 (`room_has_elderly_without_photo_consent()`).
 - **Se resuelve en:** no se resuelve; (1) y (2) son aceptados. (3) y (4) son ajustes del dashboard de Auth.
 - **Notas:**
   - (1) Las policies evalúan los helpers con el rol del usuario, así que necesitan `EXECUTE`; solo devuelven datos del propio usuario. `current_user_elderly_ids()` y `current_user_relative_ids()` solo devuelven ids ligados a `auth.uid()` y vacío para otros roles. Alternativa descartada: moverlos a un esquema privado.
@@ -340,9 +340,9 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 ### Chips con un solo adulto mayor
 
 - [ ] **Estado:** pendiente
-- **Qué:** decidir si los chips de adulto mayor del feed y del resumen se ocultan cuando el familiar tiene un solo adulto mayor vinculado.
-- **Origen:** SPEC 18, `family/components/ElderlyFilterChips.tsx`.
-- **Se resuelve en:** la spec que conecte las pantallas del familiar a Supabase.
+- **Qué:** decidir si los chips de adulto mayor del resumen se ocultan cuando el familiar tiene un solo adulto mayor vinculado. El feed ya las oculta (SPEC 25).
+- **Origen:** SPEC 18, `family/components/ElderlyFilterChips.tsx`; el feed se resolvió en SPEC 25.
+- **Se resuelve en:** la spec que conecte "Resumen del día" a Supabase.
 - **Notas:** con un solo adulto mayor el chip "Todos" y el filtro no aportan nada; en el resumen es el único chip.
 
 ### Enlaces al detalle de publicación desde `/family` y `/family/summary`
@@ -356,14 +356,11 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 ### Conectar las pantallas del familiar a Supabase
 
 - [ ] **Estado:** pendiente
-- **Qué:** hoy salen del mock:
-  - posts (visibilidad por `audience`), conteos de reacciones y comentarios, autor y hora;
-  - adultos mayores vinculados (`guardian_elderly`), parentesco, edad y sala (el pie del sidebar ya es real desde SPEC 18);
-  - `photo_consent`;
-  - el resumen (`daily_summaries`, que el esquema marca como diferido);
-  - `todayLabel` y `dateLabel`.
-- **Origen:** SPEC 18, `family/mock-family.ts`.
-- **Se resuelve en:** spec(s) de datos del familiar (feed por `audience`, `daily_summaries`).
+- **Qué:** el feed de `/family` ya es real desde SPEC 25 (posts por `audience`, conteos, autor, hora y chips). Siguen saliendo del mock (`mockFamily`):
+  - el resumen (`daily_summaries`, que el esquema marca como diferido) y su `dateLabel`;
+  - "Mi cuenta": parentesco, adultos mayores vinculados con edad y sala, y `photo_consent`.
+- **Origen:** SPEC 18, `family/mock-family.ts`; el feed se resolvió en SPEC 25.
+- **Se resuelve en:** spec(s) de datos del familiar (`daily_summaries` y "Mi cuenta").
 - **Notas:**
   - Reemplazar `mockFamily` por builders desde las filas reales.
   - Probar en pantalla el pie del sidebar con varios vínculos y el truncado con "…" (SPEC 18 solo lo probó con un vínculo); y la consulta de `fetchSidebarElderlyLinks` con adultos mayores archivados.
@@ -437,6 +434,14 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 
 ---
 
+### Tratamiento (Don/Doña) de los adultos mayores
+
+- [ ] **Estado:** pendiente
+- **Qué:** el esquema no guarda cómo tratar a cada adulto mayor. Los feeds reales (`/` y `/family`) muestran solo el nombre de pila ("Luis, Carmen"); las pantallas con mock siguen con "Don Luis" y "Doña Carmen" escritos a mano.
+- **Origen:** SPEC 25 (`feed/build-post-heading.ts`), `family/mock-family.ts` y `notices/mock-notices.ts`.
+- **Se resuelve en:** una spec que decida el campo (por ejemplo `title` o `gender` en `elderly`, con migración) y lo pida en "Agregar adulto mayor".
+- **Notas:** un "Don" fijo se equivocaba con las mujeres. Al agregar el campo, volver a usar el tratamiento en los feeds, "Avisos" y "Resumen del día".
+
 ## Staff
 
 ### Botón Editar del perfil de staff
@@ -498,8 +503,26 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 ### Borrar los archivos de Storage al borrar un post o una foto
 
 - [ ] **Estado:** pendiente
-- **Qué:** al borrar un post o una fila de `post_photos`, los archivos del bucket `post-photos` no se borran solos.
-- **Origen:** SPEC 22 (`database/22-feed-tables-and-visibility`).
-- **Se resuelve en:** la spec de "Nueva publicación" o la de edición de posts.
+- **Qué:** al borrar un post o una fila de `post_photos`, los archivos del bucket `post-photos` no se borran solos. SPEC 25 ya lo hace al deshacer una publicación fallida (`discardPost`); falta en el borrado desde la UI (borrar un post o quitar una foto).
+- **Origen:** SPEC 22 (`database/22-feed-tables-and-visibility`); el mecanismo se implementó en SPEC 25 (`feed/actions/discard-post.ts`).
+- **Se resuelve en:** la spec de edición y borrado de posts.
 - **Notas:**
   - Lo hace la app: primero borra los archivos de `{post_id}/` (mientras el post existe, para que pase la policy de Storage) y después el post o la foto.
+
+### "Nueva publicación" para un staff sin adultos mayores asignados
+
+- [ ] **Estado:** pendiente
+- **Qué:** un staff sin adultos mayores asignados ve igualmente el chip "Toda la habitación", con el select HABITACIÓN vacío; no puede publicar nada.
+- **Origen:** SPEC 25, `feed/components/AudiencePicker.tsx` y `feed/get-new-post-options.ts`.
+- **Se resuelve en:** una spec de ajustes del feed o de la asignación de staff.
+- **Notas:** decidir si se oculta "Toda la habitación" o se muestra un mensaje ("Aún no tienes adultos mayores asignados"). El mockup no lo define.
+
+### Notificar nuevas publicaciones (`notify_on_post`)
+
+- [ ] **Estado:** pendiente
+- **Qué:** al publicar, avisar por correo a los familiares que tienen `notify_on_post = true` y pueden ver el post.
+- **Origen:** SPEC 25 (quedó fuera de alcance), `references/documents/database-schema.md` (`users.notify_on_post`).
+- **Se resuelve en:** una spec de notificaciones (correo con Resend, sin tiempo real).
+- **Notas:**
+  - Decidir si se envía al publicar o en lote, y cómo se evita avisar de un post que se deshace (`discardPost`).
+  - Hoy entre `createPost` y `attachPostPhotos` el post es visible sin fotos unos segundos: conviene notificar después de adjuntar las fotos.

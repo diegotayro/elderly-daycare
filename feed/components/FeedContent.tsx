@@ -1,9 +1,39 @@
+import { cookies } from "next/headers";
 import { requireTeamUser } from "@/auth/require-user";
-import { mockFeed } from "../mock-feed";
+import { getLimaToday } from "@/shared/date/get-lima-today";
+import { createClient } from "@/shared/supabase/server";
+import { buildFeed } from "../build-feed";
+import { buildTodayLabel } from "../build-day-label";
+import { getInitialFeedDays } from "../get-feed-days";
 import { FeedView } from "./FeedView";
 
-export async function FeedContent() {
-  await requireTeamUser();
+async function countVisibleActiveElderly(): Promise<number> {
+  const supabase = createClient(await cookies());
+  const { count, error } = await supabase
+    .from("elderly")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "active");
+  if (error) throw error;
+  return count ?? 0;
+}
 
-  return <FeedView source={mockFeed} />;
+export async function FeedContent() {
+  const user = await requireTeamUser();
+  const today = getLimaToday();
+
+  const [elderlyCount, dataPage] = await Promise.all([
+    countVisibleActiveElderly(),
+    getInitialFeedDays(today),
+  ]);
+  const initialPage = buildFeed(dataPage, { currentUserId: user.id, today });
+
+  return (
+    <FeedView
+      daycareName={user.daycareName}
+      userFirstName={user.first_name}
+      elderlyCount={elderlyCount}
+      todayLabel={buildTodayLabel(today)}
+      initialPage={initialPage}
+    />
+  );
 }

@@ -1,7 +1,8 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
-import { MAX_BODY_LENGTH } from "../new-post-limits";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { findPhotoConsentWarning } from "../find-photo-consent-warning";
+import { MAX_BODY_LENGTH, MAX_TITLE_LENGTH } from "../new-post-limits";
 import { selectPhotos } from "../select-photos";
 import { toggleAudience } from "../toggle-audience";
 import { validateNewPost } from "../validate-new-post";
@@ -21,12 +22,20 @@ import { AudiencePicker } from "./AudiencePicker";
 import { PhotoPicker } from "./PhotoPicker";
 import { PostTypePicker } from "./PostTypePicker";
 
-const FIELD_ORDER: NewPostField[] = ["audience", "type", "body"];
+const FIELD_ORDER: NewPostField[] = [
+  "audience",
+  "type",
+  "title",
+  "body",
+  "photos",
+];
 
 const FOCUS_SELECTORS: Record<NewPostField, string> = {
   audience: "[data-audience-chip]",
   type: 'input[name="type"]',
+  title: 'input[name="title"]',
   body: 'textarea[name="body"]',
+  photos: "[data-photo-focus]",
 };
 
 function isNewPostField(name: string): name is NewPostField {
@@ -36,16 +45,62 @@ function isNewPostField(name: string): name is NewPostField {
 type NewPostFormProps = {
   options: NewPostOptions;
   titleId: string;
+  isPending: boolean;
   onCancel: () => void;
+  // El padre publica y, si el servidor rechaza campos, los devuelve por showFieldErrors
+  onPublish: (
+    input: NewPostInput,
+    photos: File[],
+    showFieldErrors: (errors: NewPostErrors) => void,
+  ) => void;
 };
 
-export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
+export function NewPostForm({
+  options,
+  titleId,
+  isPending,
+  onCancel,
+  onPublish,
+}: NewPostFormProps) {
   const audienceLabelId = useId();
+  const formRef = useRef<HTMLFormElement>(null);
   const [audience, setAudience] = useState<AudienceSelection>({ kind: "none" });
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [errors, setErrors] = useState<NewPostErrors>({});
+  // Los campos siguen deshabilitados mientras se publica: el foco se mueve al terminar
+  const mustFocusInvalidField = useRef(false);
   const defaultRoomId = options.rooms[0]?.id ?? "";
+  const hasTitleField = audience.kind === "room" || audience.kind === "daycare";
+  const photoConsentWarning = findPhotoConsentWarning(
+    audience,
+    photos.length,
+    options,
+  );
+
+  // Si el modal se abrió mientras cargaban las opciones, el foco inicial llega ahora
+  useEffect(() => {
+    const form = formRef.current;
+    if (form?.closest("dialog")?.open) {
+      form.querySelector<HTMLElement>("[data-audience-chip]")?.focus();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isPending || !mustFocusInvalidField.current) return;
+    mustFocusInvalidField.current = false;
+    const firstInvalidField = FIELD_ORDER.find((field) => errors[field]);
+    if (firstInvalidField) {
+      formRef.current
+        ?.querySelector<HTMLElement>(FOCUS_SELECTORS[firstInvalidField])
+        ?.focus();
+    }
+  }, [isPending, errors]);
+
+  function showErrors(nextErrors: NewPostErrors) {
+    mustFocusInvalidField.current = true;
+    setErrors(nextErrors);
+  }
 
   function clearError(field: NewPostField) {
     setErrors((current) => ({ ...current, [field]: undefined }));
@@ -56,31 +111,35 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
   ) {
     setAudience(next);
     clearError("audience");
+    clearError("photos");
   }
 
   function readInput(formData: FormData): NewPostInput {
     return {
       audience,
       type: String(formData.get("type") ?? ""),
+      title: String(formData.get("title") ?? ""),
       body: String(formData.get("body") ?? ""),
+      photoCount: photos.length,
     };
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
-    const nextErrors = validateNewPost(readInput(new FormData(form)), {
+    if (isPending) return;
+    const input = readInput(new FormData(event.currentTarget));
+    const clientErrors = validateNewPost(input, {
       roomIds: options.rooms.map((room) => room.id),
-      elderlyIds: options.elderly.map((elderly) => elderly.id),
+      elderly: options.elderly,
+      canPostToDaycare: options.canPostToDaycare,
     });
-    setErrors(nextErrors);
 
-    const firstInvalidField = FIELD_ORDER.find((field) => nextErrors[field]);
-    if (firstInvalidField) {
-      form
-        .querySelector<HTMLElement>(FOCUS_SELECTORS[firstInvalidField])
-        ?.focus();
+    if (Object.keys(clientErrors).length > 0) {
+      showErrors(clientErrors);
+      return;
     }
+    setErrors({});
+    onPublish(input, photos, showErrors);
   }
 
   function handleChange(event: FormEvent<HTMLFormElement>) {
@@ -92,15 +151,18 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
     const { accepted, error } = selectPhotos(photos, incoming);
     setPhotos([...photos, ...accepted]);
     setPhotoError(error);
+    clearError("photos");
   }
 
   function removePhoto(index: number) {
     setPhotos(photos.filter((_, photoIndex) => photoIndex !== index));
     setPhotoError(null);
+    clearError("photos");
   }
 
   return (
     <form
+      ref={formRef}
       noValidate
       onSubmit={handleSubmit}
       onChange={handleChange}
@@ -110,7 +172,8 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
         <button
           type="button"
           onClick={onCancel}
-          className="cursor-pointer text-[15px] font-bold text-muted-strong"
+          disabled={isPending}
+          className="cursor-pointer text-[15px] font-bold text-muted-strong disabled:cursor-default disabled:opacity-50"
         >
           Cancelar
         </button>
@@ -122,17 +185,22 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
         </h2>
         <button
           type="submit"
-          className="cursor-pointer text-[15px] font-extrabold text-coral-strong"
+          disabled={isPending}
+          className="cursor-pointer text-[15px] font-extrabold text-coral-strong disabled:cursor-default disabled:opacity-50"
         >
-          Publicar
+          {isPending ? "Publicando…" : "Publicar"}
         </button>
       </header>
-      <div className="flex min-h-0 flex-col gap-[22px] overflow-y-auto px-[26px] py-6">
+      <fieldset
+        disabled={isPending}
+        className="m-0 flex min-h-0 min-w-0 flex-col gap-[22px] overflow-y-auto border-0 px-[26px] py-6"
+      >
         <AudiencePicker
           labelId={audienceLabelId}
           error={errors.audience}
           elderly={options.elderly}
           rooms={options.rooms}
+          canPostToDaycare={options.canPostToDaycare}
           selection={audience}
           onToggle={(chip) =>
             changeAudience((current) =>
@@ -144,6 +212,29 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
           }
         />
         <PostTypePicker error={errors.type} />
+        {hasTitleField && (
+          <div>
+            <label
+              htmlFor="title"
+              className="mb-2.5 block text-xs font-extrabold tracking-[0.7px] text-muted-strong"
+            >
+              TÍTULO (opcional)
+            </label>
+            <input
+              id="title"
+              name="title"
+              type="text"
+              maxLength={MAX_TITLE_LENGTH}
+              aria-invalid={errors.title ? true : undefined}
+              aria-describedby={
+                errors.title ? getFieldErrorId("title") : undefined
+              }
+              placeholder="Ej.: Paseo al parque"
+              className={fieldControlClassName}
+            />
+            <FieldError fieldId="title" message={errors.title} />
+          </div>
+        )}
         <div>
           <label
             htmlFor="body"
@@ -164,11 +255,12 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
         </div>
         <PhotoPicker
           photos={photos}
-          error={photoError}
+          error={errors.photos ?? photoError}
+          warning={photoConsentWarning}
           onAdd={addPhotos}
           onRemove={removePhoto}
         />
-      </div>
+      </fieldset>
     </form>
   );
 }
