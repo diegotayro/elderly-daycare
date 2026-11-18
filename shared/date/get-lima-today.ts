@@ -8,7 +8,11 @@ const limaDateFormatter = new Intl.DateTimeFormat("en-CA", {
   day: "2-digit",
 });
 
-// "aaaa-mm-dd" de hoy en Lima (en UTC puede ser otro día durante la noche)
+// "aaaa-mm-dd" del instante dado en Lima (en UTC puede ser otro día durante la noche)
+export function getLimaDay(instant: Date): string {
+  return limaDateFormatter.format(instant);
+}
+
 export function getLimaToday(): string {
-  return limaDateFormatter.format(new Date());
+  return getLimaDay(new Date());
 }

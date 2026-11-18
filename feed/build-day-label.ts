@@ -1,3 +1,5 @@
+import { shiftDay } from "@/shared/date/shift-day";
+
 export type DayLabelAudience = "team" | "family";
 
 const WEEKDAYS = [
@@ -29,16 +31,6 @@ function parseDay(day: string): Date {
   return new Date(Date.UTC(year, month - 1, dayOfMonth));
 }
 
-function toDayString(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
-
-export function getPreviousDay(day: string): string {
-  const date = parseDay(day);
-  date.setUTCDate(date.getUTCDate() - 1);
-  return toDayString(date);
-}
-
 function formatWeekdayAndDate(day: string): string {
   const date = parseDay(day);
   return `${WEEKDAYS[date.getUTCDay()]} ${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`;
@@ -51,7 +43,7 @@ export function buildDayLabel(
   audience: DayLabelAudience,
 ): string {
   const isToday = day === today;
-  const isYesterday = day === getPreviousDay(today);
+  const isYesterday = day === shiftDay(today, -1);
 
   if (audience === "team") {
     if (isToday) return "PUBLICADO HOY";

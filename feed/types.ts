@@ -4,9 +4,11 @@ import type {
   Post,
   PostElderly,
   PostPhoto,
+  PostAudience,
   PostType,
   Room,
   User,
+  UserRole,
 } from "@/shared/database/types";
 import type { AvatarTone } from "@/elderly/avatar-tones";
 import type { RoomOption } from "@/elderly/types";
@@ -35,7 +37,8 @@ export type FeedPost = {
   publishedByMe: boolean;
   recipientLabel: string; // "familia de Don Luis" | "habitación Roble" | "toda la guardería"
   body: string;
-  photoCaption: string | null; // "Foto · taller de pintura"
+  photoCaption: string | null; // "Foto · taller de pintura"; se elimina al quitar el mock (paso 12)
+  photos: FeedPhoto[];
   reactionCount: number;
   commentCount: number;
 };
@@ -111,3 +114,26 @@ export type AttachPhotoInput = {
   width: number;
   height: number;
 };
+
+// Publicación leída de la DB (con la sesión: la RLS ya filtró lo que el usuario no ve)
+export type FeedPostData = {
+  id: string;
+  type: PostType;
+  audience: PostAudience;
+  title: string | null;
+  body: string;
+  publishedAt: string; // ISO
+  authorId: string;
+  authorFirstName: string | null;
+  authorRole: UserRole | null;
+  roomId: string | null;
+  roomName: string | null;
+  elderly: { id: string; firstName: string }[]; // solo los etiquetados que el usuario puede leer
+  photos: FeedPhoto[];
+  reactionCount: number;
+  commentCount: number;
+};
+
+export type FeedDataDay = { date: string; posts: FeedPostData[] };
+
+export type FeedDataPage = { days: FeedDataDay[]; hasMore: boolean };
