@@ -1,4 +1,5 @@
 import { buildDayLabel } from "./build-day-label";
+import { buildPostHeading, joinElderlyNames } from "./build-post-heading";
 import type {
   FeedDataDay,
   FeedDataPage,
@@ -20,34 +21,20 @@ type FeedContext = {
   today: string; // "aaaa-mm-dd" en Lima
 };
 
-// Tratamiento fijo y provisional: el esquema no tiene columna para esto.
-function displayNameOf(firstName: string): string {
-  return `Don ${firstName}`;
-}
-
 function toFeedPost(post: FeedPostData, currentUserId: string): FeedPost {
-  // Solo los etiquetados que el usuario puede leer por RLS
-  const namesLabel = post.elderly
-    .map(({ firstName }) => displayNameOf(firstName))
-    .join(", ");
-  const roomLabel = `Habitación ${post.roomName ?? ""}`.trim();
+  const namesLabel = joinElderlyNames(post.elderly);
+  const roomName = post.roomName ?? "";
 
-  // Si ninguno es legible, se usa un texto genérico en vez de dejar el encabezado vacío
-  const headings = {
-    elderly: namesLabel || "Adulto mayor",
-    room: post.title ?? roomLabel,
-    daycare: post.title ?? "Toda la guardería",
-  };
   const recipients = {
     elderly: namesLabel ? `familia de ${namesLabel}` : "familia",
-    room: `habitación ${post.roomName ?? ""}`.trim(),
+    room: `habitación ${roomName}`.trim(),
     daycare: "toda la guardería",
   };
 
   return {
     id: post.id,
     type: post.type,
-    heading: headings[post.audience],
+    heading: buildPostHeading(post),
     avatarInitial:
       post.audience === "elderly"
         ? (post.elderly[0]?.firstName[0]?.toUpperCase() ?? null)

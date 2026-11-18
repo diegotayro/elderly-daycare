@@ -218,7 +218,7 @@ Los nombres de etiquetados que el usuario no puede leer por RLS (por ejemplo, un
 
 | Audiencia | Con título | Sin título |
 | --- | --- | --- |
-| `elderly` | — (no lleva título) | Nombres de los etiquetados visibles: "Don Luis, Don Jorge" |
+| `elderly` | — (no lleva título) | Nombres de los etiquetados visibles, sin tratamiento: "Luis, Jorge" |
 | `room` | `title` | "Habitación Roble" |
 | `daycare` | `title` | "Toda la guardería" |
 
@@ -505,6 +505,7 @@ specs/BACKLOG.md
 - **Sí:** URLs firmadas por 1 hora y `next/image` con `unoptimized`. El bucket es privado y las fotos ya vienen comprimidas.
 - **Sí:** el filtro del familiar se aplica sobre los días cargados. Evita una consulta por filtro.
 - **Sí:** los nombres de etiquetados que el usuario no puede leer por RLS no se muestran. Es la regla de privacidad vigente.
+- **Sí:** los feeds reales muestran solo el nombre de pila, sin "Don" ni "Doña". Decisión del usuario; el esquema no guarda el tratamiento y un "Don" fijo se equivocaba con las mujeres. Las pantallas con mock conservan sus textos.
 
 ---
 

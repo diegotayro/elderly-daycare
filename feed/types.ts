@@ -6,11 +6,11 @@ import type { RoomOption } from "@/elderly/types";
 export type FeedPost = {
   id: string;
   type: PostType;
-  heading: string; // "Don Luis" | post.title ("Anuncio general")
+  heading: string; // "Luis" | post.title ("Anuncio general")
   avatarInitial: string | null; // "L"; null → ícono megáfono
   time: string; // "14:20"
   publishedByMe: boolean;
-  recipientLabel: string; // "familia de Don Luis" | "habitación Roble" | "toda la guardería"
+  recipientLabel: string; // "familia de Luis" | "habitación Roble" | "toda la guardería"
   body: string;
   photos: FeedPhoto[];
   reactionCount: number;
