@@ -1,6 +1,6 @@
 # SPEC 24 — Verificar invitar y activar familiares, incluido "vincular adulto mayor" con una cuenta existente
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 17, SPEC 18, SPEC 22, SPEC 25
 > **Fecha:** 2026-11-18
 > **Objetivo:** Verificar a mano, con datos reales en el remoto, los flujos de SPEC 17 (invitar familiar, activar como familiar nuevo y activar con una cuenta existente) hasta que el familiar vea a sus dos adultos mayores en `/family`, y cerrar SPEC 17 como `Implementado`.
