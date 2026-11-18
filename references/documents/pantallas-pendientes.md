@@ -50,7 +50,7 @@ Lista de pantallas, modales y componentes que faltan. Marcar cada uno al termina
 ### Auth / cuenta
 
 - [x] **20. `/create-password`**: donde el staff llega desde el correo de invitación, pasando por `/accept-invite` (flujo Staff, paso 4). (SPEC 21)
-- [ ] **21. "Vincular adulto mayor"**: para un familiar que ya tiene cuenta. Pide código y consentimiento.
+- [x] **21. "Vincular adulto mayor"**: para un familiar que ya tiene cuenta. Pide código y consentimiento. (resuelto por SPEC 17: es el modo "INGRESE SU CONTRASEÑA" de `/activate-account`)
 - [ ] **22. Recuperar contraseña**: el login tiene "¿Olvidaste tu contraseña?", pero falta la pantalla para pedir el correo y la de nueva contraseña.
 - [ ] **23. Modales "Cambiar contraseña" y "Editar perfil" (avatar)**: los abren los botones de "Mi cuenta".
 - [ ] **24. Mi cuenta del admin**: solo existe el mockup de staff. Supuesto: el admin agrega aquí la edición del nombre de la guardería (`daycares.update`).
@@ -68,4 +68,3 @@ Lista de pantallas, modales y componentes que faltan. Marcar cada uno al termina
 ## Inconsistencias por resolver
 
 - [ ] **Notificaciones**: las de `mi-cuenta` (staff) son "Nuevos comentarios de familias" y "Recordatorio 17:00", pero la DB solo tiene `notify_on_post` y `daily_summary_enabled` (19:00). Hay que decidir cuál ajustar.
-- [ ] **Familiar que ya tiene cuenta**: según la nota de "Activar cuenta", si el email ya tiene cuenta debe aparecer un mensaje que lo mande a "Vincular adulto mayor" (punto 21). Ese estado no está en el mockup.
