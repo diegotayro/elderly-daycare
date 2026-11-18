@@ -1,31 +1,6 @@
-import type {
-  Daycare,
-  Elderly,
-  Post,
-  PostElderly,
-  PostPhoto,
-  PostAudience,
-  PostType,
-  Room,
-  User,
-  UserRole,
-} from "@/shared/database/types";
+import type { PostAudience, PostType, UserRole } from "@/shared/database/types";
 import type { AvatarTone } from "@/elderly/avatar-tones";
 import type { RoomOption } from "@/elderly/types";
-
-// Lo que devolvería la consulta del feed: filas + agregados (conteos).
-export type FeedSource = {
-  daycare: Daycare;
-  currentUser: User;
-  elderlyCount: number;
-  todayLabel: string;
-  rooms: Room[];
-  elderly: Elderly[];
-  posts: Post[];
-  postElderly: PostElderly[];
-  postPhotos: PostPhoto[];
-  postCounts: Record<string, { reactions: number; comments: number }>; // por post_id
-};
 
 // Modelo de vista que consumen los componentes.
 export type FeedPost = {
@@ -37,7 +12,6 @@ export type FeedPost = {
   publishedByMe: boolean;
   recipientLabel: string; // "familia de Don Luis" | "habitación Roble" | "toda la guardería"
   body: string;
-  photoCaption: string | null; // "Foto · taller de pintura"; se elimina al quitar el mock (paso 12)
   photos: FeedPhoto[];
   reactionCount: number;
   commentCount: number;

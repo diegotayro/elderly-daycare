@@ -55,3 +55,8 @@ export function buildDayLabel(
   if (isYesterday) return `AYER · ${formatWeekdayAndDate(day)}`;
   return formatWeekdayAndDate(day);
 }
+
+// "martes 17 nov": la fecha de hoy para el encabezado del feed
+export function buildTodayLabel(today: string): string {
+  return formatWeekdayAndDate(today).toLowerCase();
+}
