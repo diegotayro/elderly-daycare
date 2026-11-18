@@ -21,12 +21,20 @@ import { AudiencePicker } from "./AudiencePicker";
 import { PhotoPicker } from "./PhotoPicker";
 import { PostTypePicker } from "./PostTypePicker";
 
-const FIELD_ORDER: NewPostField[] = ["audience", "type", "body"];
+const FIELD_ORDER: NewPostField[] = [
+  "audience",
+  "type",
+  "title",
+  "body",
+  "photos",
+];
 
 const FOCUS_SELECTORS: Record<NewPostField, string> = {
   audience: "[data-audience-chip]",
   type: 'input[name="type"]',
+  title: 'input[name="title"]',
   body: 'textarea[name="body"]',
+  photos: "[data-photo-add]",
 };
 
 function isNewPostField(name: string): name is NewPostField {
@@ -62,7 +70,9 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
     return {
       audience,
       type: String(formData.get("type") ?? ""),
+      title: String(formData.get("title") ?? ""),
       body: String(formData.get("body") ?? ""),
+      photoCount: photos.length,
     };
   }
 
@@ -71,7 +81,8 @@ export function NewPostForm({ options, titleId, onCancel }: NewPostFormProps) {
     const form = event.currentTarget;
     const nextErrors = validateNewPost(readInput(new FormData(form)), {
       roomIds: options.rooms.map((room) => room.id),
-      elderlyIds: options.elderly.map((elderly) => elderly.id),
+      elderly: options.elderly,
+      canPostToDaycare: options.canPostToDaycare,
     });
     setErrors(nextErrors);
 

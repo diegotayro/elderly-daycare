@@ -11,7 +11,10 @@ export function buildNewPostOptions(source: ElderlySource): NewPostOptions {
         firstName: elderly.first_name,
         initial: elderly.first_name.charAt(0).toUpperCase(),
         tone: source.avatarTones[elderly.id] ?? "blue",
+        photoConsent: elderly.photo_consent,
       })),
     rooms: buildRoomOptions(source),
+    canPostToDaycare: true,
+    roomsWithoutPhotoConsent: [],
   };
 }
