@@ -1,6 +1,6 @@
 # SPEC 25 — Publicar desde "Nueva publicación" y feed real del equipo y del familiar
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 06, SPEC 15, SPEC 18, SPEC 22
 > **Fecha:** 2026-11-17
 > **Objetivo:** Guardar de verdad las publicaciones del modal "Nueva publicación" (con título opcional, fotos comprimidas, filtro por rol y avisos de consentimiento) y mostrarlas en los feeds reales de `/` y `/family`, agrupadas por día y con carrusel de fotos.
