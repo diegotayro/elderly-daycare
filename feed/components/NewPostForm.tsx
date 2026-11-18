@@ -50,6 +50,7 @@ type NewPostFormProps = {
   // El padre publica y, si el servidor rechaza campos, los devuelve por showFieldErrors
   onPublish: (
     input: NewPostInput,
+    photos: File[],
     showFieldErrors: (errors: NewPostErrors) => void,
   ) => void;
 };
@@ -138,7 +139,7 @@ export function NewPostForm({
       return;
     }
     setErrors({});
-    onPublish(input, showErrors);
+    onPublish(input, photos, showErrors);
   }
 
   function handleChange(event: FormEvent<HTMLFormElement>) {

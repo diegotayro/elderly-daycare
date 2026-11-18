@@ -14,8 +14,8 @@ import {
 import { SkeletonBlock } from "@/shared/components/SkeletonBlock";
 import { Toast } from "@/shared/components/toast/Toast";
 import type { ToastMessage } from "@/shared/components/toast/types";
-import { createPost } from "../actions/create-post";
 import { newPostMessages as messages } from "../new-post-messages";
+import { publishPost } from "../publish-post";
 import type {
   CreatePostResult,
   NewPostErrors,
@@ -70,6 +70,7 @@ type NewPostFormLoaderProps = {
   onCancel: () => void;
   onPublish: (
     input: NewPostInput,
+    photos: File[],
     showFieldErrors: (errors: NewPostErrors) => void,
   ) => void;
 };
@@ -114,11 +115,12 @@ export function NewPostDialogProvider({
 
   function publish(
     input: NewPostInput,
+    photos: File[],
     showFieldErrors: (errors: NewPostErrors) => void,
   ) {
     isPublishingRef.current = true;
     startTransition(async () => {
-      const result = await createPost(input).catch(
+      const result = await publishPost(input, photos).catch(
         (): CreatePostResult => ({ status: "error" }), // fallo de red
       );
       isPublishingRef.current = false;

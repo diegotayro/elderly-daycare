@@ -105,3 +105,9 @@ export type CreatePostResult =
   | { status: "ok"; postId: string }
   | { status: "invalid"; errors: NewPostErrors }
   | { status: "error" };
+
+export type AttachPhotoInput = {
+  path: string; // "{postId}/{position}.webp"
+  width: number;
+  height: number;
+};
