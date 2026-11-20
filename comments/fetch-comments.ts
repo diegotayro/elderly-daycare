@@ -25,7 +25,7 @@ export async function fetchComments(postId: string): Promise<CommentRow[]> {
     .eq("post_id", postId)
     .order("created_at")
     .order("id")
-    .returns<CommentRow[]>();
+    .overrideTypes<CommentRow[], { merge: false }>();
   if (error) throw error;
 
   return data;

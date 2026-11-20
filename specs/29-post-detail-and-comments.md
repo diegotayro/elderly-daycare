@@ -45,6 +45,7 @@ El mockup no cubre borrar comentarios, el estado sin reacción del botón "Me en
   - El ícono de comentarios de `FamilyPostCard` (`/family`) pasa a ser un `Link` a `/family/posts/{id}`.
   - Las tarjetas de aviso `comment` y `reaction` de `/notices` enlazan a `/posts/{postId}`.
 - Migración: `list_notices` devuelve además `post_id`, sin cambiar sus reglas.
+- Deuda técnica en un archivo que la spec ya toca: `fetch-feed-page.ts` pasa de `.returns<PostRow[]>()` (deprecado en supabase-js) a `.overrideTypes<PostRow[], { merge: false }>()`, sin cambiar lo que devuelve.
 - Accesibilidad: foco visible, nombres accesibles, `aria-live` para el conteo de comentarios, área táctil de 44×44 px y `motion-reduce`.
 
 **Fuera de alcance (para specs futuras):**
@@ -295,6 +296,7 @@ supabase/migrations/
 4. **Lectura del post.**
    - Exportar lo necesario de `fetch-feed-page.ts`, `build-feed.ts` y `build-family-feed.ts`.
    - Crear `fetch-post.ts`.
+   - Cambiar `.returns<PostRow[]>()` por `.overrideTypes<PostRow[], { merge: false }>()` en `fetchFeedPage`.
    - Prueba: `npm run build` y el feed carga igual que antes.
 5. **Lectura de comentarios.**
    - `comments/types.ts`, `comment-role-labels.ts`, `fetch-comments.ts`, `build-comment-view.ts` y `feed/get-post-detail.ts`.
@@ -388,6 +390,7 @@ supabase/migrations/
 - [ ] Los avisos de cuenta activada y el recordatorio no enlazan.
 - [ ] Al volver al feed, el número de comentarios de la tarjeta coincide con lo guardado.
 - [ ] El corazón del feed funciona igual que en SPEC 28.
+- [ ] `fetchFeedPage` usa `.overrideTypes` y el feed carga igual que antes.
 
 **Cierre**
 

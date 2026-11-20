@@ -134,7 +134,7 @@ export async function fetchFeedPage(
     .gte("published_at", startOfLimaDay(range.from))
     .lt("published_at", startOfLimaDay(shiftDay(range.to, 1)))
     .order("published_at", { ascending: false })
-    .returns<PostRow[]>();
+    .overrideTypes<PostRow[], { merge: false }>();
   if (error) throw error;
 
   const photoPaths = data.flatMap((row) =>
