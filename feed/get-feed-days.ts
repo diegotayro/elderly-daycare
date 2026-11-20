@@ -31,10 +31,13 @@ function groupByDay(days: string[], posts: FeedPostData[]): FeedDataDay[] {
 }
 
 // Carga inicial: hoy y ayer (aunque estén vacíos)
-export async function getInitialFeedDays(today: string): Promise<FeedDataPage> {
+export async function getInitialFeedDays(
+  today: string,
+  currentUserId: string,
+): Promise<FeedDataPage> {
   const yesterday = shiftDay(today, -1);
   const [posts, olderDays] = await Promise.all([
-    fetchFeedPage({ from: yesterday, to: today }),
+    fetchFeedPage({ from: yesterday, to: today }, currentUserId),
     fetchVisibleDaysBefore(yesterday, 1),
   ]);
 
@@ -45,16 +48,19 @@ export async function getInitialFeedDays(today: string): Promise<FeedDataPage> {
 }
 
 // "Cargar más": los 2 días siguientes con publicaciones anteriores a `before`
-export async function getFeedDaysBefore(before: string): Promise<FeedDataPage> {
+export async function getFeedDaysBefore(
+  before: string,
+  currentUserId: string,
+): Promise<FeedDataPage> {
   // Se pide un día de más para saber si queda algo después de esta página
   const visibleDays = await fetchVisibleDaysBefore(before, DAYS_PER_PAGE + 1);
   const days = visibleDays.slice(0, DAYS_PER_PAGE);
   if (days.length === 0) return { days: [], hasMore: false };
 
-  const posts = await fetchFeedPage({
-    from: days[days.length - 1],
-    to: days[0],
-  });
+  const posts = await fetchFeedPage(
+    { from: days[days.length - 1], to: days[0] },
+    currentUserId,
+  );
   return {
     days: groupByDay(days, posts),
     hasMore: visibleDays.length > DAYS_PER_PAGE,

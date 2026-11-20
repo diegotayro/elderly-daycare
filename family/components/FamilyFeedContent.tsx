@@ -11,7 +11,7 @@ export async function FamilyFeedContent() {
 
   const [elderly, dataPage] = await Promise.all([
     fetchFamilyFeedElderly(user.id),
-    getInitialFeedDays(today),
+    getInitialFeedDays(today, user.id),
   ]);
   const initialPage = buildFamilyFeed(dataPage, { today, elderly });
 

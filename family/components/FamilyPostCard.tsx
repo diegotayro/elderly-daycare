@@ -2,8 +2,8 @@ import type { AvatarTone } from "@/elderly/avatar-tones";
 import { PhotoCarousel } from "@/feed/components/PhotoCarousel";
 import { PostAuthorAvatar } from "@/feed/components/PostAuthorAvatar";
 import { PostTypeBadge } from "@/feed/components/PostTypeBadge";
+import { ReactionButton } from "@/feed/components/ReactionButton";
 import { CommentIcon } from "@/shared/components/icons/CommentIcon";
-import { HeartIcon } from "@/shared/components/icons/HeartIcon";
 import type { FamilyPost } from "../types";
 
 const listFormatter = new Intl.ListFormat("es", { type: "conjunction" });
@@ -51,10 +51,11 @@ export function FamilyPostCard({ post, author }: FamilyPostCardProps) {
       {post.photos.length > 0 && <PhotoCarousel photos={post.photos} />}
 
       <div className="mt-4 flex items-center gap-[18px] border-t border-line-soft pt-3.5">
-        <span className="flex items-center gap-[7px] text-sm leading-[normal] font-bold text-coral-icon">
-          <HeartIcon size={19} />
-          {post.reactionCount}
-        </span>
+        <ReactionButton
+          postId={post.id}
+          initialReacted={post.reactedByMe}
+          initialCount={post.reactionCount}
+        />
         <span className="flex items-center gap-[7px] text-sm leading-[normal] font-bold text-muted-strong">
           <CommentIcon size={18} />
           {post.commentCount}

@@ -53,6 +53,7 @@ function toFamilyPost(
     body: post.body,
     photos: post.photos,
     reactionCount: post.reactionCount,
+    reactedByMe: post.reactedByMe,
     commentCount: post.commentCount,
   };
 }

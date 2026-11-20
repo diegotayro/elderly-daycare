@@ -32,6 +32,7 @@ export type FamilyPost = {
   body: string;
   photos: FeedPhoto[];
   reactionCount: number;
+  reactedByMe: boolean;
   commentCount: number;
 };
 

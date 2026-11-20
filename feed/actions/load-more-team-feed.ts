@@ -17,6 +17,6 @@ export async function loadMoreTeamFeed(
     throw new Error("Día inválido");
   }
 
-  const page = await getFeedDaysBefore(before);
+  const page = await getFeedDaysBefore(before, user.id);
   return buildFeed(page, { currentUserId: user.id, today: getLimaToday() });
 }

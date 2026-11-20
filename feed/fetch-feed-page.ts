@@ -76,9 +76,27 @@ function toPhotos(row: PostRow, urlsByPath: Map<string, string>): FeedPhoto[] {
     });
 }
 
+async function fetchReactedPostIds(
+  supabase: ServerClient,
+  currentUserId: string,
+  postIds: string[],
+): Promise<Set<string>> {
+  if (postIds.length === 0) return new Set();
+
+  const { data, error } = await supabase
+    .from("reactions")
+    .select("post_id")
+    .eq("user_id", currentUserId)
+    .in("post_id", postIds);
+  if (error) throw error;
+
+  return new Set(data.map((reaction) => reaction.post_id));
+}
+
 function toFeedPostData(
   row: PostRow,
   urlsByPath: Map<string, string>,
+  reactedPostIds: Set<string>,
 ): FeedPostData {
   return {
     id: row.id,
@@ -97,16 +115,17 @@ function toFeedPostData(
     ),
     photos: toPhotos(row, urlsByPath),
     reactionCount: row.reactions[0]?.count ?? 0,
+    reactedByMe: reactedPostIds.has(row.id),
     commentCount: row.comments[0]?.count ?? 0,
   };
 }
 
 // Publicaciones visibles entre el inicio del día `from` y el fin del día `to` (hora de Lima),
 // de la más nueva a la más vieja. from y to son "aaaa-mm-dd".
-export async function fetchFeedPage(range: {
-  from: string;
-  to: string;
-}): Promise<FeedPostData[]> {
+export async function fetchFeedPage(
+  range: { from: string; to: string },
+  currentUserId: string,
+): Promise<FeedPostData[]> {
   const supabase = createClient(await cookies());
 
   const { data, error } = await supabase
@@ -121,7 +140,14 @@ export async function fetchFeedPage(range: {
   const photoPaths = data.flatMap((row) =>
     row.post_photos.map((photo) => photo.url),
   );
-  const urlsByPath = await signPhotoUrls(supabase, photoPaths);
+  const [urlsByPath, reactedPostIds] = await Promise.all([
+    signPhotoUrls(supabase, photoPaths),
+    fetchReactedPostIds(
+      supabase,
+      currentUserId,
+      data.map((row) => row.id),
+    ),
+  ]);
 
-  return data.map((row) => toFeedPostData(row, urlsByPath));
+  return data.map((row) => toFeedPostData(row, urlsByPath, reactedPostIds));
 }

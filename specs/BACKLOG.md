@@ -301,6 +301,7 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Notas:**
   - No usar `href="/"` provisional: llevaría al familiar a un redirect.
   - Las tarjetas de `/notices` (SPEC 27) tampoco enlazan; al existir el detalle, enlazar los avisos de comentario y reacción.
+  - El detalle debe reusar `setReaction` (`feed/actions/set-reaction.ts`) para el botón "Me encanta" y definir la línea "A N personas les gusta" (SPEC 28 solo convierte el corazón del feed en botón).
 
 ### Conectar las pantallas del familiar a Supabase
 
@@ -465,6 +466,14 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Origen:** SPEC 25, `feed/components/AudiencePicker.tsx` y `feed/get-new-post-options.ts`.
 - **Se resuelve en:** una spec de ajustes del feed o de la asignación de staff.
 - **Notas:** decidir si se oculta "Toda la habitación" o se muestra un mensaje ("Aún no tienes adultos mayores asignados"). El mockup no lo define.
+
+### Conteo de reacciones en vivo
+
+- [ ] **Estado:** pendiente
+- **Qué:** las reacciones de otros usuarios solo se ven al recargar el feed; el conteo de cada tarjeta no se actualiza solo.
+- **Origen:** SPEC 28 (decidido fuera de alcance), `feed/components/ReactionButton.tsx`.
+- **Se resuelve en:** una spec de ajustes del feed.
+- **Notas:** decidir si vale Realtime de Supabase o un `refresh` periódico. Con `refresh` hay que cuidar que no re-firme las fotos ni pise el estado optimista de `ReactionButton`.
 
 ### Notificar nuevas publicaciones (`notify_on_post`)
 

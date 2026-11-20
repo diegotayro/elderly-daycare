@@ -23,7 +23,7 @@ export async function FeedContent() {
 
   const [elderlyCount, dataPage] = await Promise.all([
     countVisibleActiveElderly(),
-    getInitialFeedDays(today),
+    getInitialFeedDays(today, user.id),
   ]);
   const initialPage = buildFeed(dataPage, { currentUserId: user.id, today });
 
