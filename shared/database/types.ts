@@ -146,4 +146,5 @@ export type ListNoticesRow = {
   elderly_names: string[] | null;
   elderly_first_name: string | null; // solo account_activated
   is_first_link: boolean | null; // solo account_activated
+  post_id: string | null; // null en account_activated
 };
