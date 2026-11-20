@@ -31,14 +31,15 @@ Formato de cada entrada:
 ### Avisos del linter aceptados tras la spec 10
 
 - [ ] **Estado:** pendiente
-- **Qué:** `get_advisors` marca (1) `authenticated_security_definer_function_executable` en `current_user_daycare_id()`, `current_user_role()`, `is_admin()`, `current_user_elderly_ids()`, `current_user_relative_ids()`, `is_email_linked_to_elderly()`, `is_team_email()`, `accept_invitation()`, `get_staff_emails()`, `is_pending_staff()`, `activate_staff_account()`, `can_view_post()`, `can_post_to_room()`, `post_has_tag_without_photo_consent()`, `staff_has_history()` y `room_has_elderly_without_photo_consent()`, (2) `multiple_permissive_policies` en `users` para select y update, en `posts`, `post_elderly`, `post_photos` y `comments` para delete, y en `elderly`, `staff_elderly` y `guardian_elderly` para select, y (3) `auth_leaked_password_protection` y (4) `auth_otp_long_expiry` (la expiración del OTP del proveedor de email supera la hora recomendada).
-- **Origen:** SPEC 10 (`10-users-table`), SPEC 15 (`current_user_elderly_ids()`, `current_user_relative_ids()` y las tablas nuevas) y SPEC 17 (`is_email_linked_to_elderly()`, `is_team_email()` y `accept_invitation()`), SPEC 21 (`get_staff_emails()`, `is_pending_staff()` y `activate_staff_account()`), SPEC 22 (`can_view_post()`, `can_post_to_room()` y `post_has_tag_without_photo_consent()`; `multiple_permissive_policies` de delete en `posts`, `post_elderly`, `post_photos` y `comments`, e índices sin uso mientras las tablas están vacías) SPEC 23 (`staff_has_history()`) y SPEC 25 (`room_has_elderly_without_photo_consent()`).
+- **Qué:** `get_advisors` marca (1) `authenticated_security_definer_function_executable` en `current_user_daycare_id()`, `current_user_role()`, `is_admin()`, `current_user_elderly_ids()`, `current_user_relative_ids()`, `is_email_linked_to_elderly()`, `is_team_email()`, `accept_invitation()`, `get_staff_emails()`, `is_pending_staff()`, `activate_staff_account()`, `can_view_post()`, `can_post_to_room()`, `post_has_tag_without_photo_consent()`, `staff_has_history()`, `room_has_elderly_without_photo_consent()` y `is_first_guardian_link()`, (2) `multiple_permissive_policies` en `users` para select y update, en `posts`, `post_elderly`, `post_photos` y `comments` para delete, y en `elderly`, `staff_elderly` y `guardian_elderly` para select, y (3) `auth_leaked_password_protection` y (4) `auth_otp_long_expiry` (la expiración del OTP del proveedor de email supera la hora recomendada).
+- **Origen:** SPEC 10 (`10-users-table`), SPEC 15 (`current_user_elderly_ids()`, `current_user_relative_ids()` y las tablas nuevas) y SPEC 17 (`is_email_linked_to_elderly()`, `is_team_email()` y `accept_invitation()`), SPEC 21 (`get_staff_emails()`, `is_pending_staff()` y `activate_staff_account()`), SPEC 22 (`can_view_post()`, `can_post_to_room()` y `post_has_tag_without_photo_consent()`; `multiple_permissive_policies` de delete en `posts`, `post_elderly`, `post_photos` y `comments`, e índices sin uso mientras las tablas están vacías) SPEC 23 (`staff_has_history()`) SPEC 25 (`room_has_elderly_without_photo_consent()`) y SPEC 27 (`is_first_guardian_link()`).
 - **Se resuelve en:** no se resuelve; (1) y (2) son aceptados. (3) y (4) son ajustes del dashboard de Auth.
 - **Notas:**
   - (1) Las policies evalúan los helpers con el rol del usuario, así que necesitan `EXECUTE`; solo devuelven datos del propio usuario. `current_user_elderly_ids()` y `current_user_relative_ids()` solo devuelven ids ligados a `auth.uid()` y vacío para otros roles. Alternativa descartada: moverlos a un esquema privado.
   - Las tres funciones de SPEC 17 deben ser ejecutables por `authenticated` (el admin las llama al invitar y el familiar al activar) y validan el rol y la guardería de quien llama dentro de la función. `get_invitation_preview()` es solo para `service_role` y no genera aviso.
   - Las tres funciones de SPEC 21 también deben ser ejecutables por `authenticated` (el admin llama a `get_staff_emails()`, y el staff invitado a las otras dos con su sesión) y validan el rol de quien llama dentro de la función.
   - `staff_has_history()` (SPEC 23) también debe ser ejecutable por `authenticated` (el perfil del staff y `deleteStaff` la llaman con la sesión del admin) y devuelve `false` si quien llama no es admin o el staff no es de su guardería.
+  - `is_first_guardian_link()` (SPEC 27) debe ser ejecutable por `authenticated` (`list_notices` la llama con la sesión del staff o el admin) y devuelve `false` si quien llama no ve el vínculo; solo devuelve `true/false`, nunca filas ni nombres.
   - (2) Consecuencia de policies separadas por regla (`own`, `admin`, `team`, `staff`/`relative`). Alternativa descartada: unirlas en una sola.
   - (3) Revisar en el dashboard (Auth > Password security) si el plan lo permite.
   - (4) Detectado al verificar SPEC 23. No lo causa esa spec (es una configuración de Auth) y no se comprobó si ya aparecía antes. Revisar en el dashboard (Auth > Providers > Email) y bajar la expiración del OTP a menos de una hora; antes de cambiarla, comprobar si afecta la vigencia de los enlaces de invitación.
@@ -67,6 +68,7 @@ Formato de cada entrada:
   - La pantalla usa el copy del mockup con los valores iniciales de esos dos campos; las etiquetas viven solo en `notification-preferences.ts`.
   - Decidir si se cambia el copy del mockup o los campos/horario de la DB (17:00 vs. 19:00, comentarios vs. publicaciones).
   - Los toggles hoy solo tienen estado local: persistirlos con `update` de `users` en esa misma spec.
+  - El recordatorio de Avisos (SPEC 27) usa 17:00 y `daily_summary_enabled`; si se cambia el horario del resumen, actualizar `SUMMARY_REMINDER_TIME` en `notices/notice-limits.ts`.
 
 ---
 
@@ -296,7 +298,9 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Qué:** las tarjetas del feed, la foto y los ítems de "Lo más lindo de hoy" no enlazan todavía.
 - **Origen:** SPEC 18, `family/components/FamilyPostCard.tsx` y `SummaryHighlightItem.tsx`.
 - **Se resuelve en:** la spec del detalle de publicación (`detalle-publicacion.dc.html`) y del visor de foto (`foto.dc.html`).
-- **Notas:** no usar `href="/"` provisional: llevaría al familiar a un redirect.
+- **Notas:**
+  - No usar `href="/"` provisional: llevaría al familiar a un redirect.
+  - Las tarjetas de `/notices` (SPEC 27) tampoco enlazan; al existir el detalle, enlazar los avisos de comentario y reacción.
 
 ### Conectar las pantallas del familiar a Supabase
 
@@ -383,7 +387,7 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 
 - [ ] **Estado:** pendiente
 - **Qué:** el esquema no guarda cómo tratar a cada adulto mayor. Los feeds reales (`/` y `/family`) muestran solo el nombre de pila ("Luis, Carmen"); las pantallas con mock siguen con "Don Luis" y "Doña Carmen" escritos a mano.
-- **Origen:** SPEC 25 (`feed/build-post-heading.ts`), `family/mock-family.ts` y `notices/mock-notices.ts`.
+- **Origen:** SPEC 25 (`feed/build-post-heading.ts`), `family/mock-family.ts`. `notices/mock-notices.ts` ya no existe: Avisos (SPEC 27) usa el nombre de pila.
 - **Se resuelve en:** una spec que decida el campo (por ejemplo `title` o `gender` en `elderly`, con migración) y lo pida en "Agregar adulto mayor".
 - **Notas:** un "Don" fijo se equivocaba con las mujeres. Al agregar el campo, volver a usar el tratamiento en los feeds, "Avisos" y "Resumen del día".
 
@@ -471,3 +475,27 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Notas:**
   - Decidir si se envía al publicar o en lote, y cómo se evita avisar de un post que se deshace (`discardPost`).
   - Hoy entre `createPost` y `attachPostPhotos` el post es visible sin fotos unos segundos: conviene notificar después de adjuntar las fotos.
+
+### Recordatorio del resumen que sepa si ya se envió
+
+- [ ] **Estado:** pendiente
+- **Qué:** el recordatorio "Recuerda enviar el resumen del día" de `/notices` aparece desde las 17:00 aunque el resumen ya se haya enviado.
+- **Origen:** SPEC 27 (`notices/fetch-notices.ts`).
+- **Se resuelve en:** la spec que conecte `daily_summaries` (resumen del día).
+- **Notas:** ocultarlo cuando el staff ya envió el resumen de todos sus adultos mayores activos de hoy.
+
+### Avisos de nuevas publicaciones en `/notices`
+
+- [ ] **Estado:** pendiente
+- **Qué:** `/notices` no muestra las nuevas publicaciones como aviso; el feed ya las muestra.
+- **Origen:** SPEC 27 (decidido fuera de alcance).
+- **Se resuelve en:** una spec de ajustes de Avisos, junto con el detalle de publicación.
+- **Notas:** el mockup no define el copy ni el ícono de ese aviso. Decidir si aplica al admin, al staff o a ambos.
+
+### Leído/no leído y contador de Avisos
+
+- [ ] **Estado:** pendiente
+- **Qué:** los avisos no tienen estado de leído, la campana no muestra contador y no existe "marcar como leído".
+- **Origen:** SPEC 27 (decidido fuera de alcance).
+- **Se resuelve en:** una spec de notificaciones con tabla `notifications` (migración, RLS y triggers).
+- **Notas:** hoy los avisos se derivan al leer desde `comments`, `reactions` y `guardian_elderly` (`list_notices`); con la tabla habría que decidir si se mantiene esa derivación o se reemplaza, y hacer backfill.

@@ -115,6 +115,17 @@ Todas con `search_path` vacío y `EXECUTE` revocado a `public` y `anon` (solo `a
 
 > El linter marca `room_has_elderly_without_photo_consent` como "ejecutable por `authenticated`": es esperado, porque necesita leer adultos mayores que la RLS le oculta al staff y solo devuelve un booleano. `create_post` y `visible_post_days` son `INVOKER` y no generan aviso.
 
+### Funciones de avisos
+
+Con `search_path` vacío y `EXECUTE` revocado a `public` y `anon` (solo `authenticated`). Las llama la app con `supabase.rpc(...)`. No hay tabla de avisos: se calculan al leer desde `comments`, `reactions` y `guardian_elderly`.
+
+|Función|Tipo|Devuelve|
+|---|---|---|
+|`list_notices(p_since, p_limit)`|`SECURITY INVOKER STABLE`|Tabla con los avisos del usuario, del más nuevo al más viejo, con `limit p_limit`: `id`, `kind` (`comment`, `reaction` o `account_activated`), `occurred_at`, `actor_name`, `others_count`, `post_audience`, `post_title`, `room_name`, `elderly_names`, `elderly_first_name` e `is_first_link`. Cada `select` pasa por la RLS de quien llama, así que `actor_name` puede salir `null` y `elderly_names` vacío. Excluye los comentarios y reacciones del propio usuario. Las reacciones se agrupan por post (`others_count` = cantidad − 1; `occurred_at` y `actor_name` son de la más reciente).|
+|`is_first_guardian_link(p_link_id)`|`SECURITY DEFINER STABLE`|`boolean`: `true` si el vínculo existe, quien llama puede verlo (admin de la guardería del adulto mayor, o staff con ese adulto mayor asignado) y el familiar no tiene otro vínculo más antiguo (desempate por `id`). `false` en cualquier otro caso (vínculo inexistente, de otra guardería o no visible, usuario `relative`, `pending` o `archived`). Cumple la regla 7: solo devuelve `true/false`, nunca nombres ni filas. Es necesaria porque el staff solo ve los vínculos de sus asignados y no puede saber si el familiar ya tenía otro.|
+
+> El linter marca `is_first_guardian_link` como "ejecutable por `authenticated`": es esperado, porque `list_notices` la llama con la sesión del staff o del admin y solo devuelve un booleano. `list_notices` es `INVOKER` y no genera aviso.
+
 ### Regla del feed: ¿quién puede ver un post?
 
 Las tablas `posts`, `post_elderly`, `post_photos`, `reactions`, `comments` y el Storage de fotos usan esta regla. Debe implementarse **en un solo lugar**.
