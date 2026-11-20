@@ -1,6 +1,6 @@
 # SPEC 26 — Confirmar la contraseña en "Activar cuenta"
 
-> **Estado:** Aprobado
+> **Estado:** Implemented
 > **Depende de:** SPEC 17, SPEC 21, SPEC 24
 > **Fecha:** 2026-11-18
 > **Objetivo:** Agregar en `/activate-account`, solo en el modo "CREAR CONTRASEÑA", un campo "CONFIRMAR CONTRASEÑA" validado en cliente y servidor con la misma regla y mensajes que `/create-password`.
@@ -174,27 +174,27 @@ specs/BACKLOG.md
 
 **Código**
 
-- [ ] `passwordMessages` y `validatePasswordConfirmation` viven en `auth/validate-password.ts` y los usan `/create-password` y `/activate-account`; el texto de la regla de contraseña no está duplicado.
-- [ ] `/create-password` muestra los mismos mensajes que antes.
-- [ ] La Server Action rechaza una confirmación vacía o distinta en el modo `create` aunque el cliente no la valide.
-- [ ] En el modo `existing` la confirmación no se pide ni se valida.
-- [ ] `npm run build` y `npm run lint` sin errores.
+- [x] `passwordMessages` y `validatePasswordConfirmation` viven en `auth/validate-password.ts` y los usan `/create-password` y `/activate-account`; el texto de la regla de contraseña no está duplicado.
+- [x] `/create-password` muestra los mismos mensajes que antes.
+- [x] La Server Action rechaza una confirmación vacía o distinta en el modo `create` aunque el cliente no la valide.
+- [x] En el modo `existing` la confirmación no se pide ni se valida.
+- [x] `npm run build` y `npm run lint` sin errores.
 
 **Formulario**
 
-- [ ] En "CREAR CONTRASEÑA" se ve "CONFIRMAR CONTRASEÑA" bajo la contraseña, con el diseño del de `/create-password`.
-- [ ] Vacía muestra "Vuelve a escribir la contraseña."; distinta, "Las contraseñas no coinciden."; con `aria-invalid="true"`, `aria-describedby` y foco si es el primer error.
-- [ ] Al pasar a "INGRESE SU CONTRASEÑA" el campo desaparece junto con su error.
-- [ ] A 390×844 no hay scroll horizontal y la consola no tiene errores ni warnings de hidratación.
+- [x] En "CREAR CONTRASEÑA" se ve "CONFIRMAR CONTRASEÑA" bajo la contraseña, con el diseño del de `/create-password`.
+- [x] Vacía muestra "Vuelve a escribir la contraseña."; distinta, "Las contraseñas no coinciden."; con `aria-invalid="true"`, `aria-describedby` y foco si es el primer error.
+- [x] Al pasar a "INGRESE SU CONTRASEÑA" el campo desaparece junto con su error.
+- [x] A 390×844 no hay scroll horizontal y la consola no tiene errores ni warnings de hidratación.
 
 **Consentimiento desmarcado**
 
-- [ ] Activar con la casilla desmarcada termina en `/family` y deja `elderly.photo_consent = false` en Alberto.
+- [x] Activar con la casilla desmarcada termina en `/family` y deja `elderly.photo_consent = false` en Alberto.
 
 **Cierre**
 
-- [ ] Tras la limpieza no quedan el usuario de prueba, sus vínculos ni las invitaciones, y `photo_consent` de Alberto tiene su valor inicial.
-- [ ] SPEC 17, SPEC 24 y `BACKLOG.md` actualizados según "Cambios en documentos".
+- [x] Tras la limpieza no quedan el usuario de prueba, sus vínculos ni las invitaciones, y `photo_consent` de Alberto tiene su valor inicial.
+- [x] SPEC 17, SPEC 24 y `BACKLOG.md` actualizados según "Cambios en documentos".
 
 ---
 

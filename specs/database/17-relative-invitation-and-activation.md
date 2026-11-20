@@ -373,7 +373,7 @@ Antes de los pasos 1 y 2, cargar los skills `supabase` y `supabase-postgres-best
 - [x] Con una segunda invitación al mismo email, la página muestra "INGRESE SU CONTRASEÑA" y al activar no se crea otro usuario, se crea el segundo vínculo y se inicia sesión.
 - [x] Con el código escrito a mano y un email con cuenta, enviar muestra "Este email ya tiene cuenta. Ingresa tu contraseña." y cambia la etiqueta.
 - [x] Contraseña incorrecta en modo existente muestra "La contraseña no es correcta." y no crea el vínculo.
-- [ ] Desmarcar el consentimiento deja `photo_consent = false`; marcarlo no cambia el valor. (parte con el consentimiento desmarcado pendiente; ver BACKLOG)
+- [x] Desmarcar el consentimiento deja `photo_consent = false`; marcarlo no cambia el valor. (verificado en SPEC 26)
 - [x] Un código inexistente, vencido o ya usado muestra "El código no es válido o ya venció.".
 - [x] Un email distinto al de la invitación muestra "Este email no coincide con la invitación.".
 - [x] `abcdefgh` y `12345678` muestran el error de la regla de contraseña.
