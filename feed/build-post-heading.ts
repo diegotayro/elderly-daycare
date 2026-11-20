@@ -2,7 +2,7 @@ import type { FeedPostData } from "./types";
 
 // "Luis, Jorge": solo los etiquetados que el usuario puede leer por RLS; "" si ninguno.
 // Sin tratamiento (Don/Doña): el esquema no tiene dónde guardarlo.
-export function joinElderlyNames(elderly: FeedPostData["elderly"]): string {
+export function joinElderlyNames(elderly: { firstName: string }[]): string {
   return elderly.map(({ firstName }) => firstName).join(", ");
 }
 
