@@ -1,4 +1,5 @@
 import type { PostAudience, PostType, UserRole } from "@/shared/database/types";
+import type { CommentView } from "@/comments/types";
 import type { AvatarTone } from "@/elderly/avatar-tones";
 import type { RoomOption } from "@/elderly/types";
 
@@ -115,3 +116,9 @@ export type FeedPostData = {
 export type FeedDataDay = { date: string; posts: FeedPostData[] };
 
 export type FeedDataPage = { days: FeedDataDay[]; hasMore: boolean };
+
+// Detalle de una publicación: FeedPost (equipo) o FamilyPost (familiar) más sus comentarios
+export type PostDetail<TPost> = {
+  post: TPost;
+  comments: CommentView[];
+};
