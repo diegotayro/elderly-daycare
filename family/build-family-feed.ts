@@ -17,7 +17,7 @@ const limaTimeFormatter = new Intl.DateTimeFormat("es", {
   timeZone: "America/Lima",
 });
 
-type FamilyFeedContext = {
+export type FamilyFeedContext = {
   today: string; // "aaaa-mm-dd" en Lima
   elderly: FamilyFeedElderly[]; // los vinculados del familiar
 };
@@ -27,7 +27,7 @@ function buildAuthorLabel(post: FeedPostData): string {
   return `${userRoleLabels[post.authorRole]} ${post.authorFirstName}`;
 }
 
-function toFamilyPost(
+export function toFamilyPost(
   post: FeedPostData,
   context: FamilyFeedContext,
 ): FamilyPost {

@@ -21,7 +21,7 @@ type FeedContext = {
   today: string; // "aaaa-mm-dd" en Lima
 };
 
-function toFeedPost(post: FeedPostData, currentUserId: string): FeedPost {
+export function toFeedPost(post: FeedPostData, currentUserId: string): FeedPost {
   const namesLabel = joinElderlyNames(post.elderly);
   const roomName = post.roomName ?? "";
 
