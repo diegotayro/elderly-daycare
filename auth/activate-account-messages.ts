@@ -3,8 +3,6 @@ export const activateAccountMessages = {
   codeInvalid: "El código no es válido o ya venció.",
   emailInvalid: "Ingresa un email válido.",
   emailMismatch: "Este email no coincide con la invitación.",
-  passwordRule:
-    "La contraseña debe tener al menos 8 caracteres, con letras y números.",
   accountAlreadyExists: "Este email ya tiene cuenta. Ingresa tu contraseña.",
   passwordIncorrect: "La contraseña no es correcta.",
   accountNotAllowed:

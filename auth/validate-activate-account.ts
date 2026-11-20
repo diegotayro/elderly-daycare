@@ -1,6 +1,6 @@
 import { activateAccountMessages as messages } from "./activate-account-messages";
 import type { ActivateAccountErrors, ActivateAccountInput } from "./types";
-import { isValidPassword } from "./validate-password";
+import { isValidPassword, passwordMessages } from "./validate-password";
 
 const CODE_PATTERN = /^[A-Z0-9]{5}$/;
 const BASIC_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -21,7 +21,7 @@ export function validateActivateAccount(
       : messages.emailInvalid,
     password: isValidPassword(input.password)
       ? undefined
-      : messages.passwordRule,
+      : passwordMessages.rule,
   };
 
   return Object.fromEntries(

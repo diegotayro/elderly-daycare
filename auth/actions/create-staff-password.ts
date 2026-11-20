@@ -9,6 +9,7 @@ import { TEAM_HOME } from "@/auth/home-routes";
 import { readCreatePasswordInput } from "@/auth/read-create-password-input";
 import type { CreatePasswordResult } from "@/auth/types";
 import { validateCreatePassword } from "@/auth/validate-create-password";
+import { passwordMessages } from "@/auth/validate-password";
 import { createClient } from "@/shared/supabase/server";
 
 function failed(message: string): CreatePasswordResult {
@@ -26,7 +27,7 @@ async function savePassword(
   if (error.code === "weak_password") {
     return {
       status: "invalid",
-      errors: { password: messages.passwordRule },
+      errors: { password: passwordMessages.rule },
     };
   }
   console.error("createStaffPassword: no se pudo guardar la contraseña", error);
