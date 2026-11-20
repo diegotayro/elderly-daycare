@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { CommentIcon } from "@/shared/components/icons/CommentIcon";
-import { HeartIcon } from "@/shared/components/icons/HeartIcon";
 import type { FeedPost } from "../types";
 import { PhotoCarousel } from "./PhotoCarousel";
 import { PostAuthorAvatar } from "./PostAuthorAvatar";
 import { PostTypeBadge } from "./PostTypeBadge";
+import { ReactionButton } from "./ReactionButton";
 
 type PostCardProps = {
   post: FeedPost;
@@ -36,10 +36,11 @@ export function PostCard({ post }: PostCardProps) {
       {post.photos.length > 0 && <PhotoCarousel photos={post.photos} />}
 
       <div className="mt-4 flex items-center gap-[18px] border-t border-line-soft pt-3.5">
-        <span className="flex items-center gap-[7px] text-sm font-bold text-coral-icon">
-          <HeartIcon size={19} />
-          {post.reactionCount}
-        </span>
+        <ReactionButton
+          postId={post.id}
+          initialReacted={post.reactedByMe}
+          initialCount={post.reactionCount}
+        />
         <Link
           href="/"
           className="flex items-center gap-[7px] text-sm font-bold text-muted-strong"

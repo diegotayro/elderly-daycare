@@ -1,6 +1,6 @@
 # SPEC 28 — Reaccionar a una publicación desde el feed
 
-> **Estado:** Aprobado
+> **Estado:** Implemented
 > **Depende de:** SPEC 22, SPEC 25
 > **Fecha:** 2026-11-20
 > **Objetivo:** Convertir el corazón de las tarjetas de `/` y `/family` en un botón que agrega o quita la reacción `love` del usuario, con actualización optimista y sin cambios en la base de datos.
@@ -157,38 +157,38 @@ Más los llamadores de `getInitialFeedDays` y `getFeedDaysBefore` (`FeedContent`
 
 **Datos y acción**
 
-- [ ] No hay migraciones nuevas ni cambios en `pg_policies`.
-- [ ] El feed de `/`, el de `/family` y las páginas de "Cargar más" traen `reactedByMe` correcto para cada post.
-- [ ] Sin posts en el rango no se hace la consulta de `reactedByMe`.
-- [ ] `setReaction(postId, true)` crea una fila con `user_id` del usuario y `type = 'love'`; llamarla otra vez devuelve `ok` y no crea otra fila.
-- [ ] `setReaction(postId, false)` borra la fila del usuario; llamarla otra vez devuelve `ok`.
-- [ ] Con un `postId` que no es UUID o un `reacted` que no es `boolean`, devuelve `error` sin tocar la DB.
-- [ ] Sin sesión, devuelve `error`.
-- [ ] En un post que el usuario no puede ver, devuelve `error` y no crea filas.
-- [ ] La acción nunca usa `service_role` ni recibe `user_id` del cliente.
+- [x] No hay migraciones nuevas ni cambios en `pg_policies`.
+- [x] El feed de `/`, el de `/family` y las páginas de "Cargar más" traen `reactedByMe` correcto para cada post.
+- [x] Sin posts en el rango no se hace la consulta de `reactedByMe`.
+- [x] `setReaction(postId, true)` crea una fila con `user_id` del usuario y `type = 'love'`; llamarla otra vez devuelve `ok` y no crea otra fila.
+- [x] `setReaction(postId, false)` borra la fila del usuario; llamarla otra vez devuelve `ok`.
+- [x] Con un `postId` que no es UUID o un `reacted` que no es `boolean`, devuelve `error` sin tocar la DB.
+- [x] Sin sesión, devuelve `error`.
+- [x] En un post que el usuario no puede ver, devuelve `error` y no crea filas.
+- [x] La acción nunca usa `service_role` ni recibe `user_id` del cliente.
 
 **Pantalla**
 
-- [ ] En `/` y `/family`, un post sin reacción propia muestra el corazón con contorno en `text-muted-strong`; con reacción propia, relleno en `text-coral-icon`.
-- [ ] Tocar el corazón cambia el ícono y el número al instante (±1).
-- [ ] Al recargar, el estado y el número coinciden con lo guardado.
-- [ ] Si la acción falla, el corazón y el número vuelven al estado anterior y aparece el toast "No se pudo guardar tu reacción" / "Revisa tu conexión e intenta de nuevo.".
-- [ ] Mientras la acción está en curso, un segundo clic no hace nada.
-- [ ] Reaccionar no recarga el resto del feed (ninguna otra tarjeta cambia ni se vuelven a pedir las fotos).
-- [ ] Funciona igual en publicaciones cargadas con "Cargar más".
-- [ ] Admin, staff y familiar pueden reaccionar, también el autor en su propio post.
-- [ ] El botón tiene `aria-pressed`, nombre accesible "Me encanta, N", se activa con Enter y Espacio, y muestra foco visible.
-- [ ] El área táctil mide al menos 44×44 px y la fila de acciones se ve igual que en el mockup.
-- [ ] Con `prefers-reduced-motion: reduce` no hay transición.
-- [ ] A 390×844 no hay scroll horizontal.
+- [x] En `/` y `/family`, un post sin reacción propia muestra el corazón con contorno en `text-muted-strong`; con reacción propia, relleno en `text-coral-icon`.
+- [x] Tocar el corazón cambia el ícono y el número al instante (±1).
+- [x] Al recargar, el estado y el número coinciden con lo guardado.
+- [x] Si la acción falla, el corazón y el número vuelven al estado anterior y aparece el toast "No se pudo guardar tu reacción" / "Revisa tu conexión e intenta de nuevo.".
+- [x] Mientras la acción está en curso, un segundo clic no hace nada.
+- [x] Reaccionar no recarga el resto del feed (ninguna otra tarjeta cambia ni se vuelven a pedir las fotos).
+- [x] Funciona igual en publicaciones cargadas con "Cargar más".
+- [x] Admin, staff y familiar pueden reaccionar, también el autor en su propio post.
+- [x] El botón tiene `aria-pressed`, nombre accesible "Me encanta, N", se activa con Enter y Espacio, y muestra foco visible.
+- [x] El área táctil mide al menos 44×44 px y la fila de acciones se ve igual que en el mockup.
+- [x] Con `prefers-reduced-motion: reduce` no hay transición.
+- [x] A 390×844 no hay scroll horizontal.
 
 **Cierre**
 
-- [ ] `npm run build` y `npm run lint` sin errores. La consola no muestra errores en `/` ni en `/family`.
-- [ ] Los usos actuales de `HeartIcon` se ven igual (por ejemplo, el ícono de reacción de `/notices`).
-- [ ] El remoto queda sin las reacciones de prueba.
-- [ ] Las capturas están en `.playwright-mcp/`.
-- [ ] `BACKLOG.md` actualizado según "Entradas de BACKLOG".
+- [x] `npm run build` y `npm run lint` sin errores. La consola no muestra errores en `/` ni en `/family`.
+- [x] Los usos actuales de `HeartIcon` se ven igual (por ejemplo, el ícono de reacción de `/notices`).
+- [x] El remoto queda sin las reacciones de prueba.
+- [x] Las capturas están en `.playwright-mcp/`.
+- [x] `BACKLOG.md` actualizado según "Entradas de BACKLOG".
 
 ---
 
