@@ -8,6 +8,7 @@ export function readActivateAccountInput(
     code: read("code"),
     email: read("email"),
     password: read("password"),
+    passwordConfirmation: read("passwordConfirmation"),
     photoConsent: formData.get("photoConsent") === "on",
   };
 }
