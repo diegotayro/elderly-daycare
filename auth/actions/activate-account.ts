@@ -115,7 +115,7 @@ export async function activateAccount(
   formData: FormData,
 ): Promise<ActivateAccountResult> {
   const input = readActivateAccountInput(formData);
-  const formErrors = validateActivateAccount(input);
+  const formErrors = validateActivateAccount(input, currentMode);
   if (Object.keys(formErrors).length > 0) {
     return invalid(formErrors, currentMode);
   }

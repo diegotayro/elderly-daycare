@@ -28,8 +28,8 @@ Resuelve de `pantallas-pendientes.md`:
 
 Planificadas por el usuario; no van en `specs/BACKLOG.md`.
 
-- **SPEC 26 — Confirmar la contraseña en "Activar cuenta":** agregar un segundo campo para repetir la contraseña en `/activate-account`, como el de `/create-password` (`passwordConfirmation`), para que el familiar no se equivoque al escribirla. Hoy el formulario y el mockup `activar-cuenta.dc.html` tienen un solo campo.
-  - Supuesto por confirmar en esa spec: el campo solo aparece en el modo "CREAR CONTRASEÑA"; en "INGRESE SU CONTRASEÑA" la cuenta ya existe.
+- **SPEC 26 — Confirmar la contraseña en "Activar cuenta" (spec `26-confirm-password-on-activate-account`):** agregar un segundo campo para repetir la contraseña en `/activate-account`, como el de `/create-password` (`passwordConfirmation`), para que el familiar no se equivoque al escribirla. Hoy el formulario y el mockup `activar-cuenta.dc.html` tienen un solo campo.
+  - El campo solo aparece en el modo "CREAR CONTRASEÑA"; en "INGRESE SU CONTRASEÑA" la cuenta ya existe.
 
 ---
 

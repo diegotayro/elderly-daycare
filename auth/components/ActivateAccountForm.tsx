@@ -24,7 +24,12 @@ import { AuthSubmitButton } from "./AuthSubmitButton";
 import { InvitationCard } from "./InvitationCard";
 import { PhotoConsentCheckbox } from "./PhotoConsentCheckbox";
 
-const FIELD_ORDER: ActivateAccountField[] = ["code", "email", "password"];
+const FIELD_ORDER: ActivateAccountField[] = [
+  "code",
+  "email",
+  "password",
+  "passwordConfirmation",
+];
 
 const PASSWORD_LABELS: Record<PasswordMode, string> = {
   create: "CREAR CONTRASEÑA",
@@ -65,7 +70,12 @@ export function ActivateAccountForm({
     mustFocusInvalidField.current = true;
     setPasswordMode(result.passwordMode);
     if (result.status === "invalid") {
-      setErrors(result.errors);
+      // En modo existing no hay campo de confirmación: su error no debe quedar
+      setErrors(
+        result.passwordMode === "existing"
+          ? { ...result.errors, passwordConfirmation: undefined }
+          : result.errors,
+      );
       setGeneralError(null);
     } else {
       setErrors({});
@@ -79,6 +89,7 @@ export function ActivateAccountForm({
     const formData = new FormData(event.currentTarget);
     const clientErrors = validateActivateAccount(
       readActivateAccountInput(formData),
+      passwordMode,
     );
     setGeneralError(null);
 
@@ -154,6 +165,17 @@ export function ActivateAccountForm({
             }
           />
         </div>
+        {!isPasswordExisting && (
+          <div className="mb-[18px]">
+            <AuthField
+              id="passwordConfirmation"
+              label="CONFIRMAR CONTRASEÑA"
+              type="password"
+              error={errors.passwordConfirmation}
+              autoComplete="new-password"
+            />
+          </div>
+        )}
 
         <PhotoConsentCheckbox />
       </fieldset>

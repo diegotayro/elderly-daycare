@@ -142,7 +142,7 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 
 ### Activar con el consentimiento de fotos desmarcado
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 26
 - **Qué:** probar a mano en `/activate-account` que activar una invitación con la casilla "Autorizo a la guardería a tomar y compartir fotos…" desmarcada deja `elderly.photo_consent = false` en el adulto mayor de la invitación. La parte B de SPEC 24 se activó con la casilla marcada (viene marcada por defecto), así que ese caso no se probó desde la UI.
 - **Origen:** SPEC 24 (parte B, puntos B.3 y B.4); criterio "Desmarcar el consentimiento deja `photo_consent = false`" de SPEC 17.
 - **Se resuelve en:** una próxima verificación manual de familiares, o SPEC 26 (confirmar la contraseña en "Activar cuenta"), que vuelve a tocar ese formulario.

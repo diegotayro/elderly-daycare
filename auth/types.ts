@@ -18,10 +18,12 @@ export type ActivateAccountInput = {
   code: string;
   email: string;
   password: string;
+  passwordConfirmation: string; // "" si el campo no se muestra (modo existing)
   photoConsent: boolean;
 };
 
-export type ActivateAccountField = "code" | "email" | "password";
+export type ActivateAccountField =
+  "code" | "email" | "password" | "passwordConfirmation";
 export type ActivateAccountErrors = Partial<
   Record<ActivateAccountField, string>
 >;
