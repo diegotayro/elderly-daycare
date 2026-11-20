@@ -21,7 +21,7 @@ export async function loadMoreFamilyFeed(
 
   const [elderly, page] = await Promise.all([
     fetchFamilyFeedElderly(user.id),
-    getFeedDaysBefore(before),
+    getFeedDaysBefore(before, user.id),
   ]);
   return buildFamilyFeed(page, { today: getLimaToday(), elderly });
 }

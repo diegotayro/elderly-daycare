@@ -14,6 +14,7 @@ export type FeedPost = {
   body: string;
   photos: FeedPhoto[];
   reactionCount: number;
+  reactedByMe: boolean;
   commentCount: number;
 };
 
@@ -83,6 +84,8 @@ export type CreatePostResult =
   | { status: "invalid"; errors: NewPostErrors }
   | { status: "error" };
 
+export type SetReactionResult = { status: "ok" } | { status: "error" };
+
 export type AttachPhotoInput = {
   path: string; // "{postId}/{position}.webp"
   width: number;
@@ -105,6 +108,7 @@ export type FeedPostData = {
   elderly: { id: string; firstName: string }[]; // solo los etiquetados que el usuario puede leer
   photos: FeedPhoto[];
   reactionCount: number;
+  reactedByMe: boolean;
   commentCount: number;
 };
 
