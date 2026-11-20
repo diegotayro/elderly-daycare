@@ -1,11 +1,10 @@
 import { getLimaDay } from "@/shared/date/get-lima-today";
+import { MONTH_LABELS } from "@/shared/date/month-labels";
 import { shiftDay } from "@/shared/date/shift-day";
 import { SUMMARY_REMINDER_TIME } from "./notice-limits";
 
 const MINUTE_MS = 60_000;
 const HOUR_MS = 60 * MINUTE_MS;
-
-const MONTH_LABELS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 
 const limaTimeFormatter = new Intl.DateTimeFormat("es", {
   hour: "2-digit",
