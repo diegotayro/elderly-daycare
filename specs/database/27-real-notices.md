@@ -237,39 +237,39 @@ No hay `"use client"` nuevos. Las tarjetas, colores, estado vacío y esqueleto d
 
 **Base de datos**
 
-- [ ] Existe `supabase/migrations/<version>_create_notice_functions.sql` y su versión coincide con la de `list_migrations`.
-- [ ] `list_notices` es `SECURITY INVOKER` y `is_first_guardian_link` es `SECURITY DEFINER STABLE`; ambas con `search_path` vacío y `EXECUTE` solo para `authenticated`.
-- [ ] Ninguna policy existente cambió (mismo resultado de `pg_policies` antes y después).
-- [ ] Como staff, `list_notices` devuelve el comentario de un familiar en un post `daycare` del admin, y no devuelve el de un post `elderly` que solo etiqueta a un adulto mayor no asignado.
-- [ ] Como staff, una reacción de un familiar de un adulto mayor no asignado en un post `daycare` sale con `actor_name = null`; la de un familiar de un asignado sale con su nombre.
-- [ ] Tres reacciones en un mismo post dan una sola fila `reaction` con `others_count = 2` y el `occurred_at` y `actor_name` de la más reciente.
-- [ ] Los comentarios y reacciones del propio usuario no aparecen.
-- [ ] Como admin, aparecen comentarios y reacciones de todos los posts de su guardería y ninguno de otra guardería.
-- [ ] Como staff, aparecen los vínculos de sus asignados y no los de otros adultos mayores.
-- [ ] `is_first_guardian_link` da `true` para el primer vínculo de un familiar y `false` para el segundo, también como staff que solo tiene asignado el adulto mayor del segundo.
-- [ ] `is_first_guardian_link` da `false` como `relative`, con un vínculo de otra guardería y con un id inexistente.
-- [ ] Un comentario de hace 31 días no aparece; con más de 50 avisos, devuelve los 50 más recientes.
-- [ ] `get_advisors` sin avisos nuevos fuera de los aceptados en el BACKLOG.
+- [x] Existe `supabase/migrations/<version>_create_notice_functions.sql` y su versión coincide con la de `list_migrations`.
+- [x] `list_notices` es `SECURITY INVOKER` y `is_first_guardian_link` es `SECURITY DEFINER STABLE`; ambas con `search_path` vacío y `EXECUTE` solo para `authenticated`.
+- [x] Ninguna policy existente cambió (mismo resultado de `pg_policies` antes y después).
+- [x] Como staff, `list_notices` devuelve el comentario de un familiar en un post `daycare` del admin, y no devuelve el de un post `elderly` que solo etiqueta a un adulto mayor no asignado.
+- [x] Como staff, una reacción de un familiar de un adulto mayor no asignado en un post `daycare` sale con `actor_name = null`; la de un familiar de un asignado sale con su nombre.
+- [x] Tres reacciones en un mismo post dan una sola fila `reaction` con `others_count = 2` y el `occurred_at` y `actor_name` de la más reciente.
+- [x] Los comentarios y reacciones del propio usuario no aparecen.
+- [x] Como admin, aparecen comentarios y reacciones de todos los posts de su guardería y ninguno de otra guardería.
+- [x] Como staff, aparecen los vínculos de sus asignados y no los de otros adultos mayores.
+- [x] `is_first_guardian_link` da `true` para el primer vínculo de un familiar y `false` para el segundo, también como staff que solo tiene asignado el adulto mayor del segundo.
+- [x] `is_first_guardian_link` da `false` como `relative`, con un vínculo de otra guardería y con un id inexistente.
+- [x] Un comentario de hace 31 días no aparece; con más de 50 avisos, devuelve los 50 más recientes.
+- [x] `get_advisors` sin avisos nuevos fuera de los aceptados en el BACKLOG.
 
 **Pantalla**
 
-- [ ] `/notices` no usa mock y `notices/mock-notices.ts` no existe.
-- [ ] Los textos de cada aviso siguen la tabla "Textos", con el nombre (o "Un familiar") en negrita.
-- [ ] La frase de la publicación sigue la tabla de audiencias: un post `daycare` sin título dice "para toda la guardería"; uno con título muestra el título entre comillas.
-- [ ] La hora sigue la tabla "Hora del aviso" en hora de Lima.
-- [ ] Como staff con `daily_summary_enabled = true` y asignados activos, desde las 17:00 aparece el recordatorio con "Hoy 17:00"; antes de las 17:00, con el flag en `false` o sin asignados, no aparece. Al admin nunca le aparece.
-- [ ] Ninguna tarjeta es un enlace.
-- [ ] Sin avisos se ve "No tienes avisos por ahora.".
-- [ ] Los colores, íconos y espaciado de las tarjetas siguen igual que en SPEC 07.
-- [ ] A 390×844 no hay scroll horizontal y los textos largos hacen wrap.
+- [x] `/notices` no usa mock y `notices/mock-notices.ts` no existe.
+- [x] Los textos de cada aviso siguen la tabla "Textos", con el nombre (o "Un familiar") en negrita.
+- [x] La frase de la publicación sigue la tabla de audiencias: un post `daycare` sin título dice "para toda la guardería"; uno con título muestra el título entre comillas.
+- [x] La hora sigue la tabla "Hora del aviso" en hora de Lima.
+- [x] Como staff con `daily_summary_enabled = true` y asignados activos, desde las 17:00 aparece el recordatorio con "Hoy 17:00"; antes de las 17:00, con el flag en `false` o sin asignados, no aparece. Al admin nunca le aparece.
+- [x] Ninguna tarjeta es un enlace.
+- [x] Sin avisos se ve "No tienes avisos por ahora.".
+- [x] Los colores, íconos y espaciado de las tarjetas siguen igual que en SPEC 07.
+- [x] A 390×844 no hay scroll horizontal y los textos largos hacen wrap.
 
 **Cierre**
 
-- [ ] `npm run build` y `npm run lint` sin errores. La consola no muestra errores en `/notices`.
-- [ ] No hay `"use client"` nuevos ni usos nuevos de `service_role`.
-- [ ] El remoto queda sin los datos de prueba.
-- [ ] Las capturas están en `.playwright-mcp/`.
-- [ ] `database-schema.md` y `BACKLOG.md` actualizados según "Cambios en documentos" y "Entradas de BACKLOG".
+- [x] `npm run build` y `npm run lint` sin errores. La consola no muestra errores en `/notices`.
+- [x] No hay `"use client"` nuevos ni usos nuevos de `service_role`.
+- [x] El remoto queda sin los datos de prueba.
+- [x] Las capturas están en `.playwright-mcp/`.
+- [x] `database-schema.md` y `BACKLOG.md` actualizados según "Cambios en documentos" y "Entradas de BACKLOG".
 
 ---
 

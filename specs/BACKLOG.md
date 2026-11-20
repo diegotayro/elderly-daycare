@@ -68,6 +68,7 @@ Formato de cada entrada:
   - La pantalla usa el copy del mockup con los valores iniciales de esos dos campos; las etiquetas viven solo en `notification-preferences.ts`.
   - Decidir si se cambia el copy del mockup o los campos/horario de la DB (17:00 vs. 19:00, comentarios vs. publicaciones).
   - Los toggles hoy solo tienen estado local: persistirlos con `update` de `users` en esa misma spec.
+  - El recordatorio de Avisos (SPEC 27) usa 17:00 y `daily_summary_enabled`; si se cambia el horario del resumen, actualizar `SUMMARY_REMINDER_TIME` en `notices/notice-limits.ts`.
 
 ---
 
@@ -297,7 +298,9 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Qué:** las tarjetas del feed, la foto y los ítems de "Lo más lindo de hoy" no enlazan todavía.
 - **Origen:** SPEC 18, `family/components/FamilyPostCard.tsx` y `SummaryHighlightItem.tsx`.
 - **Se resuelve en:** la spec del detalle de publicación (`detalle-publicacion.dc.html`) y del visor de foto (`foto.dc.html`).
-- **Notas:** no usar `href="/"` provisional: llevaría al familiar a un redirect.
+- **Notas:**
+  - No usar `href="/"` provisional: llevaría al familiar a un redirect.
+  - Las tarjetas de `/notices` (SPEC 27) tampoco enlazan; al existir el detalle, enlazar los avisos de comentario y reacción.
 
 ### Conectar las pantallas del familiar a Supabase
 
@@ -384,7 +387,7 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 
 - [ ] **Estado:** pendiente
 - **Qué:** el esquema no guarda cómo tratar a cada adulto mayor. Los feeds reales (`/` y `/family`) muestran solo el nombre de pila ("Luis, Carmen"); las pantallas con mock siguen con "Don Luis" y "Doña Carmen" escritos a mano.
-- **Origen:** SPEC 25 (`feed/build-post-heading.ts`), `family/mock-family.ts` y `notices/mock-notices.ts`.
+- **Origen:** SPEC 25 (`feed/build-post-heading.ts`), `family/mock-family.ts`. `notices/mock-notices.ts` ya no existe: Avisos (SPEC 27) usa el nombre de pila.
 - **Se resuelve en:** una spec que decida el campo (por ejemplo `title` o `gender` en `elderly`, con migración) y lo pida en "Agregar adulto mayor".
 - **Notas:** un "Don" fijo se equivocaba con las mujeres. Al agregar el campo, volver a usar el tratamiento en los feeds, "Avisos" y "Resumen del día".
 
@@ -472,3 +475,27 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Notas:**
   - Decidir si se envía al publicar o en lote, y cómo se evita avisar de un post que se deshace (`discardPost`).
   - Hoy entre `createPost` y `attachPostPhotos` el post es visible sin fotos unos segundos: conviene notificar después de adjuntar las fotos.
+
+### Recordatorio del resumen que sepa si ya se envió
+
+- [ ] **Estado:** pendiente
+- **Qué:** el recordatorio "Recuerda enviar el resumen del día" de `/notices` aparece desde las 17:00 aunque el resumen ya se haya enviado.
+- **Origen:** SPEC 27 (`notices/fetch-notices.ts`).
+- **Se resuelve en:** la spec que conecte `daily_summaries` (resumen del día).
+- **Notas:** ocultarlo cuando el staff ya envió el resumen de todos sus adultos mayores activos de hoy.
+
+### Avisos de nuevas publicaciones en `/notices`
+
+- [ ] **Estado:** pendiente
+- **Qué:** `/notices` no muestra las nuevas publicaciones como aviso; el feed ya las muestra.
+- **Origen:** SPEC 27 (decidido fuera de alcance).
+- **Se resuelve en:** una spec de ajustes de Avisos, junto con el detalle de publicación.
+- **Notas:** el mockup no define el copy ni el ícono de ese aviso. Decidir si aplica al admin, al staff o a ambos.
+
+### Leído/no leído y contador de Avisos
+
+- [ ] **Estado:** pendiente
+- **Qué:** los avisos no tienen estado de leído, la campana no muestra contador y no existe "marcar como leído".
+- **Origen:** SPEC 27 (decidido fuera de alcance).
+- **Se resuelve en:** una spec de notificaciones con tabla `notifications` (migración, RLS y triggers).
+- **Notas:** hoy los avisos se derivan al leer desde `comments`, `reactions` y `guardian_elderly` (`list_notices`); con la tabla habría que decidir si se mantiene esa derivación o se reemplaza, y hacer backfill.
