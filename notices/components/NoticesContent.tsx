@@ -1,9 +1,10 @@
 import { requireTeamUser } from "@/auth/require-user";
-import { mockNotices } from "../mock-notices";
+import { fetchNotices } from "../fetch-notices";
 import { NoticesView } from "./NoticesView";
 
 export async function NoticesContent() {
-  await requireTeamUser();
+  const user = await requireTeamUser();
+  const notices = await fetchNotices(user);
 
-  return <NoticesView notices={mockNotices} />;
+  return <NoticesView notices={notices} />;
 }
