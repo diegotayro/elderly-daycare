@@ -130,3 +130,20 @@ export type StaffElderly = {
   elderly_id: string;
   created_at: string;
 };
+
+// Fila que devuelve la función list_notices (SECURITY INVOKER: la RLS puede dejar nulos algunos campos)
+export type NoticeKindRow = "comment" | "reaction" | "account_activated";
+
+export type ListNoticesRow = {
+  id: string; // 'comment:<id>' | 'reaction:<post_id>' | 'link:<id>'
+  kind: NoticeKindRow;
+  occurred_at: string;
+  actor_name: string | null;
+  others_count: number;
+  post_audience: PostAudience | null; // null en account_activated
+  post_title: string | null;
+  room_name: string | null;
+  elderly_names: string[] | null;
+  elderly_first_name: string | null; // solo account_activated
+  is_first_link: boolean | null; // solo account_activated
+};
