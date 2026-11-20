@@ -1,6 +1,14 @@
 import { activateAccountMessages as messages } from "./activate-account-messages";
-import type { ActivateAccountErrors, ActivateAccountInput } from "./types";
-import { isValidPassword, passwordMessages } from "./validate-password";
+import type {
+  ActivateAccountErrors,
+  ActivateAccountInput,
+  PasswordMode,
+} from "./types";
+import {
+  isValidPassword,
+  passwordMessages,
+  validatePasswordConfirmation,
+} from "./validate-password";
 
 const CODE_PATTERN = /^[A-Z0-9]{5}$/;
 const BASIC_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -11,6 +19,7 @@ export function normalizeInvitationCode(code: string): string {
 
 export function validateActivateAccount(
   input: ActivateAccountInput,
+  passwordMode: PasswordMode,
 ): ActivateAccountErrors {
   const candidates: ActivateAccountErrors = {
     code: CODE_PATTERN.test(normalizeInvitationCode(input.code))
@@ -22,6 +31,14 @@ export function validateActivateAccount(
     password: isValidPassword(input.password)
       ? undefined
       : passwordMessages.rule,
+    // En modo existing la cuenta ya tiene contraseña: no se pide confirmarla
+    passwordConfirmation:
+      passwordMode === "create"
+        ? validatePasswordConfirmation(
+            input.password,
+            input.passwordConfirmation,
+          )
+        : undefined,
   };
 
   return Object.fromEntries(
