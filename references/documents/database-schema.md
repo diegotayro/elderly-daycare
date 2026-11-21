@@ -48,7 +48,7 @@ Diccionario de tablas para PostgreSQL. Tipos en notación Postgres. Convención:
 1. **RLS activado en todas las tablas.** Una tabla con RLS y sin policies queda cerrada; cada policy abre solo lo que un rol necesita.
 2. **Todas las policies son `to authenticated`.** El rol `anon` (sin login) no tiene ninguna policy.
 3. **Todo `insert` y `update` lleva `with check`** (además del `using` en `update`).
-4. **Cliente con sesión (`@supabase/ssr`) para todo.** El cliente admin (`service_role`) solo se usa para: crear cuentas (`auth.admin.*`), leer la invitación sin sesión y crear la cuenta del familiar, invitar y reenviar la invitación al staff (`inviteUserByEmail`, o `resetPasswordForEmail` si su email ya está confirmado), archivar y reactivar usuarios (incluye bloquear o desbloquear su login), cancelar la invitación y eliminar staff sin historial (`auth.admin.deleteUser`) y el cron del resumen diario. Antes de usarlo, el código verifica que quien llama tiene permiso.
+4. **Cliente con sesión (`@supabase/ssr`) para todo.** El cliente admin (`service_role`) solo se usa para: crear cuentas (`auth.admin.*`), leer la invitación sin sesión y crear la cuenta del familiar, invitar y reenviar la invitación al staff (`inviteUserByEmail`, o `resetPasswordForEmail` si su email ya está confirmado), archivar y reactivar usuarios (incluye bloquear o desbloquear su login), cancelar la invitación y eliminar staff sin historial (`auth.admin.deleteUser`), cambiar el email de un staff `active` o de un familiar no `archived` (`auth.admin.updateUserById` con `email_confirm: true`, solo el admin de su guardería) y el cron del resumen diario. Antes de usarlo, el código verifica que quien llama tiene permiso.
 5. **Nombres de policies en inglés:** `<tabla>_<acción>_<quién>` (ej. `posts_select_visible`).
 6. **Sin policy de `delete`** donde hay borrado lógico (`elderly`, `invitations`) o donde lo maneja Supabase Auth (`users`).
 7. **Funciones helper.** Usar funciones helper en las policies siempre que se pueda, para no repetir lógica. Deben ser `SECURITY DEFINER`, `STABLE` y con `search_path` fijo, para evitar la recursión al leer `users`. Solo pueden devolver datos del propio usuario logueado (`auth.uid()`) o un `true/false`, nunca filas de otras personas. Dentro de las policies, envolverlas en un `select` (ej. `(select is_staff())`) para que se calculen una vez por consulta.
@@ -102,6 +102,19 @@ Todas `SECURITY DEFINER`, con `search_path` vacío, nombres calificados y `EXECU
 |`activate_staff_account()`|`volatile`|`authenticated`|`void`. Si quien llama no es staff `pending`, `raise exception 'not_a_pending_staff'`. Si lo es, activa el flag local `app.staff_activation` y pasa su propia fila de `users` a `active`.|
 
 > `get_staff_emails()` no es un helper de policy (regla 7): devuelve filas de otras personas, solo al admin y solo de su guardería. Es la misma idea que `is_team_email`, pero para leer. El linter marca las tres como "ejecutables por `authenticated`": es esperado, porque validan el rol de quien llama dentro de la función.
+
+### Funciones de avatares y perfil del familiar
+
+Todas con `search_path` vacío, nombres calificados y `EXECUTE` revocado a `public` y `anon`. Devuelven solo un `true/false`, un `uuid` o un dato que quien llama ya puede ver.
+
+|Función|Tipo|EXECUTE|Devuelve|
+|---|---|---|---|
+|`avatar_owner_from_path(p_path)`|`IMMUTABLE`|`authenticated`|`uuid` de la primera carpeta de la ruta, o `null` si no tiene formato UUID. Misma idea que `post_id_from_path`.|
+|`can_upload_avatar(p_user_id)`|`SECURITY DEFINER STABLE`|`authenticated`|`true` si quien llama está `active` y es `p_user_id`, o es admin y `p_user_id` es un `staff` o `relative` de su guardería que **no** está `archived`.|
+|`can_remove_avatar(p_user_id)`|`SECURITY DEFINER STABLE`|`authenticated`|Igual que `can_upload_avatar`, pero el admin también puede con un `staff` o `relative` `archived`.|
+|`get_relative_email(p_relative_id)`|`SECURITY DEFINER STABLE`|`authenticated`|`text`: el email de `auth.users` si quien llama es admin y `p_relative_id` es un `relative` de su guardería. `null` en otro caso.|
+
+> `get_relative_email` no es un helper de policy (regla 7), como `get_staff_emails()`: la RLS no deja leer `auth.users`. El linter las marca como "ejecutables por `authenticated`": es esperado, porque validan el rol de quien llama dentro de la función.
 
 ### Funciones del feed
 
@@ -178,7 +191,7 @@ Perfil de aplicación vinculado a **Supabase Auth**. Relatives y staff comparten
 |`first_name`|`text`|NOT NULL|
 |`last_name`|`text`|NOT NULL|
 |`full_name`|`text`|Columna generada y guardada: `first_name` y `last_name` unidos con un espacio.|
-|`avatar_url`|`text`|Nullable.|
+|`avatar_url`|`text`|Nullable. Ruta del archivo en el bucket `avatars` (`{user_id}/{uuid}.webp`), no una URL. `null` = sin foto.|
 |`notify_on_post`|`boolean` default `true`|Avisos cuando publican.|
 |`daily_summary_enabled`|`boolean` default `true`|Resumen diario (19:00).|
 |`created_at` / `updated_at`|`timestamptz`||
@@ -556,6 +569,24 @@ Las fotos viven en `storage.objects`, que tiene su **propia** RLS. Si el bucket 
 
 ---
 
+## Storage: bucket `avatars`
+
+- Bucket **privado**, con `file_size_limit = 204800` (200 KB) y `allowed_mime_types = {image/webp}`, como `post-photos`.
+- Ruta de cada archivo: `{user_id}/{uuid}.webp`. La primera carpeta es el dueño de la foto y es lo que usan las policies. El `uuid` cambia en cada subida: se sube un archivo nuevo y se borra el anterior, así una URL firmada en caché nunca muestra la foto vieja. Por eso no hay policy de `update`.
+- `users.avatar_url` guarda la ruta. Para mostrar fotos: URLs firmadas (`createSignedUrls`, 1 hora), generadas en el servidor.
+
+|Acción|Quién|Regla|
+|---|---|---|
+|select|todos|existe el usuario de la ruta en `users` (pasa por su RLS: ve la foto quien ya ve a esa persona)|
+|insert|dueño o admin|`can_upload_avatar(avatar_owner_from_path(name))`|
+|delete|dueño o admin|`can_remove_avatar(avatar_owner_from_path(name))`|
+
+Policies: `avatars_objects_select_visible`, `avatars_objects_insert_owner_or_admin` y `avatars_objects_delete_owner_or_admin`. El admin no gestiona la foto de otro admin. Un usuario `pending` o `archived` no puede subir, borrar ni firmar.
+
+> `notify_on_post` significa cosas distintas para el equipo y para el familiar: para el staff y el admin son los avisos de comentarios nuevos de las familias; para el familiar, los avisos de publicaciones nuevas. La spec que envíe esos correos debe respetarlo.
+
+---
+
 ## Cómo probar las policies
 
 Crear un usuario de prueba por rol y comprobar:
@@ -582,6 +613,10 @@ Crear un usuario de prueba por rol y comprobar:
 20. **Relative:** ve un post `room` de la habitación de su adulto mayor, y no ve uno de otra habitación.
 21. Crear un post `elderly` sin adultos mayores etiquetados → falla. Editarlo y quitar a todos → falla. Borrar el post completo → funciona.
 22. Borrar un post con fotos, reacciones y comentarios → se borra todo, incluidos los archivos en Storage.
+23. **Avatares:** staff, admin y relative suben y borran en su propia carpeta; no en la de otro usuario.
+24. **Avatares:** el admin sube y borra en la carpeta de un staff o relative `active` o `pending` de su guardería; en uno `archived` solo borra; en la de otro admin o de otra guardería no puede ni subir ni borrar.
+25. **Avatares:** un relative firma la foto de un staff de su guardería y no la de otra guardería. Un usuario `pending` o `archived` no sube, borra ni firma.
+26. `get_relative_email`: devuelve el email solo a un admin y solo de un familiar de su guardería; a otros roles, `null`.
 
 ---
 
