@@ -79,8 +79,7 @@ export type PhotoViewerPost = {
 };
 
 export type PhotoDownloadResult =
-  | { status: "ok"; url: string }
-  | { status: "error" };
+  { status: "ok"; url: string } | { status: "error" };
 
 export type FeedDay<TPost> = {
   date: string; // "aaaa-mm-dd" (Lima)
