@@ -508,3 +508,29 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Origen:** SPEC 27 (decidido fuera de alcance).
 - **Se resuelve en:** una spec de notificaciones con tabla `notifications` (migración, RLS y triggers).
 - **Notas:** hoy los avisos se derivan al leer desde `comments`, `reactions` y `guardian_elderly` (`list_notices`); con la tabla habría que decidir si se mantiene esa derivación o se reemplaza, y hacer backfill.
+
+---
+
+## Calidad del código y las migraciones
+
+### Revisar que las migraciones tengan el nombre y el orden correctos
+
+- [ ] **Estado:** pendiente
+- **Qué:** comprobar que cada archivo de `supabase/migrations/` tiene el mismo nombre (versión y slug) que su registro en el remoto (`list_migrations`) y que el orden por versión es el de aplicación.
+- **Origen:** SPEC 29 (paso 2). La migración `add_post_id_to_list_notices` se aplicó con `apply_migration`, que registró la versión con la hora del momento (`20261120225412`), y el archivo local se había nombrado con otra (`20261120120000`). Se corrigió renombrando el archivo.
+- **Se resuelve en:** una spec de database de revisión de migraciones.
+- **Notas:**
+  - Al cerrar la SPEC 29 se compararon las 17 migraciones y solo esa difería; falta revisar el orden y el historial.
+  - Tras cada `apply_migration`, nombrar el archivo local con la versión que devuelve `list_migrations`.
+  - Evaluar si conviene un chequeo automático (script o paso del flujo de `/spec-impl`) que compare local y remoto.
+
+### Revisar todo el código con la documentación actual
+
+- [ ] **Estado:** pendiente
+- **Qué:** revisar el código completo de la app contra la documentación vigente de Context7 (supabase-js, React y demás librerías), la documentación local de Next.js (`node_modules/next/dist/docs/`) y el MCP de Supabase actualizado (`search_docs`, advisors), para que todo use APIs actuales y no deprecadas.
+- **Origen:** SPEC 29 (paso 6). Se encontró `.returns<T>()`, deprecado en supabase-js, en código escrito sin consultar Context7; en esa spec se cambió por `.overrideTypes<T, { merge: false }>()`.
+- **Se resuelve en:** una spec de revisión técnica, sin cambios de comportamiento.
+- **Notas:**
+  - Cubrir supabase-js y `@supabase/ssr`, React 19, Next 16 (APIs de caché y renderizado, `proxy.ts`), Tailwind v4 y Resend.
+  - Revisar también SQL, RLS y funciones de las migraciones contra la documentación y los advisors actuales.
+  - En adelante, consultar Context7 antes de escribir cualquier API de librería, como piden los `CLAUDE.md`.
