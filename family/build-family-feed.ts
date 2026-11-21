@@ -1,3 +1,4 @@
+import { buildAuthorLabel } from "@/feed/build-author-label";
 import { buildDayLabel } from "@/feed/build-day-label";
 import { buildPostHeading } from "@/feed/build-post-heading";
 import type {
@@ -7,7 +8,6 @@ import type {
   FeedPage,
   FeedPostData,
 } from "@/feed/types";
-import { userRoleLabels } from "@/users/user-role-labels";
 import type { FamilyFeedElderly, FamilyPost } from "./types";
 
 const limaTimeFormatter = new Intl.DateTimeFormat("es", {
@@ -17,17 +17,12 @@ const limaTimeFormatter = new Intl.DateTimeFormat("es", {
   timeZone: "America/Lima",
 });
 
-type FamilyFeedContext = {
+export type FamilyFeedContext = {
   today: string; // "aaaa-mm-dd" en Lima
   elderly: FamilyFeedElderly[]; // los vinculados del familiar
 };
 
-function buildAuthorLabel(post: FeedPostData): string {
-  if (!post.authorRole || !post.authorFirstName) return "Equipo";
-  return `${userRoleLabels[post.authorRole]} ${post.authorFirstName}`;
-}
-
-function toFamilyPost(
+export function toFamilyPost(
   post: FeedPostData,
   context: FamilyFeedContext,
 ): FamilyPost {

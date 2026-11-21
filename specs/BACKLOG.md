@@ -292,16 +292,18 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Se resuelve en:** la spec que conecte "Resumen del día" a Supabase.
 - **Notas:** con un solo adulto mayor el chip "Todos" y el filtro no aportan nada; en el resumen es el único chip.
 
-### Enlaces al detalle de publicación desde `/family` y `/family/summary`
+### Enlaces al detalle de publicación y al visor de foto
 
 - [ ] **Estado:** pendiente
-- **Qué:** las tarjetas del feed, la foto y los ítems de "Lo más lindo de hoy" no enlazan todavía.
-- **Origen:** SPEC 18, `family/components/FamilyPostCard.tsx` y `SummaryHighlightItem.tsx`.
-- **Se resuelve en:** la spec del detalle de publicación (`detalle-publicacion.dc.html`) y del visor de foto (`foto.dc.html`).
+- **Qué:** siguen sin enlazar:
+  - los ítems de "Lo más lindo de hoy" de `/family/summary`;
+  - la foto del post, que debería abrir el visor de foto (`foto.dc.html`);
+  - la tarjeta completa del feed, que hoy solo enlaza desde el ícono de comentarios.
+- **Origen:** SPEC 18, `family/components/SummaryHighlightItem.tsx`; el detalle (`/posts/[id]` y `/family/posts/[id]`) y los enlaces desde el ícono de comentarios de `/` y `/family` y desde los avisos de `/notices` se resolvieron en SPEC 29.
+- **Se resuelve en:** la spec del visor de foto y la que conecte "Resumen del día" a Supabase.
 - **Notas:**
   - No usar `href="/"` provisional: llevaría al familiar a un redirect.
-  - Las tarjetas de `/notices` (SPEC 27) tampoco enlazan; al existir el detalle, enlazar los avisos de comentario y reacción.
-  - El detalle debe reusar `setReaction` (`feed/actions/set-reaction.ts`) para el botón "Me encanta" y definir la línea "A N personas les gusta" (SPEC 28 solo convierte el corazón del feed en botón).
+  - Hacer clicable la tarjeta entera choca con el corazón y el carrusel; resolverlo con un área de enlace que no los tape.
 
 ### Conectar las pantallas del familiar a Supabase
 
@@ -467,6 +469,32 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Se resuelve en:** una spec de ajustes del feed o de la asignación de staff.
 - **Notas:** decidir si se oculta "Toda la habitación" o se muestra un mensaje ("Aún no tienes adultos mayores asignados"). El mockup no lo define.
 
+### Paginación de comentarios
+
+- [ ] **Estado:** pendiente
+- **Qué:** el detalle de una publicación carga todos sus comentarios de una vez, sin paginar.
+- **Origen:** SPEC 29 (decidido fuera de alcance), `comments/fetch-comments.ts`.
+- **Se resuelve en:** una spec de ajustes del feed, si algún post acumula muchos comentarios.
+- **Notas:** decidir entre "Cargar más" (como el feed) o mostrar los últimos N con "Ver anteriores". Con paginación hay que cuidar el orden (del más viejo al más nuevo) y el contador "COMENTARIOS · N".
+
+### Editar comentarios
+
+- [ ] **Estado:** pendiente
+- **Qué:** un usuario no puede editar su propio comentario. Borrarlo ya se puede (SPEC 29).
+- **Origen:** SPEC 29 (decidido fuera de alcance), `comments/components/CommentItem.tsx`.
+- **Se resuelve en:** una spec de ajustes del feed.
+- **Notas:**
+  - La RLS ya lo permite (`comments_update_author`).
+  - No hay mockup de la edición: decidir la UI (en la burbuja o en el campo de abajo) y si se marca "editado".
+
+### Parentesco en los comentarios
+
+- [ ] **Estado:** pendiente
+- **Qué:** el rol del comentario dice "familiar" en vez del parentesco ("· hija").
+- **Origen:** SPEC 29 (decidido fuera de alcance), `comments/comment-role-labels.ts`; el mockup `detalle-publicacion.dc.html` muestra "· hija".
+- **Se resuelve en:** una spec de database (función SQL) y su pantalla.
+- **Notas:** requiere una función `SECURITY DEFINER`, porque la RLS no deja leer los `guardian_elderly` de otros usuarios. Evaluar qué se expone: solo el parentesco, nunca el adulto mayor vinculado.
+
 ### Conteo de reacciones en vivo
 
 - [ ] **Estado:** pendiente
@@ -474,6 +502,14 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Origen:** SPEC 28 (decidido fuera de alcance), `feed/components/ReactionButton.tsx`.
 - **Se resuelve en:** una spec de ajustes del feed.
 - **Notas:** decidir si vale Realtime de Supabase o un `refresh` periódico. Con `refresh` hay que cuidar que no re-firme las fotos ni pise el estado optimista de `ReactionButton`.
+
+### Comentarios en vivo
+
+- [ ] **Estado:** pendiente
+- **Qué:** los comentarios de otros usuarios solo se ven al recargar el detalle de la publicación; la lista y el contador no se actualizan solos.
+- **Origen:** SPEC 29 (decidido fuera de alcance), `comments/components/CommentList.tsx`.
+- **Se resuelve en:** una spec de ajustes del feed, junto con el conteo de reacciones en vivo.
+- **Notas:** `CommentList` guarda la lista en estado: un refresco del servidor no la reemplaza. Al traer comentarios nuevos hay que mezclarlos sin pisar los que el usuario acaba de crear o borrar.
 
 ### Notificar nuevas publicaciones (`notify_on_post`)
 
@@ -484,6 +520,14 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Notas:**
   - Decidir si se envía al publicar o en lote, y cómo se evita avisar de un post que se deshace (`discardPost`).
   - Hoy entre `createPost` y `attachPostPhotos` el post es visible sin fotos unos segundos: conviene notificar después de adjuntar las fotos.
+
+### Correos por comentarios
+
+- [ ] **Estado:** pendiente
+- **Qué:** al comentar una publicación no se avisa por correo a nadie.
+- **Origen:** SPEC 29 (decidido fuera de alcance), `comments/actions/create-comment.ts`.
+- **Se resuelve en:** una spec de notificaciones (correo con Resend), junto con `notify_on_post`.
+- **Notas:** decidir a quién avisar (el autor del post, los familiares vinculados o ambos) y si hace falta una preferencia nueva en `users`, distinta de `notify_on_post`.
 
 ### Recordatorio del resumen que sepa si ya se envió
 
@@ -508,3 +552,29 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Origen:** SPEC 27 (decidido fuera de alcance).
 - **Se resuelve en:** una spec de notificaciones con tabla `notifications` (migración, RLS y triggers).
 - **Notas:** hoy los avisos se derivan al leer desde `comments`, `reactions` y `guardian_elderly` (`list_notices`); con la tabla habría que decidir si se mantiene esa derivación o se reemplaza, y hacer backfill.
+
+---
+
+## Calidad del código y las migraciones
+
+### Revisar que las migraciones tengan el nombre y el orden correctos
+
+- [ ] **Estado:** pendiente
+- **Qué:** comprobar que cada archivo de `supabase/migrations/` tiene el mismo nombre (versión y slug) que su registro en el remoto (`list_migrations`) y que el orden por versión es el de aplicación.
+- **Origen:** SPEC 29 (paso 2). La migración `add_post_id_to_list_notices` se aplicó con `apply_migration`, que registró la versión con la hora del momento (`20261120225412`), y el archivo local se había nombrado con otra (`20261120120000`). Se corrigió renombrando el archivo.
+- **Se resuelve en:** una spec de database de revisión de migraciones.
+- **Notas:**
+  - Al cerrar la SPEC 29 se compararon las 17 migraciones y solo esa difería; falta revisar el orden y el historial.
+  - Tras cada `apply_migration`, nombrar el archivo local con la versión que devuelve `list_migrations`.
+  - Evaluar si conviene un chequeo automático (script o paso del flujo de `/spec-impl`) que compare local y remoto.
+
+### Revisar todo el código con la documentación actual
+
+- [ ] **Estado:** pendiente
+- **Qué:** revisar el código completo de la app contra la documentación vigente de Context7 (supabase-js, React y demás librerías), la documentación local de Next.js (`node_modules/next/dist/docs/`) y el MCP de Supabase actualizado (`search_docs`, advisors), para que todo use APIs actuales y no deprecadas.
+- **Origen:** SPEC 29 (paso 6). Se encontró `.returns<T>()`, deprecado en supabase-js, en código escrito sin consultar Context7; en esa spec se cambió por `.overrideTypes<T, { merge: false }>()`.
+- **Se resuelve en:** una spec de revisión técnica, sin cambios de comportamiento.
+- **Notas:**
+  - Cubrir supabase-js y `@supabase/ssr`, React 19, Next 16 (APIs de caché y renderizado, `proxy.ts`), Tailwind v4 y Resend.
+  - Revisar también SQL, RLS y funciones de las migraciones contra la documentación y los advisors actuales.
+  - En adelante, consultar Context7 antes de escribir cualquier API de librería, como piden los `CLAUDE.md`.

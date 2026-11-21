@@ -5,6 +5,7 @@ import { LoadMoreButton } from "@/feed/components/LoadMoreButton";
 import type { FeedDay, FeedPage } from "@/feed/types";
 import { loadMoreFamilyFeed } from "../actions/load-more-family-feed";
 import { filterFamilyPosts } from "../filter-family-posts";
+import { findPostAuthor } from "../find-post-author";
 import type { ElderlyFilter, FamilyFeedElderly, FamilyPost } from "../types";
 import { ElderlyFilterChips } from "./ElderlyFilterChips";
 import { FamilyPostCard } from "./FamilyPostCard";
@@ -20,11 +21,6 @@ type DaySectionProps = {
 };
 
 function FamilyDaySection({ day, elderly }: DaySectionProps) {
-  const findAuthor = ({ elderlyIds }: FamilyPost) => {
-    const owner = elderly.find(({ id }) => id === elderlyIds[0]);
-    return owner ? { initial: owner.initial, tone: owner.tone } : null;
-  };
-
   return (
     <section className="mb-7">
       <div className="mb-3.5 flex items-center gap-3.5">
@@ -41,7 +37,7 @@ function FamilyDaySection({ day, elderly }: DaySectionProps) {
             <FamilyPostCard
               key={post.id}
               post={post}
-              author={findAuthor(post)}
+              author={findPostAuthor(post, elderly)}
             />
           ))}
         </div>

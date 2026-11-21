@@ -9,9 +9,9 @@ const PHOTOS_BUCKET = "post-photos";
 const SIGNED_URL_SECONDS = 3600;
 const LIMA_UTC_OFFSET = "-05:00";
 
-type ServerClient = ReturnType<typeof createClient>;
+export type ServerClient = ReturnType<typeof createClient>;
 
-type PostRow = {
+export type PostRow = {
   id: string;
   type: PostType;
   audience: PostAudience;
@@ -34,7 +34,7 @@ type PostRow = {
   comments: { count: number }[];
 };
 
-const POST_COLUMNS = `
+export const POST_COLUMNS = `
   id, type, audience, title, body, published_at, author_id, room_id,
   author:users!author_id(first_name, role),
   room:rooms(name),
@@ -49,7 +49,7 @@ function startOfLimaDay(day: string): string {
   return `${day}T00:00:00${LIMA_UTC_OFFSET}`;
 }
 
-async function signPhotoUrls(
+export async function signPhotoUrls(
   supabase: ServerClient,
   paths: string[],
 ): Promise<Map<string, string>> {
@@ -76,7 +76,7 @@ function toPhotos(row: PostRow, urlsByPath: Map<string, string>): FeedPhoto[] {
     });
 }
 
-async function fetchReactedPostIds(
+export async function fetchReactedPostIds(
   supabase: ServerClient,
   currentUserId: string,
   postIds: string[],
@@ -93,7 +93,7 @@ async function fetchReactedPostIds(
   return new Set(data.map((reaction) => reaction.post_id));
 }
 
-function toFeedPostData(
+export function toFeedPostData(
   row: PostRow,
   urlsByPath: Map<string, string>,
   reactedPostIds: Set<string>,
@@ -134,7 +134,7 @@ export async function fetchFeedPage(
     .gte("published_at", startOfLimaDay(range.from))
     .lt("published_at", startOfLimaDay(shiftDay(range.to, 1)))
     .order("published_at", { ascending: false })
-    .returns<PostRow[]>();
+    .overrideTypes<PostRow[], { merge: false }>();
   if (error) throw error;
 
   const photoPaths = data.flatMap((row) =>

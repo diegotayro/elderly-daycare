@@ -15,9 +15,10 @@ export function getReminderInstant(now: Date): Date {
 }
 
 function toNoticePost(row: ListNoticesRow): NoticePost | null {
-  if (row.post_audience === null) return null;
+  if (row.post_audience === null || row.post_id === null) return null;
 
   return {
+    postId: row.post_id,
     audience: row.post_audience,
     title: row.post_title,
     roomName: row.room_name,

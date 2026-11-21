@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CommentIcon } from "@/shared/components/icons/CommentIcon";
+import { buildTeamPostSubtitle } from "../build-team-post-subtitle";
 import type { FeedPost } from "../types";
 import { PhotoCarousel } from "./PhotoCarousel";
 import { PostAuthorAvatar } from "./PostAuthorAvatar";
@@ -11,10 +12,6 @@ type PostCardProps = {
 };
 
 export function PostCard({ post }: PostCardProps) {
-  const subtitle = post.publishedByMe
-    ? `${post.time} · publicado por ti`
-    : post.time;
-
   return (
     <article className="rounded-[20px] border border-line bg-surface px-[22px] py-5 shadow-[0_4px_16px_-12px_rgba(120,90,60,0.5)]">
       <div className="mb-3.5 flex items-center gap-3">
@@ -23,7 +20,9 @@ export function PostCard({ post }: PostCardProps) {
           <div className="font-display text-[16.5px] font-semibold text-ink">
             {post.heading}
           </div>
-          <div className="text-[12.5px] text-muted">{subtitle}</div>
+          <div className="text-[12.5px] text-muted">
+            {buildTeamPostSubtitle(post)}
+          </div>
         </div>
         <PostTypeBadge type={post.type} />
       </div>
@@ -42,8 +41,8 @@ export function PostCard({ post }: PostCardProps) {
           initialCount={post.reactionCount}
         />
         <Link
-          href="/"
-          className="flex items-center gap-[7px] text-sm font-bold text-muted-strong"
+          href={`/posts/${post.id}`}
+          className="flex items-center gap-[7px] text-sm font-bold text-muted-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral-strong"
         >
           <CommentIcon size={18} />
           {post.commentCount}

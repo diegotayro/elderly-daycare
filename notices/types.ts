@@ -3,6 +3,7 @@ import type { PostAudience } from "@/shared/database/types";
 export type NoticeKind = "comment" | "reaction" | "account_activated" | "reminder";
 
 export type NoticePost = {
+  postId: string;
   audience: PostAudience;
   title: string | null;
   roomName: string | null;

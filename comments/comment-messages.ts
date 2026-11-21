@@ -1,0 +1,16 @@
+export const commentMessages = {
+  placeholder: "Escribe un comentario…",
+  emptyError: "Escribe un comentario antes de enviarlo.",
+  tooLongError: "El comentario no puede superar los 1000 caracteres.",
+  sendErrorTitle: "No se pudo enviar tu comentario",
+  sendErrorDescription: "Revisa tu conexión e intenta de nuevo.",
+  confirmDeleteTitle: "¿Eliminar este comentario?",
+  confirmDeleteDescription: "Esta acción no se puede deshacer.",
+  confirmDeleteCancel: "Cancelar",
+  confirmDeleteConfirm: "Eliminar",
+  deleteErrorTitle: "No se pudo eliminar el comentario",
+  deleteErrorDescription: "Revisa tu conexión e intenta de nuevo.",
+  deleteLink: "Eliminar",
+  emptyList: "Aún no hay comentarios. Sé el primero en comentar.",
+  sendButtonLabel: "Enviar comentario",
+} as const;
