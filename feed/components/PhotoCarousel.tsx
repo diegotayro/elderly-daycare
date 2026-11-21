@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
 import { ChevronLeftIcon } from "@/shared/components/icons/ChevronLeftIcon";
 import { ChevronRightIcon } from "@/shared/components/icons/ChevronRightIcon";
 import type { FeedPhoto } from "../types";
+import { usePhotoTrack } from "../use-photo-track";
 
 const ARROW_REVEAL_CLASS_NAME =
   "absolute top-1/2 hidden -translate-y-1/2 transition-opacity motion-reduce:transition-none [@media(hover:hover)]:block [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100";
@@ -59,27 +59,8 @@ export function PhotoCarousel({
   photos,
   sizeClassName = "mt-3.5 h-40 lg:h-[200px]",
 }: PhotoCarouselProps) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const { trackRef, activeIndex, updateActiveIndex, goTo } = usePhotoTrack();
   const hasSeveralPhotos = photos.length > 1;
-
-  function updateActiveIndex() {
-    const track = trackRef.current;
-    if (!track) return;
-    setActiveIndex(Math.round(track.scrollLeft / track.clientWidth));
-  }
-
-  function goTo(index: number) {
-    const track = trackRef.current;
-    if (!track) return;
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    track.scrollTo({
-      left: index * track.clientWidth,
-      behavior: prefersReducedMotion ? "instant" : "smooth",
-    });
-  }
 
   return (
     <div
