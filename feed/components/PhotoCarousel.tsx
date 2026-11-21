@@ -52,9 +52,13 @@ function PhotoSlide({ photo, position, total }: PhotoSlideProps) {
 
 type PhotoCarouselProps = {
   photos: FeedPhoto[];
+  sizeClassName?: string; // margen y alto del carrusel
 };
 
-export function PhotoCarousel({ photos }: PhotoCarouselProps) {
+export function PhotoCarousel({
+  photos,
+  sizeClassName = "mt-3.5 h-40 lg:h-[200px]",
+}: PhotoCarouselProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const hasSeveralPhotos = photos.length > 1;
@@ -82,7 +86,7 @@ export function PhotoCarousel({ photos }: PhotoCarouselProps) {
       role="region"
       aria-roledescription="carrusel"
       aria-label="Fotos de la publicación"
-      className="group relative mt-3.5 h-40 overflow-hidden rounded-2xl bg-photo lg:h-[200px]"
+      className={`group relative overflow-hidden rounded-2xl bg-photo ${sizeClassName}`}
     >
       <div
         ref={trackRef}
