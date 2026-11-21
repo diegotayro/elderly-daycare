@@ -4,17 +4,8 @@ import { PostAuthorAvatar } from "@/feed/components/PostAuthorAvatar";
 import { PostTypeBadge } from "@/feed/components/PostTypeBadge";
 import { ReactionButton } from "@/feed/components/ReactionButton";
 import { CommentIcon } from "@/shared/components/icons/CommentIcon";
+import { buildRoomLine } from "../build-room-line";
 import type { FamilyPost } from "../types";
-
-const listFormatter = new Intl.ListFormat("es", { type: "conjunction" });
-
-// "Habitación Roble · Luis y Carmen": cuáles de sus adultos mayores están en la habitación
-function buildRoomLine({ roomName, roomElderlyNames }: FamilyPost): string {
-  const room = `Habitación ${roomName ?? ""}`.trim();
-  return roomElderlyNames.length > 0
-    ? `${room} · ${listFormatter.format(roomElderlyNames)}`
-    : room;
-}
 
 type FamilyPostCardProps = {
   post: FamilyPost;
