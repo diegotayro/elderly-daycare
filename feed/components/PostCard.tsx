@@ -42,8 +42,8 @@ export function PostCard({ post }: PostCardProps) {
           initialCount={post.reactionCount}
         />
         <Link
-          href="/"
-          className="flex items-center gap-[7px] text-sm font-bold text-muted-strong"
+          href={`/posts/${post.id}`}
+          className="flex items-center gap-[7px] text-sm font-bold text-muted-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral-strong"
         >
           <CommentIcon size={18} />
           {post.commentCount}

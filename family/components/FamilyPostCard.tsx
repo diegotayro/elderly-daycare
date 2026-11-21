@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { AvatarTone } from "@/elderly/avatar-tones";
 import { PhotoCarousel } from "@/feed/components/PhotoCarousel";
 import { PostAuthorAvatar } from "@/feed/components/PostAuthorAvatar";
@@ -47,10 +48,13 @@ export function FamilyPostCard({ post, author }: FamilyPostCardProps) {
           initialReacted={post.reactedByMe}
           initialCount={post.reactionCount}
         />
-        <span className="flex items-center gap-[7px] text-sm leading-[normal] font-bold text-muted-strong">
+        <Link
+          href={`/family/posts/${post.id}`}
+          className="flex items-center gap-[7px] text-sm leading-[normal] font-bold text-muted-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral-strong"
+        >
           <CommentIcon size={18} />
           {post.commentCount}
-        </span>
+        </Link>
       </div>
     </article>
   );
