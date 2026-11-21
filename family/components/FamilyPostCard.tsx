@@ -40,7 +40,17 @@ export function FamilyPostCard({ post, author }: FamilyPostCardProps) {
       )}
       <p className="m-0 text-[15.5px] leading-[1.55] text-body">{post.body}</p>
 
-      {post.photos.length > 0 && <PhotoCarousel photos={post.photos} />}
+      {post.photos.length > 0 && (
+        <PhotoCarousel
+          photos={post.photos}
+          viewerPost={{
+            postId: post.id,
+            heading: post.heading,
+            subtitle: `${post.time} · ${post.authorLabel}`,
+            caption: post.body,
+          }}
+        />
+      )}
 
       <div className="mt-4 flex items-center gap-[18px] border-t border-line-soft pt-3.5">
         <ReactionButton

@@ -295,12 +295,11 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 ### Enlaces al detalle de publicación y al visor de foto
 
 - [ ] **Estado:** pendiente
-- **Qué:** siguen sin enlazar:
+- **Qué:** siguen sin enlazar (la foto del post ya abre el visor desde SPEC 30):
   - los ítems de "Lo más lindo de hoy" de `/family/summary`;
-  - la foto del post, que debería abrir el visor de foto (`foto.dc.html`);
   - la tarjeta completa del feed, que hoy solo enlaza desde el ícono de comentarios.
 - **Origen:** SPEC 18, `family/components/SummaryHighlightItem.tsx`; el detalle (`/posts/[id]` y `/family/posts/[id]`) y los enlaces desde el ícono de comentarios de `/` y `/family` y desde los avisos de `/notices` se resolvieron en SPEC 29.
-- **Se resuelve en:** la spec del visor de foto y la que conecte "Resumen del día" a Supabase.
+- **Se resuelve en:** la que conecte "Resumen del día" a Supabase.
 - **Notas:**
   - No usar `href="/"` provisional: llevaría al familiar a un redirect.
   - Hacer clicable la tarjeta entera choca con el corazón y el carrusel; resolverlo con un área de enlace que no los tape.
@@ -451,6 +450,30 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
   - Marcar como resuelta cuando la policy de autores de comentarios exista.
 
 ## Feed
+
+### El botón atrás no cierra el visor de foto
+
+- [ ] **Estado:** pendiente
+- **Qué:** con el visor de foto abierto, el botón atrás del navegador o el gesto de atrás de Android sale de la pantalla en vez de cerrar el visor.
+- **Origen:** SPEC 30 (decidido fuera de alcance), `feed/components/PhotoViewer.tsx`.
+- **Se resuelve en:** una spec de ajustes del visor de foto.
+- **Notas:** requiere manejar el historial (por ejemplo, una entrada al abrir y su limpieza al cerrar) o pasar el visor a una ruta propia.
+
+### Zoom en el visor de foto
+
+- [ ] **Estado:** pendiente
+- **Qué:** el visor no permite acercar la foto (pellizcar ni doble toque).
+- **Origen:** SPEC 30 (decidido fuera de alcance), `feed/components/PhotoViewer.tsx`.
+- **Se resuelve en:** una spec de ajustes del visor de foto.
+- **Notas:** el track usa `scroll-snap` para el swipe entre fotos; el zoom debe convivir con ese gesto.
+
+### Renovar URLs firmadas vencidas
+
+- [ ] **Estado:** pendiente
+- **Qué:** las URLs firmadas de las fotos duran una hora. Con la página abierta más tiempo, el carrusel del feed y del detalle y el visor muestran fotos rotas; el visor solo muestra "No se pudo cargar la foto. Recarga la página para verla.".
+- **Origen:** SPEC 30, `feed/fetch-feed-page.ts` (`SIGNED_URL_SECONDS`) y `feed/components/PhotoViewer.tsx`.
+- **Se resuelve en:** una spec de ajustes de fotos del feed.
+- **Notas:** decidir si se vuelven a firmar al fallar la carga o al volver a la pestaña, o si se sube la duración.
 
 ### Borrar los archivos de Storage al borrar un post o una foto
 

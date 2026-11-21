@@ -6,7 +6,7 @@ import { CommentList } from "@/comments/components/CommentList";
 import type { CommentView } from "@/comments/types";
 import { getAvatarTone } from "@/elderly/get-avatar-tone";
 import { ChevronLeftIcon } from "@/shared/components/icons/ChevronLeftIcon";
-import type { FeedPhoto } from "../types";
+import type { FeedPhoto, PhotoViewerPost } from "../types";
 import { PhotoCarousel } from "./PhotoCarousel";
 import { PostDetailReactions } from "./PostDetailReactions";
 
@@ -20,6 +20,7 @@ type PostDetailViewProps = {
     reactionCount: number;
     reactedByMe: boolean;
   };
+  viewerPost: PhotoViewerPost;
   comments: CommentView[];
   currentUser: Pick<CurrentUser, "id" | "first_name">;
   backHref: string; // "/" o "/family"
@@ -28,6 +29,7 @@ type PostDetailViewProps = {
 
 export function PostDetailView({
   post,
+  viewerPost,
   comments,
   currentUser,
   backHref,
@@ -57,6 +59,7 @@ export function PostDetailView({
           {post.photos.length > 0 && (
             <PhotoCarousel
               photos={post.photos}
+              viewerPost={viewerPost}
               sizeClassName={PHOTO_SIZE_CLASS_NAME}
             />
           )}

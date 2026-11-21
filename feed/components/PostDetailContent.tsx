@@ -17,10 +17,17 @@ export async function PostDetailContent({ params }: PostDetailContentProps) {
   if (!detail) notFound();
 
   const { post, comments } = detail;
+  const subtitle = buildTeamPostSubtitle(post);
 
   return (
     <PostDetailView
       post={post}
+      viewerPost={{
+        postId: post.id,
+        heading: post.heading,
+        subtitle,
+        caption: post.body,
+      }}
       comments={comments}
       currentUser={user}
       backHref="/"
@@ -29,7 +36,7 @@ export async function PostDetailContent({ params }: PostDetailContentProps) {
         avatarInitial={post.avatarInitial}
         type={post.type}
         heading={post.heading}
-        subtitle={buildTeamPostSubtitle(post)}
+        subtitle={subtitle}
       />
       <div className="mb-2.5 text-[12.5px] text-muted">
         Para: {post.recipientLabel}

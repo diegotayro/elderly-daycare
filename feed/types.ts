@@ -68,7 +68,18 @@ export type FeedPhoto = {
   url: string; // url firmada
   width: number | null;
   height: number | null;
+  position: number; // post_photos.position
 };
+
+export type PhotoViewerPost = {
+  postId: string;
+  heading: string; // "Don Luis"
+  subtitle: string; // "09:40 · Cuidador/a Caro" | "09:40 · publicado por ti"
+  caption: string; // body del post
+};
+
+export type PhotoDownloadResult =
+  { status: "ok"; url: string } | { status: "error" };
 
 export type FeedDay<TPost> = {
   date: string; // "aaaa-mm-dd" (Lima)
