@@ -72,7 +72,9 @@ function toPhotos(row: PostRow, urlsByPath: Map<string, string>): FeedPhoto[] {
     .sort((a, b) => a.position - b.position)
     .flatMap((photo) => {
       const url = urlsByPath.get(photo.url);
-      return url ? [{ url, width: photo.width, height: photo.height }] : [];
+      return url
+        ? [{ url, width: photo.width, height: photo.height, position: photo.position }]
+        : [];
     });
 }
 
