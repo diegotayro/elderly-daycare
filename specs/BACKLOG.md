@@ -292,16 +292,18 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Se resuelve en:** la spec que conecte "Resumen del día" a Supabase.
 - **Notas:** con un solo adulto mayor el chip "Todos" y el filtro no aportan nada; en el resumen es el único chip.
 
-### Enlaces al detalle de publicación desde `/family` y `/family/summary`
+### Enlaces al detalle de publicación y al visor de foto
 
 - [ ] **Estado:** pendiente
-- **Qué:** las tarjetas del feed, la foto y los ítems de "Lo más lindo de hoy" no enlazan todavía.
-- **Origen:** SPEC 18, `family/components/FamilyPostCard.tsx` y `SummaryHighlightItem.tsx`.
-- **Se resuelve en:** la spec del detalle de publicación (`detalle-publicacion.dc.html`) y del visor de foto (`foto.dc.html`).
+- **Qué:** siguen sin enlazar:
+  - los ítems de "Lo más lindo de hoy" de `/family/summary`;
+  - la foto del post, que debería abrir el visor de foto (`foto.dc.html`);
+  - la tarjeta completa del feed, que hoy solo enlaza desde el ícono de comentarios.
+- **Origen:** SPEC 18, `family/components/SummaryHighlightItem.tsx`; el detalle (`/posts/[id]` y `/family/posts/[id]`) y los enlaces desde el ícono de comentarios de `/` y `/family` y desde los avisos de `/notices` se resolvieron en SPEC 29.
+- **Se resuelve en:** la spec del visor de foto y la que conecte "Resumen del día" a Supabase.
 - **Notas:**
   - No usar `href="/"` provisional: llevaría al familiar a un redirect.
-  - Las tarjetas de `/notices` (SPEC 27) tampoco enlazan; al existir el detalle, enlazar los avisos de comentario y reacción.
-  - El detalle debe reusar `setReaction` (`feed/actions/set-reaction.ts`) para el botón "Me encanta" y definir la línea "A N personas les gusta" (SPEC 28 solo convierte el corazón del feed en botón).
+  - Hacer clicable la tarjeta entera choca con el corazón y el carrusel; resolverlo con un área de enlace que no los tape.
 
 ### Conectar las pantallas del familiar a Supabase
 
@@ -467,6 +469,32 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Se resuelve en:** una spec de ajustes del feed o de la asignación de staff.
 - **Notas:** decidir si se oculta "Toda la habitación" o se muestra un mensaje ("Aún no tienes adultos mayores asignados"). El mockup no lo define.
 
+### Paginación de comentarios
+
+- [ ] **Estado:** pendiente
+- **Qué:** el detalle de una publicación carga todos sus comentarios de una vez, sin paginar.
+- **Origen:** SPEC 29 (decidido fuera de alcance), `comments/fetch-comments.ts`.
+- **Se resuelve en:** una spec de ajustes del feed, si algún post acumula muchos comentarios.
+- **Notas:** decidir entre "Cargar más" (como el feed) o mostrar los últimos N con "Ver anteriores". Con paginación hay que cuidar el orden (del más viejo al más nuevo) y el contador "COMENTARIOS · N".
+
+### Editar comentarios
+
+- [ ] **Estado:** pendiente
+- **Qué:** un usuario no puede editar su propio comentario. Borrarlo ya se puede (SPEC 29).
+- **Origen:** SPEC 29 (decidido fuera de alcance), `comments/components/CommentItem.tsx`.
+- **Se resuelve en:** una spec de ajustes del feed.
+- **Notas:**
+  - La RLS ya lo permite (`comments_update_author`).
+  - No hay mockup de la edición: decidir la UI (en la burbuja o en el campo de abajo) y si se marca "editado".
+
+### Parentesco en los comentarios
+
+- [ ] **Estado:** pendiente
+- **Qué:** el rol del comentario dice "familiar" en vez del parentesco ("· hija").
+- **Origen:** SPEC 29 (decidido fuera de alcance), `comments/comment-role-labels.ts`; el mockup `detalle-publicacion.dc.html` muestra "· hija".
+- **Se resuelve en:** una spec de database (función SQL) y su pantalla.
+- **Notas:** requiere una función `SECURITY DEFINER`, porque la RLS no deja leer los `guardian_elderly` de otros usuarios. Evaluar qué se expone: solo el parentesco, nunca el adulto mayor vinculado.
+
 ### Conteo de reacciones en vivo
 
 - [ ] **Estado:** pendiente
@@ -474,6 +502,14 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Origen:** SPEC 28 (decidido fuera de alcance), `feed/components/ReactionButton.tsx`.
 - **Se resuelve en:** una spec de ajustes del feed.
 - **Notas:** decidir si vale Realtime de Supabase o un `refresh` periódico. Con `refresh` hay que cuidar que no re-firme las fotos ni pise el estado optimista de `ReactionButton`.
+
+### Comentarios en vivo
+
+- [ ] **Estado:** pendiente
+- **Qué:** los comentarios de otros usuarios solo se ven al recargar el detalle de la publicación; la lista y el contador no se actualizan solos.
+- **Origen:** SPEC 29 (decidido fuera de alcance), `comments/components/CommentList.tsx`.
+- **Se resuelve en:** una spec de ajustes del feed, junto con el conteo de reacciones en vivo.
+- **Notas:** `CommentList` guarda la lista en estado: un refresco del servidor no la reemplaza. Al traer comentarios nuevos hay que mezclarlos sin pisar los que el usuario acaba de crear o borrar.
 
 ### Notificar nuevas publicaciones (`notify_on_post`)
 
@@ -484,6 +520,14 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Notas:**
   - Decidir si se envía al publicar o en lote, y cómo se evita avisar de un post que se deshace (`discardPost`).
   - Hoy entre `createPost` y `attachPostPhotos` el post es visible sin fotos unos segundos: conviene notificar después de adjuntar las fotos.
+
+### Correos por comentarios
+
+- [ ] **Estado:** pendiente
+- **Qué:** al comentar una publicación no se avisa por correo a nadie.
+- **Origen:** SPEC 29 (decidido fuera de alcance), `comments/actions/create-comment.ts`.
+- **Se resuelve en:** una spec de notificaciones (correo con Resend), junto con `notify_on_post`.
+- **Notas:** decidir a quién avisar (el autor del post, los familiares vinculados o ambos) y si hace falta una preferencia nueva en `users`, distinta de `notify_on_post`.
 
 ### Recordatorio del resumen que sepa si ya se envió
 

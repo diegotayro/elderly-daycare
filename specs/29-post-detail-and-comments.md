@@ -1,6 +1,6 @@
 # SPEC 29 — Detalle de publicación con comentarios
 
-> **Estado:** Aprobado
+> **Estado:** Implemented
 > **Depende de:** SPEC 22, SPEC 25, SPEC 27, SPEC 28
 > **Fecha:** 2026-11-20
 > **Objetivo:** Construir el detalle de publicación (`/posts/[id]` para el equipo y `/family/posts/[id]` para el familiar) con "Me encanta", la lista de comentarios y la opción de comentar y borrar, enlazado desde el feed y desde Avisos.
@@ -333,71 +333,71 @@ supabase/migrations/
 
 **Datos y acciones**
 
-- [ ] La única migración nueva es la de `list_notices`. `pg_policies` no cambia.
-- [ ] `list_notices` devuelve `post_id` en `comment` y `reaction`, y `null` en `account_activated`.
-- [ ] El resto de las columnas y filas de `list_notices` no cambian.
-- [ ] `list_notices` sigue `security invoker`, sin `EXECUTE` para `anon`.
-- [ ] `createComment` con un texto válido crea una fila con `author_id` del usuario y devuelve el comentario armado.
-- [ ] `createComment` con texto vacío, solo espacios o de más de 1000 caracteres devuelve `invalid` sin tocar la DB.
-- [ ] Un `postId` o `commentId` que no es UUID devuelve `error` sin tocar la DB.
-- [ ] Sin sesión, ambas acciones devuelven `error`.
-- [ ] `createComment` en un post que el usuario no puede ver devuelve `error` y no crea filas.
-- [ ] `deleteComment` borra el comentario propio de cualquier rol.
-- [ ] Como admin, `deleteComment` borra el comentario de otro en su guardería.
-- [ ] Como staff o familiar, `deleteComment` sobre un comentario ajeno devuelve `error` y no borra.
-- [ ] Ninguna acción usa `service_role` ni recibe `author_id` del cliente.
+- [x] La única migración nueva es la de `list_notices`. `pg_policies` no cambia.
+- [x] `list_notices` devuelve `post_id` en `comment` y `reaction`, y `null` en `account_activated`.
+- [x] El resto de las columnas y filas de `list_notices` no cambian.
+- [x] `list_notices` sigue `security invoker`, sin `EXECUTE` para `anon`.
+- [x] `createComment` con un texto válido crea una fila con `author_id` del usuario y devuelve el comentario armado.
+- [x] `createComment` con texto vacío, solo espacios o de más de 1000 caracteres devuelve `invalid` sin tocar la DB.
+- [x] Un `postId` o `commentId` que no es UUID devuelve `error` sin tocar la DB.
+- [x] Sin sesión, ambas acciones devuelven `error`.
+- [x] `createComment` en un post que el usuario no puede ver devuelve `error` y no crea filas.
+- [x] `deleteComment` borra el comentario propio de cualquier rol.
+- [x] Como admin, `deleteComment` borra el comentario de otro en su guardería.
+- [x] Como staff o familiar, `deleteComment` sobre un comentario ajeno devuelve `error` y no borra.
+- [x] Ninguna acción usa `service_role` ni recibe `author_id` del cliente.
 
 **Pantalla**
 
-- [ ] `/posts/{id}` (admin y staff) y `/family/posts/{id}` (familiar) muestran el post visible.
-- [ ] Un familiar que abre `/posts/{id}` va a `/family`. Un admin o staff que abre `/family/posts/{id}` va a `/`.
-- [ ] Un id inexistente, que no es UUID, de un post borrado o no visible muestra el `not-found.tsx` con "Volver al feed".
-- [ ] La vista del familiar coincide con el mockup a 1440×900: tarjeta, línea de "les gusta", botones, comentarios y campo fijo.
-- [ ] La cabecera del equipo sigue a `PostCard` ("publicado por ti" y "Para: …").
-- [ ] La hora es "HH:MM" si es de hoy, "Ayer HH:MM" si es de ayer y "D mmm HH:MM" si es anterior.
-- [ ] La regla de la hora vale para el post y para los comentarios.
-- [ ] Las fotos se ven con el carrusel y no enlazan a otra pantalla.
-- [ ] "Me encanta" cambia al instante con el estado del mockup.
-- [ ] La línea "A N personas les gusta" se actualiza junto con el botón.
-- [ ] Con 0 reacciones la línea no se muestra. Con 1 dice "A 1 persona le gusta".
-- [ ] Al recargar, el estado de "Me encanta" coincide con lo guardado.
-- [ ] Si `setReaction` falla, vuelve al estado anterior y aparece el toast de SPEC 28.
-- [ ] "Comentar" lleva el foco al campo de comentario.
-- [ ] Los comentarios se listan del más viejo al más nuevo.
-- [ ] Cada comentario muestra el nombre completo y el rol ("familiar", "cuidador/a" o "administración").
-- [ ] Sin comentarios se ve "COMENTARIOS · 0" y "Aún no hay comentarios. Sé el primero en comentar.".
-- [ ] Enter envía el comentario.
-- [ ] El botón de enviar está deshabilitado con el campo vacío o mientras envía.
-- [ ] El input no deja escribir más de 1000 caracteres.
-- [ ] Al enviar con éxito, el comentario aparece al final, el contador sube y el input se limpia.
-- [ ] Enviar un comentario no recarga el post ni vuelve a firmar las fotos.
-- [ ] Si el envío falla, aparece el toast "No se pudo enviar tu comentario" y el texto se conserva.
-- [ ] "Eliminar" solo aparece en los comentarios propios, o en todos si el usuario es admin.
-- [ ] "Eliminar" abre la confirmación.
-- [ ] Al confirmar, el comentario desaparece y el contador baja.
-- [ ] Si el borrado falla, aparece el toast "No se pudo eliminar el comentario" y el comentario sigue.
-- [ ] El campo de comentario queda fijo abajo al hacer scroll.
-- [ ] Todos los controles se usan con teclado, con foco visible.
-- [ ] El área táctil del botón enviar y de "Eliminar" mide al menos 44×44 px.
-- [ ] Con `prefers-reduced-motion: reduce` no hay transiciones.
-- [ ] A 390×844 no hay scroll horizontal y el campo fijo no tapa el último comentario.
+- [x] `/posts/{id}` (admin y staff) y `/family/posts/{id}` (familiar) muestran el post visible.
+- [x] Un familiar que abre `/posts/{id}` va a `/family`. Un admin o staff que abre `/family/posts/{id}` va a `/`.
+- [x] Un id inexistente, que no es UUID, de un post borrado o no visible muestra el `not-found.tsx` con "Volver al feed".
+- [x] La vista del familiar coincide con el mockup a 1440×900: tarjeta, línea de "les gusta", botones, comentarios y campo fijo.
+- [x] La cabecera del equipo sigue a `PostCard` ("publicado por ti" y "Para: …").
+- [x] La hora es "HH:MM" si es de hoy, "Ayer HH:MM" si es de ayer y "D mmm HH:MM" si es anterior.
+- [x] La regla de la hora vale para el post y para los comentarios.
+- [x] Las fotos se ven con el carrusel y no enlazan a otra pantalla.
+- [x] "Me encanta" cambia al instante con el estado del mockup.
+- [x] La línea "A N personas les gusta" se actualiza junto con el botón.
+- [x] Con 0 reacciones la línea no se muestra. Con 1 dice "A 1 persona le gusta".
+- [x] Al recargar, el estado de "Me encanta" coincide con lo guardado.
+- [x] Si `setReaction` falla, vuelve al estado anterior y aparece el toast de SPEC 28.
+- [x] "Comentar" lleva el foco al campo de comentario.
+- [x] Los comentarios se listan del más viejo al más nuevo.
+- [x] Cada comentario muestra el nombre completo y el rol ("familiar", "cuidador/a" o "administración").
+- [x] Sin comentarios se ve "COMENTARIOS · 0" y "Aún no hay comentarios. Sé el primero en comentar.".
+- [x] Enter envía el comentario.
+- [x] El botón de enviar está deshabilitado con el campo vacío o mientras envía.
+- [x] El input no deja escribir más de 1000 caracteres.
+- [x] Al enviar con éxito, el comentario aparece al final, el contador sube y el input se limpia.
+- [x] Enviar un comentario no recarga el post ni vuelve a firmar las fotos.
+- [x] Si el envío falla, aparece el toast "No se pudo enviar tu comentario" y el texto se conserva.
+- [x] "Eliminar" solo aparece en los comentarios propios, o en todos si el usuario es admin.
+- [x] "Eliminar" abre la confirmación.
+- [x] Al confirmar, el comentario desaparece y el contador baja.
+- [x] Si el borrado falla, aparece el toast "No se pudo eliminar el comentario" y el comentario sigue.
+- [x] El campo de comentario queda fijo abajo al hacer scroll.
+- [x] Todos los controles se usan con teclado, con foco visible.
+- [x] El área táctil del botón enviar y de "Eliminar" mide al menos 44×44 px.
+- [x] Con `prefers-reduced-motion: reduce` no hay transiciones.
+- [x] A 390×844 no hay scroll horizontal y el campo fijo no tapa el último comentario.
 
 **Enlaces**
 
-- [ ] El ícono de comentarios de `/` lleva a `/posts/{id}`.
-- [ ] El ícono de comentarios de `/family` lleva a `/family/posts/{id}`.
-- [ ] Los avisos de comentario y reacción de `/notices` llevan a `/posts/{postId}`.
-- [ ] Los avisos de cuenta activada y el recordatorio no enlazan.
-- [ ] Al volver al feed, el número de comentarios de la tarjeta coincide con lo guardado.
-- [ ] El corazón del feed funciona igual que en SPEC 28.
-- [ ] `fetchFeedPage` usa `.overrideTypes` y el feed carga igual que antes.
+- [x] El ícono de comentarios de `/` lleva a `/posts/{id}`.
+- [x] El ícono de comentarios de `/family` lleva a `/family/posts/{id}`.
+- [x] Los avisos de comentario y reacción de `/notices` llevan a `/posts/{postId}`.
+- [x] Los avisos de cuenta activada y el recordatorio no enlazan.
+- [x] Al volver al feed, el número de comentarios de la tarjeta coincide con lo guardado.
+- [x] El corazón del feed funciona igual que en SPEC 28.
+- [x] `fetchFeedPage` usa `.overrideTypes` y el feed carga igual que antes.
 
 **Cierre**
 
-- [ ] `npm run build` y `npm run lint` sin errores. La consola no muestra errores en las dos rutas nuevas, `/`, `/family` ni `/notices`.
-- [ ] El remoto queda sin los comentarios ni las reacciones de prueba.
-- [ ] Las capturas están en `.playwright-mcp/`.
-- [ ] `database-schema.md` y `BACKLOG.md` están actualizados.
+- [x] `npm run build` y `npm run lint` sin errores. La consola no muestra errores en las dos rutas nuevas, `/`, `/family` ni `/notices`.
+- [x] El remoto queda sin los comentarios ni las reacciones de prueba.
+- [x] Las capturas están en `.playwright-mcp/`.
+- [x] `database-schema.md` y `BACKLOG.md` están actualizados.
 
 ---
 
