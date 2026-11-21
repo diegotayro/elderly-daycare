@@ -1,3 +1,4 @@
+import { buildAuthorLabel } from "./build-author-label";
 import { buildDayLabel } from "./build-day-label";
 import { buildPostHeading, joinElderlyNames } from "./build-post-heading";
 import type {
@@ -41,6 +42,7 @@ export function toFeedPost(post: FeedPostData, currentUserId: string): FeedPost 
         : null,
     time: limaTimeFormatter.format(new Date(post.publishedAt)),
     publishedByMe: post.authorId === currentUserId,
+    authorLabel: buildAuthorLabel(post),
     recipientLabel: recipients[post.audience],
     body: post.body,
     photos: post.photos,

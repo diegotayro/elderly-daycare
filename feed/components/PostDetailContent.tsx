@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { requireTeamUser } from "@/auth/require-user";
+import { buildTeamPostSubtitle } from "../build-team-post-subtitle";
 import { getTeamPostDetail } from "../get-post-detail";
 import { PostDetailHeader } from "./PostDetailHeader";
 import { PostDetailView } from "./PostDetailView";
@@ -16,9 +17,6 @@ export async function PostDetailContent({ params }: PostDetailContentProps) {
   if (!detail) notFound();
 
   const { post, comments } = detail;
-  const subtitle = post.publishedByMe
-    ? `${post.time} · publicado por ti`
-    : post.time;
 
   return (
     <PostDetailView
@@ -31,7 +29,7 @@ export async function PostDetailContent({ params }: PostDetailContentProps) {
         avatarInitial={post.avatarInitial}
         type={post.type}
         heading={post.heading}
-        subtitle={subtitle}
+        subtitle={buildTeamPostSubtitle(post)}
       />
       <div className="mb-2.5 text-[12.5px] text-muted">
         Para: {post.recipientLabel}

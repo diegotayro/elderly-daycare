@@ -44,6 +44,7 @@ El mockup no cubre borrar comentarios, el estado sin reacción del botón "Me en
   - El ícono de comentarios de `PostCard` (`/`) apunta a `/posts/{id}`.
   - El ícono de comentarios de `FamilyPostCard` (`/family`) pasa a ser un `Link` a `/family/posts/{id}`.
   - Las tarjetas de aviso `comment` y `reaction` de `/notices` enlazan a `/posts/{postId}`.
+- Autor en las tarjetas del equipo: el feed (`PostCard`) y la cabecera del detalle `/posts/[id]` muestran "01:30 · Cuidador/a Diego" cuando el post lo publicó otra persona. Si es del propio usuario se mantiene "publicado por ti". El dato ya llega: la RLS deja al admin y al staff leer a los usuarios `staff` y `admin` de su guardería. No hay cambios de base de datos. El mockup `feed.dc.html` solo dibuja "publicado por ti"; el formato sigue al feed del familiar.
 - Migración: `list_notices` devuelve además `post_id`, sin cambiar sus reglas.
 - Deuda técnica en un archivo que la spec ya toca: `fetch-feed-page.ts` pasa de `.returns<PostRow[]>()` (deprecado en supabase-js) a `.overrideTypes<PostRow[], { merge: false }>()`, sin cambiar lo que devuelve.
 - Accesibilidad: foco visible, nombres accesibles, `aria-live` para el conteo de comentarios, área táctil de 44×44 px y `motion-reduce`.
@@ -251,7 +252,9 @@ feed/
   fetch-feed-page.ts             # exporta POST_COLUMNS, firma de fotos, fetchReactedPostIds y toFeedPostData
   fetch-post.ts                  # nuevo
   get-post-detail.ts             # nuevo
-  build-feed.ts                  # exporta toFeedPost
+  build-feed.ts                  # exporta toFeedPost; FeedPost suma authorLabel
+  build-author-label.ts          # nuevo, sale de build-family-feed.ts y lo usan ambos feeds
+  build-team-post-subtitle.ts    # nuevo: "01:30 · publicado por ti" | "01:30 · Cuidador/a Diego"
   use-reaction-toggle.ts         # nuevo
   components/
     ReactionButton.tsx           # usa el hook
@@ -259,7 +262,7 @@ feed/
     PostDetailView.tsx           # nuevo
     PostDetailContent.tsx        # nuevo (equipo, dentro de Suspense)
     PostDetailSkeleton.tsx       # nuevo
-    PostCard.tsx                 # enlace de comentarios a /posts/{id}
+    PostCard.tsx                 # enlace de comentarios a /posts/{id} y subtítulo con el autor
 family/
   build-family-feed.ts           # exporta toFamilyPost
   find-post-author.ts            # nuevo, sale de FamilyFeedList
@@ -326,6 +329,11 @@ supabase/migrations/
     - Capturas en `.playwright-mcp/` a 1440×900 y 390×844 de ambas rutas, con y sin comentarios.
     - Borrar al terminar los comentarios y reacciones de prueba que queden.
 12. **Documentación.** "Entradas de BACKLOG".
+13. **Autor en las tarjetas del equipo.**
+    - Mover `buildAuthorLabel` de `build-family-feed.ts` a `feed/build-author-label.ts`; el feed del familiar la importa desde ahí.
+    - `FeedPost` suma `authorLabel` y `toFeedPost` lo arma con esa función.
+    - `build-team-post-subtitle.ts` arma el subtítulo; lo usan `PostCard` y `PostDetailContent`.
+    - Prueba: como admin, el post de otro staff muestra "01:30 · Cuidador/a Diego" y el propio sigue con "publicado por ti"; `/family` no cambia.
 
 ---
 
@@ -354,6 +362,8 @@ supabase/migrations/
 - [x] Un id inexistente, que no es UUID, de un post borrado o no visible muestra el `not-found.tsx` con "Volver al feed".
 - [x] La vista del familiar coincide con el mockup a 1440×900: tarjeta, línea de "les gusta", botones, comentarios y campo fijo.
 - [x] La cabecera del equipo sigue a `PostCard` ("publicado por ti" y "Para: …").
+- [x] En el feed y en el detalle del equipo, un post de otra persona muestra "HH:MM · Cuidador/a Nombre" (o "Administrador/a Nombre") y uno propio sigue con "HH:MM · publicado por ti".
+- [x] El feed del familiar muestra el autor igual que antes (`buildAuthorLabel` movida sin cambios).
 - [x] La hora es "HH:MM" si es de hoy, "Ayer HH:MM" si es de ayer y "D mmm HH:MM" si es anterior.
 - [x] La regla de la hora vale para el post y para los comentarios.
 - [x] Las fotos se ven con el carrusel y no enlazan a otra pantalla.
@@ -444,6 +454,7 @@ supabase/migrations/
 - **Sí:** input de una línea, Enter envía, `maxLength` 1000. Decisión del usuario. El servidor valida igual, como el `check` de la tabla.
 - **Sí:** extraer `use-reaction-toggle.ts`. El botón grande y la línea de conteo comparten estado sin duplicar la lógica de SPEC 28.
 - **Sí:** exportar y reusar las piezas de `fetch-feed-page.ts`, `build-feed.ts` y `build-family-feed.ts`. Un solo lugar arma `FeedPostData` y las tarjetas.
+- **Sí:** mostrar el autor en las tarjetas del equipo, con el formato del feed del familiar ("01:30 · Cuidador/a Diego"), en el feed y en el detalle. Decisión del usuario. El dato ya llega por la RLS (`users_select_team` y `users_select_admin`), así que no hay cambios de base de datos.
 - **Sí:** nuevo feature `comments/` y el detalle en `feed/`. Así lo pide Screaming Architecture: los comentarios son su propio concepto de dominio.
 
 ---

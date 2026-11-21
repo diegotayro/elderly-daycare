@@ -11,6 +11,7 @@ export type FeedPost = {
   avatarInitial: string | null; // "L"; null → ícono megáfono
   time: string; // "14:20"
   publishedByMe: boolean;
+  authorLabel: string; // "Cuidador/a Diego"
   recipientLabel: string; // "familia de Luis" | "habitación Roble" | "toda la guardería"
   body: string;
   photos: FeedPhoto[];
