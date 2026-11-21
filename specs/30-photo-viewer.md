@@ -1,6 +1,6 @@
 # SPEC 30 — Visor de foto a pantalla completa
 
-> **Estado:** Aprobado
+> **Estado:** Implemented
 > **Depende de:** SPEC 25, SPEC 29
 > **Fecha:** 2026-11-20
 > **Objetivo:** Abrir las fotos de un post en un visor oscuro a pantalla completa (`foto.dc.html`) desde el feed y el detalle, con navegación entre fotos y descarga.
@@ -195,34 +195,34 @@ specs/BACKLOG.md                   # entrada actualizada y entradas nuevas
 
 **Datos y acción**
 
-- [ ] No hay migraciones nuevas y `pg_policies` no cambia.
-- [ ] `FeedPhoto.position` coincide con `post_photos.position` y las fotos siguen ordenadas por `position`.
-- [ ] `getPhotoDownloadUrl` con un post visible devuelve una URL que descarga el archivo como `foto-aaaa-mm-dd-N.webp`.
-- [ ] La URL de descarga vence a los 60 s.
-- [ ] Sin sesión, con un `postId` que no es UUID o con un `position` negativo o no entero, devuelve `error` sin consultar.
-- [ ] Con un post que el usuario no puede ver, o una `position` inexistente, devuelve `error`.
-- [ ] La acción no usa `service_role`.
+- [x] No hay migraciones nuevas y `pg_policies` no cambia.
+- [x] `FeedPhoto.position` coincide con `post_photos.position` y las fotos siguen ordenadas por `position`.
+- [x] `getPhotoDownloadUrl` con un post visible devuelve una URL que descarga el archivo como `foto-aaaa-mm-dd-N.webp`.
+- [x] La URL de descarga vence a los 60 s.
+- [x] Sin sesión, con un `postId` que no es UUID o con un `position` negativo o no entero, devuelve `error` sin consultar.
+- [x] Con un post que el usuario no puede ver, o una `position` inexistente, devuelve `error`.
+- [x] La acción no usa `service_role`.
 
 **Visor**
 
-- [ ] Tocar una foto en `/`, `/family`, `/posts/{id}` y `/family/posts/{id}` abre el visor en esa foto.
-- [ ] El visor coincide con `foto.dc.html` a 1440×900: fondo, cabecera, foto centrada y pie.
-- [ ] La foto se ve entera, sin recortar, en horizontal y en vertical.
-- [ ] La cabecera muestra el heading y el subtítulo de la tarjeta desde donde se abrió ("publicado por ti" en un post propio del equipo).
-- [ ] El pie muestra el texto completo del post; si es largo, hace scroll sin achicar la foto.
-- [ ] Con varias fotos hay flechas, contador "N / M", swipe y ← →. Las flechas se deshabilitan en la primera y en la última.
-- [ ] Con una sola foto no hay flechas ni contador.
-- [ ] La X, Esc y el clic en el fondo cierran el visor. Tocar la foto no lo cierra.
-- [ ] Al cerrar, el foco vuelve a la foto que lo abrió y el carrusel sigue en la misma foto.
-- [ ] Mientras el visor está abierto, la página de fondo no hace scroll.
-- [ ] "Descargar" baja la foto activa sin salir de la página y se deshabilita mientras espera.
-- [ ] Si la descarga falla, aparece el toast "No se pudo descargar la foto".
-- [ ] Si la foto no carga, se ve "No se pudo cargar la foto. Recarga la página para verla." en su lugar.
-- [ ] Todos los controles se usan con teclado, con foco visible y nombre accesible.
-- [ ] El área táctil de cerrar, descargar y las flechas mide al menos 44×44 px.
-- [ ] Con `prefers-reduced-motion: reduce` el cambio de foto no se anima.
-- [ ] A 390×844 no hay scroll horizontal y la cabecera, la foto y el pie entran en pantalla.
-- [ ] El carrusel del feed y del detalle se ve y se mueve igual que antes.
+- [x] Tocar una foto en `/`, `/family`, `/posts/{id}` y `/family/posts/{id}` abre el visor en esa foto.
+- [x] El visor coincide con `foto.dc.html` a 1440×900: fondo, cabecera, foto centrada y pie.
+- [x] La foto se ve entera, sin recortar, en horizontal y en vertical.
+- [x] La cabecera muestra el heading y el subtítulo de la tarjeta desde donde se abrió ("publicado por ti" en un post propio del equipo).
+- [x] El pie muestra el texto completo del post; si es largo, hace scroll sin achicar la foto.
+- [x] Con varias fotos hay flechas, contador "N / M", swipe y ← →. Las flechas se deshabilitan en la primera y en la última.
+- [x] Con una sola foto no hay flechas ni contador.
+- [x] La X, Esc y el clic en el fondo cierran el visor. Tocar la foto no lo cierra.
+- [x] Al cerrar, el foco vuelve a la foto que lo abrió y el carrusel sigue en la misma foto.
+- [x] Mientras el visor está abierto, la página de fondo no hace scroll.
+- [x] "Descargar" baja la foto activa sin salir de la página y se deshabilita mientras espera.
+- [x] Si la descarga falla, aparece el toast "No se pudo descargar la foto".
+- [x] Si la foto no carga, se ve "No se pudo cargar la foto. Recarga la página para verla." en su lugar.
+- [x] Todos los controles se usan con teclado, con foco visible y nombre accesible.
+- [x] El área táctil de cerrar, descargar y las flechas mide al menos 44×44 px.
+- [x] Con `prefers-reduced-motion: reduce` el cambio de foto no se anima.
+- [x] A 390×844 no hay scroll horizontal y la cabecera, la foto y el pie entran en pantalla.
+- [x] El carrusel del feed y del detalle se ve y se mueve igual que antes.
 
 ---
 
