@@ -8,7 +8,10 @@ import type {
   ProfileErrors,
   ProfileField,
 } from "@/account/types";
-import { validateProfileNames } from "@/account/validate-profile";
+import {
+  validateEmailConfirmation,
+  validateProfileChanges,
+} from "@/account/validate-profile";
 import {
   FormField,
   fieldControlClassName,
@@ -16,9 +19,23 @@ import {
 } from "@/elderly/components/FormField";
 import { NAME_MAX_LENGTH } from "@/elderly/validate-new-elderly";
 
-const FIELD_ORDER: ProfileField[] = ["firstName", "lastName"];
+type EditField = ProfileField | "emailConfirmation";
+type FormErrors = Partial<Record<EditField, string>>;
 
-export type EditUserValues = { firstName: string; lastName: string };
+const FIELD_ORDER: EditField[] = [
+  "firstName",
+  "lastName",
+  "email",
+  "emailConfirmation",
+];
+const CONFIRMATION_HELP_ID = "emailConfirmation-help";
+
+// Sin `email` el modal no muestra ese campo (el admin no cambia su propio email ni el de un staff pending)
+export type EditUserValues = {
+  firstName: string;
+  lastName: string;
+  email?: string;
+};
 
 type EditUserFormProps = {
   titleId: string;
@@ -41,13 +58,23 @@ export function EditUserForm({
   onCancel,
   onSave,
 }: EditUserFormProps) {
-  const [values, setValues] = useState(initialValues);
-  const [errors, setErrors] = useState<ProfileErrors>({});
+  const showEmail = initialValues.email !== undefined;
+  const [values, setValues] = useState<Record<EditField, string>>({
+    firstName: initialValues.firstName,
+    lastName: initialValues.lastName,
+    email: initialValues.email ?? "",
+    emailConfirmation: "",
+  });
+  const [errors, setErrors] = useState<FormErrors>({});
   const formRef = useRef<HTMLFormElement>(null);
   // Los campos siguen deshabilitados mientras se guarda: el foco se mueve al terminar
   const mustFocusInvalidField = useRef(false);
 
-  const changes = diffProfileChanges(initialValues, values);
+  const changes = diffProfileChanges(initialValues, {
+    firstName: values.firstName,
+    lastName: values.lastName,
+    ...(showEmail && { email: values.email }),
+  });
   const changedFields = Object.keys(changes) as ProfileField[];
   const hasChanges = changedFields.length > 0;
 
@@ -62,16 +89,30 @@ export function EditUserForm({
     }
   }, [isPending, errors]);
 
-  function showErrors(nextErrors: ProfileErrors) {
+  function showErrors(nextErrors: FormErrors) {
     mustFocusInvalidField.current = true;
     setErrors(nextErrors);
+  }
+
+  // "Confirmar email" solo se exige si el email cambió
+  function validate(): FormErrors {
+    const candidates: FormErrors = {
+      ...validateProfileChanges(changes),
+      emailConfirmation:
+        changes.email === undefined
+          ? undefined
+          : validateEmailConfirmation(changes.email, values.emailConfirmation),
+    };
+    return Object.fromEntries(
+      Object.entries(candidates).filter(([, message]) => message !== undefined),
+    );
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (isPending || !hasChanges) return;
 
-    const clientErrors = validateProfileNames(changes);
+    const clientErrors = validate();
     if (Object.keys(clientErrors).length > 0) {
       showErrors(clientErrors);
       return;
@@ -80,22 +121,23 @@ export function EditUserForm({
     onSave(changes, showErrors);
   }
 
-  function updateField(field: keyof EditUserValues, value: string) {
+  function updateField(field: EditField, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
-  function controlProps(field: keyof EditUserValues) {
+  function controlProps(field: EditField, describedBy?: string) {
+    const errorId = errors[field] ? getFieldErrorId(field) : undefined;
     return {
       id: field,
       name: field,
       value: values[field],
       onChange: (event: FormEvent<HTMLInputElement>) =>
         updateField(field, event.currentTarget.value),
-      maxLength: NAME_MAX_LENGTH,
       className: fieldControlClassName,
       "aria-invalid": errors[field] ? true : undefined,
-      "aria-describedby": errors[field] ? getFieldErrorId(field) : undefined,
+      "aria-describedby":
+        [errorId, describedBy].filter(Boolean).join(" ") || undefined,
     };
   }
 
@@ -135,11 +177,42 @@ export function EditUserForm({
       >
         <ProfileChangesSummary changedFields={changedFields} />
         <FormField id="firstName" label="NOMBRES" error={errors.firstName}>
-          <input {...controlProps("firstName")} />
+          <input {...controlProps("firstName")} maxLength={NAME_MAX_LENGTH} />
         </FormField>
         <FormField id="lastName" label="APELLIDOS" error={errors.lastName}>
-          <input {...controlProps("lastName")} />
+          <input {...controlProps("lastName")} maxLength={NAME_MAX_LENGTH} />
         </FormField>
+        {showEmail && (
+          <>
+            <FormField id="email" label="EMAIL" error={errors.email}>
+              <input
+                {...controlProps("email")}
+                type="email"
+                autoComplete="off"
+              />
+            </FormField>
+            <FormField
+              id="emailConfirmation"
+              label="CONFIRMAR EMAIL"
+              error={errors.emailConfirmation}
+            >
+              <input
+                {...controlProps("emailConfirmation", CONFIRMATION_HELP_ID)}
+                type="email"
+                autoComplete="off"
+                placeholder="Repite el email"
+                onPaste={(event) => event.preventDefault()}
+                onDrop={(event) => event.preventDefault()}
+              />
+              <p
+                id={CONFIRMATION_HELP_ID}
+                className="mt-1.5 text-[13px] text-muted"
+              >
+                Escríbelo de nuevo, sin copiar y pegar.
+              </p>
+            </FormField>
+          </>
+        )}
       </fieldset>
     </form>
   );

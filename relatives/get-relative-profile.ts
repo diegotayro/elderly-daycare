@@ -11,6 +11,8 @@ import type { RelativeProfile } from "./types";
 
 type RelativeRow = {
   id: string;
+  first_name: string;
+  last_name: string;
   full_name: string;
   status: UserStatus;
   avatar_url: string | null;
@@ -30,7 +32,7 @@ export const getRelativeProfile = cache(
     const [relativeResult, emailResult, elderly] = await Promise.all([
       supabase
         .from("users")
-        .select("id, full_name, status, avatar_url")
+        .select("id, first_name, last_name, full_name, status, avatar_url")
         .eq("role", "relative")
         .eq("id", id)
         .maybeSingle<RelativeRow>(),
@@ -49,6 +51,8 @@ export const getRelativeProfile = cache(
     return {
       id: relative.id,
       fullName: relative.full_name,
+      firstName: relative.first_name,
+      lastName: relative.last_name,
       email,
       status: relative.status,
       photoUrl: photoUrls[relative.id] ?? null,

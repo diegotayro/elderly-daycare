@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import { requireAdminOrNotFound } from "@/auth/require-user";
+import { EditUserDialog } from "@/users/components/EditUserDialog";
 import { FamilyAccountView } from "@/family/components/FamilyAccountView";
 import { buildBackHref } from "../build-back-href";
+import { updateRelative } from "../actions/update-relative";
 import { getRelativeProfile } from "../get-relative-profile";
 import { RelativeProfileHeading } from "./RelativeProfileHeading";
 
@@ -32,6 +34,20 @@ export async function RelativeProfileContent({
       photoUrl={profile.photoUrl}
       elderly={profile.elderly}
       avatarPermissions={{ canChange: !isArchived, canRemove: true }}
+      editAction={
+        !isArchived && (
+          <EditUserDialog
+            title="Editar familiar"
+            initialValues={{
+              firstName: profile.firstName,
+              lastName: profile.lastName,
+              email: profile.email,
+            }}
+            successDescription={`Actualizamos los datos de ${profile.fullName}.`}
+            onSave={updateRelative.bind(null, profile.id)}
+          />
+        )
+      }
       heading={
         <RelativeProfileHeading
           fullName={profile.fullName}

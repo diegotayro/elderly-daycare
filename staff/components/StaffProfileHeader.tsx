@@ -1,7 +1,9 @@
 import { avatarTones } from "@/elderly/avatar-tones";
+import { EditUserDialog } from "@/users/components/EditUserDialog";
 import { AvatarPhotoButton } from "@/users/components/AvatarPhotoButton";
 import { ChangeAvatarButton } from "@/users/components/ChangeAvatarButton";
 import { userRoleLabels } from "@/users/user-role-labels";
+import { updateStaff } from "../actions/update-staff";
 import type { StaffProfile } from "../types";
 import { StaffStatusActions } from "./StaffStatusActions";
 
@@ -34,12 +36,18 @@ export function StaffProfileHeader({ profile }: StaffProfileHeaderProps) {
         {profile.avatarPermissions.canChange && (
           <ChangeAvatarButton userId={profile.id} />
         )}
-        <button
-          type="button"
-          className="cursor-pointer rounded-xl border-[1.5px] border-line bg-surface px-4 py-[9px] text-sm font-bold text-nav"
-        >
-          Editar
-        </button>
+        {profile.canEdit && (
+          <EditUserDialog
+            title="Editar staff"
+            initialValues={{
+              firstName: profile.firstName,
+              lastName: profile.lastName,
+              ...(profile.canEditEmail && { email: profile.email }),
+            }}
+            successDescription={`Actualizamos los datos de ${profile.fullName}.`}
+            onSave={updateStaff.bind(null, profile.id)}
+          />
+        )}
       </div>
     </div>
   );

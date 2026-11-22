@@ -73,12 +73,16 @@ export type ElderlyOption = {
 export type StaffProfile = {
   id: string;
   fullName: string;
+  firstName: string;
+  lastName: string;
   initial: string;
   tone: AvatarTone;
   photoUrl: string | null;
   avatarPermissions: AvatarPermissions; // con un staff archived solo se puede quitar la foto
   notificationValues: Record<NotificationPreferenceKey, boolean> | null; // null si está archived
   email: string;
+  canEdit: boolean; // un staff archived no se edita
+  canEditEmail: boolean; // solo active; el de un pending no se edita
   statusLabel: "Activo" | "Pendiente" | "Archivado";
   joinedAtLabel: string; // "feb 2025"
   canManageLinks: boolean; // status = active

@@ -8,7 +8,7 @@ import { accountMessages } from "../account-messages";
 import { diffProfileChanges } from "../diff-profile-changes";
 import { readProfileChanges } from "../read-profile-changes";
 import type { ActionResult, ProfileChanges, ProfileErrors } from "../types";
-import { validateProfileNames } from "../validate-profile";
+import { validateProfileChanges } from "../validate-profile";
 
 const error: ActionResult<ProfileErrors> = {
   status: "error",
@@ -42,7 +42,7 @@ export async function updateOwnProfile(
   );
   if (Object.keys(effective).length === 0) return { status: "ok" };
 
-  const errors = validateProfileNames(effective);
+  const errors = validateProfileChanges(effective);
   if (Object.keys(errors).length > 0) return { status: "invalid", errors };
 
   const { data, error: updateError } = await supabase
