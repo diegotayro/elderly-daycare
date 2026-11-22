@@ -1,6 +1,6 @@
 # SPEC 31 — Foto de avatar, perfil del familiar y edición de cuentas del equipo
 
-> **Estado:** Aprobado
+> **Estado:** Implemented
 > **Depende de:** SPEC 08, SPEC 10, SPEC 16, SPEC 17, SPEC 18, SPEC 21, SPEC 23, SPEC 30
 > **Fecha:** 2026-11-21
 > **Objetivo:** Que cada usuario tenga foto de avatar y que el admin gestione la foto y los datos del staff y de los familiares, con un perfil del familiar para el admin y las preferencias de notificaciones guardadas en la DB.
@@ -410,87 +410,87 @@ specs/BACKLOG.md
 
 **Base de datos y Storage**
 
-- [ ] El bucket `avatars` existe, es privado, acepta solo `image/webp` y hasta 200 KB.
-- [ ] Staff, admin y relative `active` pueden subir y borrar archivos en su propia carpeta.
-- [ ] Un admin puede subir y borrar en la carpeta de un staff o relative no `archived` de su guardería.
-- [ ] Un admin puede borrar, pero no subir, en la carpeta de un staff o relative `archived` de su guardería.
-- [ ] Un admin no puede subir ni borrar en la carpeta de otro admin ni de otra guardería.
-- [ ] Un staff o relative no puede subir ni borrar en la carpeta de otro usuario.
-- [ ] Un relative puede firmar la foto de un staff de su guardería y no la de otra guardería.
-- [ ] Un usuario `pending` o `archived` no puede subir, borrar ni firmar.
-- [ ] `get_relative_email` devuelve el email solo a un admin y solo de un familiar de su guardería; a otros roles, `null`.
-- [ ] Las policies de `users` no cambian.
-- [ ] El archivo de la migración tiene el mismo nombre que su registro en el remoto.
-- [ ] `get_advisors` no muestra avisos nuevos, salvo los aceptados y documentados.
+- [x] El bucket `avatars` existe, es privado, acepta solo `image/webp` y hasta 200 KB.
+- [x] Staff, admin y relative `active` pueden subir y borrar archivos en su propia carpeta.
+- [x] Un admin puede subir y borrar en la carpeta de un staff o relative no `archived` de su guardería.
+- [x] Un admin puede borrar, pero no subir, en la carpeta de un staff o relative `archived` de su guardería.
+- [x] Un admin no puede subir ni borrar en la carpeta de otro admin ni de otra guardería.
+- [x] Un staff o relative no puede subir ni borrar en la carpeta de otro usuario.
+- [x] Un relative puede firmar la foto de un staff de su guardería y no la de otra guardería.
+- [x] Un usuario `pending` o `archived` no puede subir, borrar ni firmar.
+- [x] `get_relative_email` devuelve el email solo a un admin y solo de un familiar de su guardería; a otros roles, `null`.
+- [x] Las policies de `users` no cambian.
+- [x] El archivo de la migración tiene el mismo nombre que su registro en el remoto.
+- [x] `get_advisors` no muestra avisos nuevos, salvo los aceptados y documentados.
 
 **Foto de avatar**
 
-- [ ] En `/account` el staff ve "Cambiar foto" y no ve "Editar". El admin ve los dos.
-- [ ] En `/family/account` el familiar ve "Cambiar foto" y no ve "Editar".
-- [ ] Elegir una imagen la comprime a WebP, la sube y se ve en la tarjeta y el sidebar sin recargar a mano.
-- [ ] Reemplazar la foto borra el archivo anterior del bucket.
-- [ ] Una imagen que no se puede procesar muestra el toast de error y no cambia nada.
-- [ ] Con foto, tocar el avatar de la tarjeta abre el visor con el nombre y el rol en la cabecera, sin pie, flechas ni "Descargar".
-- [ ] Sin foto, el avatar no es un botón (no recibe foco ni clic).
-- [ ] "Quitar foto" pide confirmación; al confirmar, `avatar_url` queda `null`, el archivo se borra y vuelven las iniciales.
-- [ ] El admin cambia y quita la foto de un staff `active` o `pending` desde `/staff/[id]` y la de un familiar desde `/relatives/[id]`.
-- [ ] Con un staff o familiar `archived`, el admin abre el visor y puede quitar la foto, pero no ve "Cambiar foto".
-- [ ] La foto de un staff o admin se ve en el sidebar, `/staff`, `/staff/[id]`, sus comentarios, `PostComposerButton` y `CommentComposer`.
-- [ ] La foto de un familiar se ve en su sidebar, `/family/account`, `/relatives/[id]`, sus comentarios, `CommentComposer` y "Familiares vinculados".
-- [ ] Si la firma o la imagen fallan, se ven las iniciales.
-- [ ] El visor de las fotos de los posts funciona igual que en SPEC 30.
+- [x] En `/account` el staff ve "Cambiar foto" y no ve "Editar". El admin ve los dos.
+- [x] En `/family/account` el familiar ve "Cambiar foto" y no ve "Editar".
+- [x] Elegir una imagen la comprime a WebP, la sube y se ve en la tarjeta y el sidebar sin recargar a mano.
+- [x] Reemplazar la foto borra el archivo anterior del bucket.
+- [x] Una imagen que no se puede procesar muestra el toast de error y no cambia nada.
+- [x] Con foto, tocar el avatar de la tarjeta abre el visor con el nombre y el rol en la cabecera, sin pie, flechas ni "Descargar".
+- [x] Sin foto, el avatar no es un botón (no recibe foco ni clic).
+- [x] "Quitar foto" pide confirmación; al confirmar, `avatar_url` queda `null`, el archivo se borra y vuelven las iniciales.
+- [x] El admin cambia y quita la foto de un staff `active` o `pending` desde `/staff/[id]` y la de un familiar desde `/relatives/[id]`.
+- [x] Con un staff o familiar `archived`, el admin abre el visor y puede quitar la foto, pero no ve "Cambiar foto".
+- [x] La foto de un staff o admin se ve en el sidebar, `/staff`, `/staff/[id]`, sus comentarios, `PostComposerButton` y `CommentComposer`.
+- [x] La foto de un familiar se ve en su sidebar, `/family/account`, `/relatives/[id]`, sus comentarios, `CommentComposer` y "Familiares vinculados".
+- [x] Si la firma o la imagen fallan, se ven las iniciales.
+- [x] El visor de las fotos de los posts funciona igual que en SPEC 30.
 
 **Perfil del familiar y "Mi cuenta" del familiar**
 
-- [ ] En `/elderly/[id]`, el admin toca una fila activa de "Familiares vinculados" y abre `/relatives/{id}`. Las invitaciones pendientes no enlazan.
-- [ ] Para el staff, las filas de "Familiares vinculados" no enlazan.
-- [ ] `/relatives/[id]` abierto por un staff o un familiar, o con el id de un familiar de otra guardería, muestra el 404.
-- [ ] `/relatives/[id]` muestra la tarjeta de perfil (foto, nombre, email y parentesco), "Cambiar foto", "Editar" y "ADULTOS MAYORES", sin notificaciones, "Cambiar contraseña" ni "Cerrar sesión".
-- [ ] "Volver al perfil" lleva al perfil del adulto mayor desde donde se entró.
-- [ ] En `/family/account` y `/relatives/[id]`, la tarjeta de adultos mayores muestra nombre, edad, habitación y consentimiento de fotos desde la DB, de todos los vinculados.
-- [ ] Los `active` van primero y los `archived` al final, cada grupo en el orden de los vínculos.
-- [ ] Un adulto mayor `archived` se ve con opacidad reducida y el badge "Archivado", en las dos pantallas.
-- [ ] El consentimiento de fotos se ve, pero no se puede cambiar.
-- [ ] El parentesco de la tarjeta de perfil sale de `guardian_elderly`.
-- [ ] Sin vínculos, la tarjeta muestra "Aún no tienes adultos mayores vinculados." en `/family/account` y "No tiene adultos mayores vinculados." en `/relatives/[id]`.
-- [ ] `/family/account` ya no muestra la tarjeta "NOTIFICACIONES" ni datos del mock.
+- [x] En `/elderly/[id]`, el admin toca una fila activa de "Familiares vinculados" y abre `/relatives/{id}`. Las invitaciones pendientes no enlazan.
+- [x] Para el staff, las filas de "Familiares vinculados" no enlazan.
+- [x] `/relatives/[id]` abierto por un staff o un familiar, o con el id de un familiar de otra guardería, muestra el 404.
+- [x] `/relatives/[id]` muestra la tarjeta de perfil (foto, nombre, email y parentesco), "Cambiar foto", "Editar" y "ADULTOS MAYORES", sin notificaciones, "Cambiar contraseña" ni "Cerrar sesión".
+- [x] "Volver al perfil" lleva al perfil del adulto mayor desde donde se entró.
+- [x] En `/family/account` y `/relatives/[id]`, la tarjeta de adultos mayores muestra nombre, edad, habitación y consentimiento de fotos desde la DB, de todos los vinculados.
+- [x] Los `active` van primero y los `archived` al final, cada grupo en el orden de los vínculos.
+- [x] Un adulto mayor `archived` se ve con opacidad reducida y el badge "Archivado", en las dos pantallas.
+- [x] El consentimiento de fotos se ve, pero no se puede cambiar.
+- [x] El parentesco de la tarjeta de perfil sale de `guardian_elderly`.
+- [x] Sin vínculos, la tarjeta muestra "Aún no tienes adultos mayores vinculados." en `/family/account` y "No tiene adultos mayores vinculados." en `/relatives/[id]`.
+- [x] `/family/account` ya no muestra la tarjeta "NOTIFICACIONES" ni datos del mock.
 
 **Preferencias**
 
-- [ ] Cambiar un switch en `/account` guarda el valor: al recargar se mantiene.
-- [ ] "Nuevos comentarios de familias" guarda `notify_on_post` y "Recordatorio de resumen (17:00)" guarda `daily_summary_enabled`.
-- [ ] Si guardar falla, el switch vuelve a su valor y aparece el toast.
-- [ ] En `/staff/[id]` el admin ve y cambia las preferencias de un staff `active` o `pending`. Para un `archived` la tarjeta no aparece.
+- [x] Cambiar un switch en `/account` guarda el valor: al recargar se mantiene.
+- [x] "Nuevos comentarios de familias" guarda `notify_on_post` y "Recordatorio de resumen (17:00)" guarda `daily_summary_enabled`.
+- [x] Si guardar falla, el switch vuelve a su valor y aparece el toast.
+- [x] En `/staff/[id]` el admin ve y cambia las preferencias de un staff `active` o `pending`. Para un `archived` la tarjeta no aparece.
 
 **Edición**
 
-- [ ] "Editar" de `/account` (admin) abre el modal con nombres y apellidos, sin email.
-- [ ] El admin guarda sus nombres y el cambio se ve en `/account` y el sidebar.
-- [ ] En `/staff/[id]`, "Editar" no aparece para un `archived`.
-- [ ] Para un `pending` el modal muestra nombres y apellidos, sin email.
-- [ ] Para un `active` el modal muestra nombres, apellidos, email y "Confirmar email".
-- [ ] Cambiar el email sin confirmarlo, o con una confirmación distinta, muestra el error en el campo y no guarda.
-- [ ] Sin cambiar el email, "Confirmar email" no es obligatorio.
-- [ ] Con un email ya usado por otra cuenta aparece "Ese email ya está en uso." y no se guarda nada.
-- [ ] Tras cambiar el email, el staff inicia sesión con el nuevo y no con el anterior.
-- [ ] En `/relatives/[id]`, "Editar" abre "Editar familiar" con nombres, apellidos, email y "Confirmar email", con las mismas reglas que "Editar staff".
-- [ ] Tras cambiar el email de un familiar, inicia sesión con el nuevo y no con el anterior.
-- [ ] Campos vacíos o de más de `NAME_MAX_LENGTH` caracteres muestran los mismos mensajes que "Agregar staff".
-- [ ] Un staff o familiar que llama a `updateStaff`, `updateRelative` o `updateOwnProfile` recibe `error` y no cambia nada.
-- [ ] Solo `apply-profile-changes.ts` usa `service_role`, y solo para el email.
-- [ ] Al abrir un modal, "Guardar" está deshabilitado y no hay línea de resumen.
-- [ ] Agregar espacios al inicio o al final de un campo no cuenta como cambio: "Guardar" sigue deshabilitado.
-- [ ] Cambiar las mayúsculas del email no cuenta como cambio.
-- [ ] Al cambiar un campo aparece "Cambiará: {campo}"; con varios, se listan todos. Al deshacer el cambio, la línea desaparece y "Guardar" se deshabilita.
-- [ ] Al guardar, la petición solo lleva los campos cambiados y el `update` solo toca esas columnas.
-- [ ] Guardar sin cambiar el email no llama a `auth.admin.updateUserById`.
-- [ ] Los valores se guardan sin espacios a los extremos y el email en minúsculas.
+- [x] "Editar" de `/account` (admin) abre el modal con nombres y apellidos, sin email.
+- [x] El admin guarda sus nombres y el cambio se ve en `/account` y el sidebar.
+- [x] En `/staff/[id]`, "Editar" no aparece para un `archived`.
+- [x] Para un `pending` el modal muestra nombres y apellidos, sin email.
+- [x] Para un `active` el modal muestra nombres, apellidos, email y "Confirmar email".
+- [x] Cambiar el email sin confirmarlo, o con una confirmación distinta, muestra el error en el campo y no guarda.
+- [x] Sin cambiar el email, "Confirmar email" no es obligatorio.
+- [x] Con un email ya usado por otra cuenta aparece "Ese email ya está en uso." y no se guarda nada.
+- [x] Tras cambiar el email, el staff inicia sesión con el nuevo y no con el anterior.
+- [x] En `/relatives/[id]`, "Editar" abre "Editar familiar" con nombres, apellidos, email y "Confirmar email", con las mismas reglas que "Editar staff".
+- [x] Tras cambiar el email de un familiar, inicia sesión con el nuevo y no con el anterior.
+- [x] Campos vacíos o de más de `NAME_MAX_LENGTH` caracteres muestran los mismos mensajes que "Agregar staff".
+- [x] Un staff o familiar que llama a `updateStaff`, `updateRelative` o `updateOwnProfile` recibe `error` y no cambia nada.
+- [x] Solo `apply-profile-changes.ts` usa `service_role`, y solo para el email.
+- [x] Al abrir un modal, "Guardar" está deshabilitado y no hay línea de resumen.
+- [x] Agregar espacios al inicio o al final de un campo no cuenta como cambio: "Guardar" sigue deshabilitado.
+- [x] Cambiar las mayúsculas del email no cuenta como cambio.
+- [x] Al cambiar un campo aparece "Cambiará: {campo}"; con varios, se listan todos. Al deshacer el cambio, la línea desaparece y "Guardar" se deshabilita.
+- [x] Al guardar, la petición solo lleva los campos cambiados y el `update` solo toca esas columnas.
+- [x] Guardar sin cambiar el email no llama a `auth.admin.updateUserById`.
+- [x] Los valores se guardan sin espacios a los extremos y el email en minúsculas.
 
 **General**
 
-- [ ] Los modales, los botones y el diálogo se usan con teclado, con foco visible y nombre accesible.
-- [ ] A 390×844 no hay scroll horizontal en `/account`, `/family/account`, `/staff/[id]` ni `/relatives/[id]`.
-- [ ] `npm run build` y `npm run lint` pasan.
+- [x] Los modales, los botones y el diálogo se usan con teclado, con foco visible y nombre accesible.
+- [x] A 390×844 no hay scroll horizontal en `/account`, `/family/account`, `/staff/[id]` ni `/relatives/[id]`.
+- [x] `npm run build` y `npm run lint` pasan.
 
 ---
 

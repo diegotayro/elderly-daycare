@@ -60,7 +60,7 @@ Formato de cada entrada:
 
 ### Notificaciones de "Mi cuenta": copy del mockup distinto de los campos de la DB
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 31
 - **Qué:** el mockup staff dice "Nuevos comentarios de familias" y "Recordatorio de resumen (17:00)", pero los campos de `users` son `notify_on_post` (nuevas publicaciones) y `daily_summary_enabled` (resumen a las 19:00).
 - **Origen:** SPEC 08 (`08-account-screen-mock`), `account/notification-preferences.ts`.
 - **Se resuelve en:** la spec de integración con Supabase.
@@ -69,6 +69,27 @@ Formato de cada entrada:
   - Decidir si se cambia el copy del mockup o los campos/horario de la DB (17:00 vs. 19:00, comentarios vs. publicaciones).
   - Los toggles hoy solo tienen estado local: persistirlos con `update` de `users` en esa misma spec.
   - El recordatorio de Avisos (SPEC 27) usa 17:00 y `daily_summary_enabled`; si se cambia el horario del resumen, actualizar `SUMMARY_REMINDER_TIME` en `notices/notice-limits.ts`.
+  - SPEC 31: se mantuvo el copy del mockup ("Nuevos comentarios de familias" guarda `notify_on_post` y "Recordatorio de resumen (17:00)" guarda `daily_summary_enabled`) y los switches ya guardan en la DB. Para el equipo, `notify_on_post` significa avisos de comentarios; para el familiar, de publicaciones. Está documentado en `database-schema.md`.
+
+### Archivos huérfanos en el bucket `avatars`
+
+- [ ] **Estado:** pendiente
+- **Qué:** una foto de avatar puede quedar en el bucket sin que ningún `users.avatar_url` la use: la subida termina pero `setAvatar` no llega a guardarla (se cierra la pestaña, falla la red) o rechaza la ruta antes de poder borrarla.
+- **Origen:** SPEC 31 (`users/upload-avatar.ts`, `users/actions/set-avatar.ts`).
+- **Se resuelve en:** una spec de mantenimiento de Storage (sin asignar).
+- **Notas:**
+  - `setAvatar` ya borra el archivo recién subido cuando el `update` falla; el huérfano solo queda si la acción no corre o falla antes de poder borrar.
+  - Solución prevista: una limpieza periódica que compare `storage.objects` del bucket con `users.avatar_url` y borre lo que no coincida y tenga más de un día.
+
+### Detección de email repetido con `listUsers`
+
+- [ ] **Estado:** pendiente
+- **Qué:** al cambiar un email por otro ya usado, `auth.admin.updateUserById` responde un 500 `unexpected_failure` (violación de `users_email_partial_key`), no `email_exists`. `users/apply-profile-changes.ts` busca entonces el email con `auth.admin.listUsers` (paginado, 1000 por página) y muestra "Ese email ya está en uso.". Solo ocurre cuando el cambio falla.
+- **Origen:** SPEC 31 (`users/apply-profile-changes.ts`).
+- **Se resuelve en:** una spec de endurecimiento, si las cuentas crecen a miles.
+- **Notas:**
+  - Alternativa: una función SQL `is_email_registered(p_email)` para el admin, con migración. Es más rápida, pero se decidió no sumarla a SPEC 31.
+  - Si Auth vuelve a responder `email_exists`, el código ya lo maneja sin buscar en la lista.
 
 ---
 
@@ -255,6 +276,7 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 - **Se resuelve en:** cada spec que implemente una de esas tareas (invitación de staff, aceptar invitaciones, archivar usuarios, resumen diario).
 - **Notas:**
   - **Necesario:** crear cuentas (incluida la del familiar nuevo al activar su invitación), invitar y reenviar la invitación al staff (`inviteUserByEmail` y, si su email ya está confirmado, `resetPasswordForEmail`; en SPEC 21 usan `service_role` `staff/actions/invite-staff.ts` y `staff/actions/resend-staff-invitation.ts`) bloquear el login (`auth.admin.updateUserById` con ban) y borrar cuentas de Auth (`auth.admin.deleteUser`, para cancelar la invitación y eliminar staff sin historial; en SPEC 23 usan `service_role` `staff/actions/archive-staff.ts`, `reactivate-staff.ts`, `cancel-staff-invitation.ts` y `delete-staff.ts`).
+  - **Cambiar el email de un staff `active` o de un familiar:** `auth.admin.updateUserById` con `email_confirm: true` (en SPEC 31 usa `service_role` solo `users/apply-profile-changes.ts`). Los nombres se cambian con la sesión del admin.
   - **Aceptar una invitación:** resuelto en SPEC 17 con `accept_invitation(code, photo_consent)` (`SECURITY DEFINER`), llamada con la sesión del familiar. `service_role` solo se usa para leer la vista previa de la invitación sin sesión (`get_invitation_preview`) y para `auth.admin.createUser`.
   - **Activar al staff:** resuelto en SPEC 21 con `activate_staff_account()` (`SECURITY DEFINER`), llamada con la sesión del staff al crear su contraseña. Sin trigger en `auth.users`, que también se dispararía al recuperar la contraseña.
   - **Archivar o reactivar (`status`):** ya lo permite la policy de update del admin.
@@ -282,7 +304,7 @@ Las entradas de esta sección se resuelven juntas en una misma spec y rama ("spe
 
 ## Familiar
 
-Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en SPEC 18 con datos mock (`family/mock-family.ts`). Solo el nombre, el email, las preferencias de notificación y el parentesco del pie del sidebar son reales.
+Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en SPEC 18 con datos mock (`family/mock-family.ts`). El feed es real desde SPEC 25 y "Mi cuenta" desde SPEC 31; solo `/family/summary` sigue con datos mock.
 
 ### Chips con un solo adulto mayor
 
@@ -304,14 +326,38 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
   - No usar `href="/"` provisional: llevaría al familiar a un redirect.
   - Hacer clicable la tarjeta entera choca con el corazón y el carrusel; resolverlo con un área de enlace que no los tape.
 
+### Notificaciones del familiar en `/family/account`
+
+- [ ] **Estado:** pendiente
+- **Qué:** la tarjeta "NOTIFICACIONES" se quitó de `/family/account` en SPEC 31 y no se muestra en `/relatives/[id]`. Decidir si vuelve y con qué copy.
+- **Origen:** SPEC 31.
+- **Se resuelve en:** una spec de notificaciones del familiar (sin asignar), junto con el envío de los correos de `notify_on_post` y `daily_summary_enabled`.
+- **Notas:**
+  - `familyNotificationPreferences` en `account/notification-preferences.ts` conserva el copy del mockup familiar y hoy no se usa.
+  - La DB no cambió: el familiar sigue teniendo `notify_on_post` y `daily_summary_enabled`.
+
+### Switch de consentimiento de fotos del familiar
+
+- [ ] **Estado:** pendiente
+- **Qué:** la tarjeta de adultos mayores de `/family/account` ya muestra el consentimiento de fotos real, pero solo en lectura (SPEC 31). Falta que el familiar pase `photo_consent` de `true` a `false`; nunca al revés.
+- **Origen:** SPEC 31 (`family/components/FamilyElderlyCard.tsx`, `PhotoConsentIndicator`).
+- **Se resuelve en:** la spec siguiente a SPEC 31.
+- **Notas:** "siempre gana el no". Solo el admin puede volver a ponerlo en `true`. Revisar la RLS de `elderly` y el trigger que protege `photo_consent`.
+
+### El 404 de `/relatives/[id]` se ve con la barra del equipo
+
+- [ ] **Estado:** pendiente
+- **Qué:** un familiar que abre `/relatives/{id}` ve el 404 dentro del layout de `(app)` (sidebar del equipo con su nombre). No hay fuga de datos, pero el marco no es el suyo.
+- **Origen:** SPEC 31 (`app/(app)/relatives/[id]/page.tsx`, `auth/require-user.ts`).
+- **Se resuelve en:** una spec de rutas por rol (sin asignar).
+- **Notas:** `/staff` y `/elderly` redirigen al familiar a `/family`; aquí la spec pidió 404. Una opción es un `not-found.tsx` propio de `(app)` que no muestre la barra del equipo.
+
 ### Conectar las pantallas del familiar a Supabase
 
 - [ ] **Estado:** pendiente
-- **Qué:** el feed de `/family` ya es real desde SPEC 25 (posts por `audience`, conteos, autor, hora y chips). Siguen saliendo del mock (`mockFamily`):
-  - el resumen (`daily_summaries`, que el esquema marca como diferido) y su `dateLabel`;
-  - "Mi cuenta": parentesco, adultos mayores vinculados con edad y sala, y `photo_consent`.
-- **Origen:** SPEC 18, `family/mock-family.ts`; el feed se resolvió en SPEC 25.
-- **Se resuelve en:** spec(s) de datos del familiar (`daily_summaries` y "Mi cuenta").
+- **Qué:** el feed de `/family` ya es real desde SPEC 25 (posts por `audience`, conteos, autor, hora y chips) y "Mi cuenta" desde SPEC 31. Sigue saliendo del mock (`mockFamily`) solo el resumen (`daily_summaries`, que el esquema marca como diferido) y su `dateLabel`.
+- **Origen:** SPEC 18, `family/mock-family.ts`; el feed se resolvió en SPEC 25 y "Mi cuenta" en SPEC 31.
+- **Se resuelve en:** la spec de datos del resumen diario (`daily_summaries`).
 - **Notas:**
   - Reemplazar `mockFamily` por builders desde las filas reales.
   - Probar en pantalla el pie del sidebar con varios vínculos y el truncado con "…" (SPEC 18 solo lo probó con un vínculo); y la consulta de `fetchSidebarElderlyLinks` con adultos mayores archivados.
@@ -363,7 +409,7 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 - **Qué:** el perfil muestra a todo familiar vinculado como "activa"/"activo", aunque su `users.status` sea `archived`.
 - **Origen:** SPEC 16, `elderly/fetch-relative-links.ts` y `elderly/get-linked-relatives.ts`.
 - **Se resuelve en:** la spec que permita archivar familiares.
-- **Notas:** hoy no hay flujo para archivar familiares. Definir qué se muestra (fila atenuada, badge o se oculta); el mockup no lo cubre.
+- **Notas:** hoy no hay flujo para archivar familiares. Definir qué se muestra (fila atenuada, badge o se oculta); el mockup no lo cubre. Desde SPEC 31 la fila activa del admin enlaza a `/relatives/[id]`, que para un familiar `archived` ya oculta "Cambiar foto" y "Editar" (solo deja "Quitar foto"); eso no se probó con datos reales porque no hay familiares archivados.
 
 ### Botones "Editar" y "Resumen del día" del perfil
 
@@ -397,7 +443,7 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 
 ### Botón Editar del perfil de staff
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 31
 - **Qué:** el botón "Editar" de `/staff/[id]` no tiene acción (es un `<button type="button">`).
 - **Origen:** SPEC 20 (`staff/components/StaffProfileHeader.tsx`).
 - **Se resuelve en:** una spec de edición de staff (sin asignar).
