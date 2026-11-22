@@ -16,6 +16,7 @@ export type ElderlySource = {
   guardianElderly: GuardianElderly[];
   invitations: Invitation[];
   avatarTones: Record<string, AvatarTone>; // por id de elderly, user o invitation; solo UI
+  avatarUrls: Record<string, string>; // avatar firmado, por id de familiar; vacío donde no se muestran fotos
 };
 
 export type ElderlyIndicator =
@@ -43,6 +44,8 @@ export type LinkedRelative = {
   fullName: string;
   initial: string;
   tone: AvatarTone;
+  photoUrl: string | null; // url firmada; null en invitaciones pendientes
+  profileHref: string | null; // solo el admin, en vínculos activos
   detail: string; // "Hija · activa" | "Hijo · invitación enviada"
   status: "active" | "pending";
   statusLabel: string; // "ACTIVA" | "ACTIVO" | "PENDIENTE"

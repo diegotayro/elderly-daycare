@@ -31,7 +31,7 @@ export function buildElderlyProfile(
     isArchived: elderly.status === "archived",
     canLinkRelative: isAdmin && elderly.status === "active",
     enrolledAtLabel: formatEnrolledAt(elderly.enrolled_at),
-    relatives: getLinkedRelatives(source, elderly.id),
+    relatives: getLinkedRelatives(source, elderly.id, { isAdmin }),
     pendingInvitationEmails: source.invitations
       .filter(
         (invitation) =>

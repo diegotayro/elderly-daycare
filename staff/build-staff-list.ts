@@ -27,6 +27,7 @@ function buildItem(source: StaffSource, staff: StaffMember): StaffListItem {
     fullName: staff.full_name,
     initial: staff.first_name[0],
     tone: source.avatarTones[staff.id] ?? "blue",
+    photoUrl: source.avatarUrls[staff.id] ?? null,
     summary: formatLinkedElderlyCount(activeLinksCount),
     indicator: resolveIndicator(staff, activeLinksCount),
   };

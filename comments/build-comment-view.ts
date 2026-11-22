@@ -12,6 +12,7 @@ export function toCommentView(
   row: CommentRow,
   currentUser: Pick<CurrentUser, "id" | "role">,
   today: string,
+  photoUrls: Record<string, string>,
 ): CommentView {
   const authorName = row.author?.full_name ?? UNKNOWN_AUTHOR_NAME;
 
@@ -21,6 +22,7 @@ export function toCommentView(
       ? authorName.charAt(0).toUpperCase()
       : UNKNOWN_AUTHOR_INITIAL,
     authorTone: getAvatarTone(row.author_id),
+    authorPhotoUrl: photoUrls[row.author_id] ?? null,
     authorName,
     roleLabel: row.author ? commentRoleLabels[row.author.role] : null,
     timeLabel: formatRelativeTime(row.created_at, today),

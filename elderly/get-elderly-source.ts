@@ -41,5 +41,6 @@ export async function getElderlySource(): Promise<ElderlySource> {
     avatarTones: Object.fromEntries(
       [...elderly, ...relatives].map(({ id }) => [id, getAvatarTone(id)]),
     ),
+    avatarUrls: {}, // la lista no muestra fotos de familiares
   };
 }

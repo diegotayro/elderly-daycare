@@ -23,6 +23,7 @@ type PostDetailViewProps = {
   viewerPost: PhotoViewerPost;
   comments: CommentView[];
   currentUser: Pick<CurrentUser, "id" | "first_name">;
+  currentUserPhotoUrl: string | null;
   backHref: string; // "/" o "/family"
   children: ReactNode; // cabecera de la tarjeta, según el rol
 };
@@ -32,12 +33,14 @@ export function PostDetailView({
   viewerPost,
   comments,
   currentUser,
+  currentUserPhotoUrl,
   backHref,
   children,
 }: PostDetailViewProps) {
   const author = {
     initial: currentUser.first_name.charAt(0).toUpperCase(),
     tone: getAvatarTone(currentUser.id),
+    photoUrl: currentUserPhotoUrl,
   };
 
   return (

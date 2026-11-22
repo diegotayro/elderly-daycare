@@ -69,9 +69,25 @@ export function buildStaffProfile(
   return {
     id: staff.id,
     fullName: staff.full_name,
+    firstName: staff.first_name,
+    lastName: staff.last_name,
     initial: staff.first_name[0],
     tone: source.avatarTones[staff.id] ?? "blue",
+    photoUrl: source.avatarUrls[staff.id] ?? null,
+    avatarPermissions: {
+      canChange: staff.status !== "archived",
+      canRemove: true,
+    },
+    notificationValues:
+      staff.status === "archived"
+        ? null
+        : {
+            notify_on_post: staff.notify_on_post,
+            daily_summary_enabled: staff.daily_summary_enabled,
+          },
     email: staff.email,
+    canEdit: staff.status !== "archived",
+    canEditEmail: staff.status === "active",
     statusLabel: formatStaffStatus(staff.status),
     joinedAtLabel: formatEnrolledAt(staff.created_at),
     canManageLinks: staff.status === "active",

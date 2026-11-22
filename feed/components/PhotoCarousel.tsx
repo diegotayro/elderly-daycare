@@ -7,6 +7,7 @@ import { ChevronRightIcon } from "@/shared/components/icons/ChevronRightIcon";
 import { photoViewerMessages } from "../photo-viewer-messages";
 import type { FeedPhoto, PhotoViewerPost } from "../types";
 import { usePhotoTrack } from "../use-photo-track";
+import { PhotoDownloadButton } from "./PhotoDownloadButton";
 import { PhotoViewer } from "./PhotoViewer";
 
 const ARROW_REVEAL_CLASS_NAME =
@@ -151,7 +152,15 @@ export function PhotoCarousel({
         <PhotoViewer
           photos={photos}
           initialIndex={viewerIndex}
-          post={viewerPost}
+          heading={viewerPost.heading}
+          subtitle={viewerPost.subtitle}
+          caption={viewerPost.caption}
+          renderHeaderAction={(activeIndex) => (
+            <PhotoDownloadButton
+              postId={viewerPost.postId}
+              position={photos[activeIndex].position}
+            />
+          )}
           onClose={closeViewer}
         />
       )}

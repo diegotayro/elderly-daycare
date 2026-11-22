@@ -2,6 +2,7 @@ import "server-only";
 import type { CurrentUser } from "@/auth/types";
 import { toCommentView } from "@/comments/build-comment-view";
 import { fetchComments } from "@/comments/fetch-comments";
+import { signCommentAvatars } from "@/comments/sign-comment-avatars";
 import type { CommentView } from "@/comments/types";
 import { toFamilyPost } from "@/family/build-family-feed";
 import type { FamilyFeedElderly, FamilyPost } from "@/family/types";
@@ -32,9 +33,13 @@ async function loadDetail(
   ]);
   if (!postData) return null;
 
+  const photoUrls = await signCommentAvatars(commentRows);
+
   return {
     postData,
-    comments: commentRows.map((row) => toCommentView(row, user, today)),
+    comments: commentRows.map((row) =>
+      toCommentView(row, user, today, photoUrls),
+    ),
     today,
   };
 }

@@ -1,4 +1,3 @@
-import { relationshipLabels } from "@/elderly/relationship-labels";
 import type { FamilyMock } from "./types";
 
 const LUIS_ID = "mock-luis";
@@ -6,7 +5,6 @@ const CARMEN_ID = "mock-carmen";
 const DATE_LABEL = "martes 17 de junio";
 
 export const mockFamily: FamilyMock = {
-  relationshipLabel: relationshipLabels.daughter.label,
   elderly: [
     {
       id: LUIS_ID,

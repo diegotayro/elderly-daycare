@@ -4,12 +4,16 @@ import { NewPostTrigger } from "./NewPostTrigger";
 
 type PostComposerButtonProps = {
   userInitial: string;
+  userPhotoUrl: string | null;
 };
 
-export function PostComposerButton({ userInitial }: PostComposerButtonProps) {
+export function PostComposerButton({
+  userInitial,
+  userPhotoUrl,
+}: PostComposerButtonProps) {
   return (
     <NewPostTrigger className="mb-6 flex w-full cursor-pointer items-center gap-3.5 rounded-[18px] border border-line bg-surface px-[18px] py-3.5 text-left shadow-[0_4px_14px_-10px_rgba(120,90,60,0.4)]">
-      <Avatar initial={userInitial} size={40} />
+      <Avatar initial={userInitial} size={40} photoUrl={userPhotoUrl} />
       <span className="flex-1 text-[15px] text-muted">
         Comparte un momento…
       </span>

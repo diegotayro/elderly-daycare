@@ -24,6 +24,7 @@ export function StaffCard({ item }: StaffCardProps) {
         size={48}
         fontSize={19}
         colors={avatarTones[item.tone]}
+        photoUrl={item.photoUrl}
       />
       <div className="min-w-0 flex-1">
         <div className="font-display text-base leading-[normal] font-semibold text-ink">

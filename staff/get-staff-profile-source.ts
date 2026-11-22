@@ -11,6 +11,7 @@ import type {
   StaffElderly,
   User,
 } from "@/shared/database/types";
+import { signAvatarUrls } from "@/users/sign-avatar-urls";
 import { buildAvatarTones } from "./build-avatar-tones";
 import { fetchStaffEmails } from "./fetch-staff-emails";
 import type { StaffProfileSource } from "./types";
@@ -109,6 +110,7 @@ export const getStaffProfileSource = cache(
       hasHistory: historyResult.data === true,
       otherActiveLinks,
       avatarTones: buildAvatarTones([...staff, ...elderly]),
+      avatarUrls: await signAvatarUrls(staff),
     };
   },
 );

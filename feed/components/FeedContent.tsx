@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { requireTeamUser } from "@/auth/require-user";
 import { getLimaToday } from "@/shared/date/get-lima-today";
 import { createClient } from "@/shared/supabase/server";
+import { getCurrentUserPhotoUrl } from "@/users/get-current-user-photo-url";
 import { buildFeed } from "../build-feed";
 import { buildTodayLabel } from "../build-day-label";
 import { getInitialFeedDays } from "../get-feed-days";
@@ -21,9 +22,10 @@ export async function FeedContent() {
   const user = await requireTeamUser();
   const today = getLimaToday();
 
-  const [elderlyCount, dataPage] = await Promise.all([
+  const [elderlyCount, dataPage, photoUrl] = await Promise.all([
     countVisibleActiveElderly(),
     getInitialFeedDays(today, user.id),
+    getCurrentUserPhotoUrl(),
   ]);
   const initialPage = buildFeed(dataPage, { currentUserId: user.id, today });
 
@@ -31,6 +33,7 @@ export async function FeedContent() {
     <FeedView
       daycareName={user.daycareName}
       userFirstName={user.first_name}
+      userPhotoUrl={photoUrl}
       elderlyCount={elderlyCount}
       todayLabel={buildTodayLabel(today)}
       initialPage={initialPage}

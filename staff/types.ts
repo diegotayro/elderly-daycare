@@ -6,6 +6,8 @@ import type {
 } from "@/shared/database/types";
 import type { AvatarTone } from "@/elderly/avatar-tones";
 import type { ElderlyIndicator } from "@/elderly/types";
+import type { NotificationPreferenceKey } from "@/account/notification-preferences";
+import type { AvatarPermissions } from "@/users/types";
 
 export type StaffMember = User & { email: string }; // role = staff; el email viene de auth.users
 
@@ -17,6 +19,7 @@ export type StaffSource = {
   rooms: Room[];
   staffElderly: StaffElderly[];
   avatarTones: Record<string, AvatarTone>; // por id de staff o elderly; solo UI
+  avatarUrls: Record<string, string>; // avatar firmado, por id de staff
 };
 
 // Lo que solo necesita el perfil del staff (la lista no lo lee)
@@ -35,6 +38,7 @@ export type StaffListItem = {
   fullName: string;
   initial: string;
   tone: AvatarTone;
+  photoUrl: string | null;
   summary: string; // "3 adultos mayores vinculados"
   indicator: StaffIndicator;
 };
@@ -69,9 +73,16 @@ export type ElderlyOption = {
 export type StaffProfile = {
   id: string;
   fullName: string;
+  firstName: string;
+  lastName: string;
   initial: string;
   tone: AvatarTone;
+  photoUrl: string | null;
+  avatarPermissions: AvatarPermissions; // con un staff archived solo se puede quitar la foto
+  notificationValues: Record<NotificationPreferenceKey, boolean> | null; // null si está archived
   email: string;
+  canEdit: boolean; // un staff archived no se edita
+  canEditEmail: boolean; // solo active; el de un pending no se edita
   statusLabel: "Activo" | "Pendiente" | "Archivado";
   joinedAtLabel: string; // "feb 2025"
   canManageLinks: boolean; // status = active

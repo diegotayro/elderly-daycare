@@ -13,7 +13,7 @@ import { useCommentInputRef } from "./CommentInputProvider";
 
 type CommentComposerProps = {
   postId: string;
-  author: { initial: string; tone: AvatarTone };
+  author: { initial: string; tone: AvatarTone; photoUrl: string | null };
   onCreated: (comment: CommentView) => void;
   onSendError: () => void;
 };
@@ -78,6 +78,7 @@ export function CommentComposer({
           size={38}
           fontSize={15}
           colors={avatarTones[author.tone]}
+          photoUrl={author.photoUrl}
         />
         <input
           ref={inputRef}

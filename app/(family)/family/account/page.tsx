@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function FamilyAccountPage() {
   return (
-    <Suspense fallback={<AccountSkeleton withElderlyCard />}>
+    <Suspense fallback={<AccountSkeleton withElderlyCard withNotifications={false} />}>
       <FamilyAccountContent />
     </Suspense>
   );

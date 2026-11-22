@@ -1,6 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { CurrentUser } from "@/auth/types";
 import { createClient } from "@/shared/supabase/server";
 import { RELATIVE_HOME, TEAM_HOME } from "./home-routes";
@@ -51,6 +51,13 @@ export async function requireTeamUser(): Promise<CurrentUser> {
 export async function requireAdminUser(): Promise<CurrentUser> {
   const user = await requireTeamUser();
   if (user.role !== "admin") redirect(TEAM_HOME);
+  return user;
+}
+
+// Para pantallas que ocultan su existencia a quien no es admin: ve el 404, no una redirección
+export async function requireAdminOrNotFound(): Promise<CurrentUser> {
+  const user = await requireActiveUser();
+  if (user.role !== "admin") notFound();
   return user;
 }
 

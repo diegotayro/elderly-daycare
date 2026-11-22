@@ -6,6 +6,7 @@ import { getLimaToday } from "@/shared/date/get-lima-today";
 import { isUuid } from "@/shared/text/is-uuid";
 import { createClient } from "@/shared/supabase/server";
 import type { Elderly, Room } from "@/shared/database/types";
+import { signAvatarUrls } from "@/users/sign-avatar-urls";
 import { fetchPendingInvitations } from "./fetch-pending-invitations";
 import { fetchRelativeLinks } from "./fetch-relative-links";
 import { getAvatarTone } from "./get-avatar-tone";
@@ -48,6 +49,7 @@ export const getElderlyProfileSource = cache(
       avatarTones: Object.fromEntries(
         [elderly, ...relatives].map(({ id }) => [id, getAvatarTone(id)]),
       ),
+      avatarUrls: await signAvatarUrls(relatives),
     };
   },
 );

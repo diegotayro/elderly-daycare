@@ -9,11 +9,15 @@ export type CommentRow = {
   body: string;
   created_at: string;
   // null cuando la RLS no deja leer al autor
-  author: { full_name: string; role: UserRole } | null;
+  author: {
+    full_name: string;
+    role: UserRole;
+    avatar_url: string | null;
+  } | null;
 };
 
 export const COMMENT_COLUMNS =
-  "id, author_id, body, created_at, author:users!author_id(full_name, role)";
+  "id, author_id, body, created_at, author:users!author_id(full_name, role, avatar_url)";
 
 // Todos los comentarios del post, del más viejo al más nuevo
 export async function fetchComments(postId: string): Promise<CommentRow[]> {

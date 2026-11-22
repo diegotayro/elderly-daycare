@@ -3,6 +3,7 @@ import { DetailsList } from "@/shared/components/DetailsList";
 import { ChevronLeftIcon } from "@/shared/components/icons/ChevronLeftIcon";
 import type { StaffProfile } from "../types";
 import { LinkedElderlyCard } from "./LinkedElderlyCard";
+import { StaffNotificationCard } from "./StaffNotificationCard";
 import { StaffProfileHeader } from "./StaffProfileHeader";
 
 type StaffProfileViewProps = {
@@ -29,6 +30,12 @@ export function StaffProfileView({ profile }: StaffProfileViewProps) {
               { label: "En el equipo desde", value: profile.joinedAtLabel },
             ]}
           />
+          {profile.notificationValues && (
+            <StaffNotificationCard
+              staffId={profile.id}
+              values={profile.notificationValues}
+            />
+          )}
         </div>
         <div className="flex w-full flex-col gap-3.5 lg:w-[300px] lg:flex-none">
           <LinkedElderlyCard
