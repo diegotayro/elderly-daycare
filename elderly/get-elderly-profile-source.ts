@@ -12,9 +12,10 @@ import { fetchRelativeLinks } from "./fetch-relative-links";
 import { getAvatarTone } from "./get-avatar-tone";
 import type { ElderlySource } from "./types";
 
-// React cache evita consultar dos veces entre generateMetadata y la página
+// React cache evita consultar dos veces entre generateMetadata y la página.
+// El admin recibe todas las habitaciones (las necesita el modal de edición); el resto, solo la del adulto mayor.
 export const getElderlyProfileSource = cache(
-  async (id: string): Promise<ElderlySource | null> => {
+  async (id: string, isAdmin: boolean): Promise<ElderlySource | null> => {
     if (!isUuid(id)) return null;
 
     // La fecha de hoy debe quedar fuera del prerender
@@ -32,7 +33,9 @@ export const getElderlyProfileSource = cache(
 
     const [roomResult, { guardianElderly, relatives }, invitations] =
       await Promise.all([
-      supabase.from("rooms").select("*").eq("id", elderly.room_id),
+        isAdmin
+          ? supabase.from("rooms").select("*").order("name")
+          : supabase.from("rooms").select("*").eq("id", elderly.room_id),
         fetchRelativeLinks(supabase, [id]),
         fetchPendingInvitations(supabase, [id]),
       ]);

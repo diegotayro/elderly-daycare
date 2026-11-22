@@ -1,9 +1,11 @@
+import { buildRoomOptions } from "./build-room-options";
 import {
   formatAge,
   formatBirthDate,
   formatEnrolledAt,
 } from "./elderly-formatters";
 import { getLinkedRelatives } from "./get-linked-relatives";
+import { toElderlyFormValues } from "./to-elderly-form-values";
 import type { ElderlyProfile, ElderlySource } from "./types";
 
 type BuildElderlyProfileOptions = { isAdmin: boolean };
@@ -16,6 +18,7 @@ export function buildElderlyProfile(
   const elderly = source.elderly.find((item) => item.id === id);
   const room = source.rooms.find((item) => item.id === elderly?.room_id);
   if (!elderly || !room) return null;
+  const canEdit = isAdmin && elderly.status === "active";
 
   return {
     id: elderly.id,
@@ -32,6 +35,10 @@ export function buildElderlyProfile(
     canLinkRelative: isAdmin && elderly.status === "active",
     photoConsent: elderly.photo_consent,
     canEditPhotoConsent: isAdmin && elderly.status === "active",
+    canEdit,
+    editValues: toElderlyFormValues(elderly),
+    today: source.referenceDate,
+    roomOptions: canEdit ? buildRoomOptions(source) : [],
     enrolledAtLabel: formatEnrolledAt(elderly.enrolled_at),
     relatives: getLinkedRelatives(source, elderly.id, { isAdmin }),
     pendingInvitationEmails: source.invitations

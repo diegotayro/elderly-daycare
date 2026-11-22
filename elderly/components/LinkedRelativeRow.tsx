@@ -41,7 +41,8 @@ export function LinkedRelativeRow({ relative }: LinkedRelativeRowProps) {
     </>
   );
 
-  if (!relative.profileHref) return <div className={ROW_CLASS_NAME}>{content}</div>;
+  if (!relative.profileHref)
+    return <div className={ROW_CLASS_NAME}>{content}</div>;
 
   return (
     <Link href={relative.profileHref} className={LINK_CLASS_NAME}>

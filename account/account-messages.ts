@@ -24,6 +24,4 @@ export const accountMessages = {
   profileSaveErrorToast,
   profileSaveError: "No se pudieron guardar los cambios. Intenta de nuevo.",
   emailInUse: "Ese email ya está en uso.",
-  changesSummary: (fieldLabels: string[]) =>
-    `Cambiará: ${fieldLabels.join(", ")}`,
 } as const;

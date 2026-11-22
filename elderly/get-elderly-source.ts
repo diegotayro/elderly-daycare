@@ -20,11 +20,11 @@ export async function getElderlySource(): Promise<ElderlySource> {
     { guardianElderly, relatives },
     invitations,
   ] = await Promise.all([
-      supabase.from("elderly").select("*").order("full_name"),
-      supabase.from("rooms").select("*").order("name"),
-      fetchRelativeLinks(supabase),
-      fetchPendingInvitations(supabase),
-    ]);
+    supabase.from("elderly").select("*").order("full_name"),
+    supabase.from("rooms").select("*").order("name"),
+    fetchRelativeLinks(supabase),
+    fetchPendingInvitations(supabase),
+  ]);
   if (elderlyResult.error) throw elderlyResult.error;
   if (roomsResult.error) throw roomsResult.error;
 

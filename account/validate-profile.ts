@@ -1,4 +1,4 @@
-import { NAME_MAX_LENGTH } from "@/elderly/validate-new-elderly";
+import { NAME_MAX_LENGTH } from "@/elderly/validate-elderly-form";
 import { normalizeProfileValue } from "./diff-profile-changes";
 import type { ProfileChanges, ProfileErrors } from "./types";
 

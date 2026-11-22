@@ -66,6 +66,10 @@ export type ElderlyProfile = {
   canLinkRelative: boolean; // admin y adulto mayor activo
   photoConsent: boolean;
   canEditPhotoConsent: boolean; // admin y adulto mayor active
+  canEdit: boolean; // admin y adulto mayor active
+  editValues: ElderlyFormValues; // valores iniciales del modal de edición
+  roomOptions: RoomOption[]; // todas las habitaciones; vacío si !canEdit
+  today: string; // "hoy" (Lima): tope de la fecha de nacimiento en el modal de edición
   enrolledAtLabel: string; // "feb 2025"
   relatives: LinkedRelative[];
   pendingInvitationEmails: string[]; // invitaciones pending de este adulto mayor
@@ -76,7 +80,7 @@ export type PhotoConsentResult = { status: "ok" } | { status: "error" };
 export type RoomOption = { id: string; name: string };
 
 // Valores del formulario tal como llegan del FormData
-export type NewElderlyInput = {
+export type ElderlyFormValues = {
   firstName: string;
   lastName: string;
   birthDate: string; // "1947-03-12" o "" si está vacío o incompleto
@@ -86,12 +90,20 @@ export type NewElderlyInput = {
   medicalNotes: string;
 };
 
-export type NewElderlyField = keyof NewElderlyInput;
-export type NewElderlyErrors = Partial<Record<NewElderlyField, string>>;
+export type ElderlyFormField = keyof ElderlyFormValues;
+export type ElderlyFormErrors = Partial<Record<ElderlyFormField, string>>;
+
+// Resultado mínimo que entiende el diálogo del formulario (alta y edición)
+export type ElderlySaveResult =
+  | { status: "success" }
+  | { status: "invalid"; errors: ElderlyFormErrors }
+  | { status: "error" };
+
+export type UpdateElderlyResult = ElderlySaveResult;
 
 export type CreateElderlyResult =
   | { status: "success"; fullName: string }
-  | { status: "invalid"; errors: NewElderlyErrors }
+  | { status: "invalid"; errors: ElderlyFormErrors }
   | { status: "error" };
 
 // Valores del formulario de invitación tal como llegan del FormData

@@ -1,11 +1,5 @@
 export type AvatarTone =
-  | "blue"
-  | "pink"
-  | "green"
-  | "yellow"
-  | "purple"
-  | "lilac"
-  | "sky";
+  "blue" | "pink" | "green" | "yellow" | "purple" | "lilac" | "sky";
 
 export const avatarTones: Record<AvatarTone, { bg: string; fg: string }> = {
   blue: { bg: "#A9D9E8", fg: "#1F7A93" },
