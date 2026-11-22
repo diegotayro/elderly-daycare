@@ -24,6 +24,7 @@ const FIELD_ORDER: ElderlyFormField[] = [
 type ElderlyFormProps = {
   rooms: RoomOption[];
   today: string;
+  title: string;
   titleId: string;
   isPending: boolean;
   onCancel: () => void;
@@ -37,6 +38,7 @@ type ElderlyFormProps = {
 export function ElderlyForm({
   rooms,
   today,
+  title,
   titleId,
   isPending,
   onCancel,
@@ -115,7 +117,7 @@ export function ElderlyForm({
           id={titleId}
           className="m-0 font-display text-lg leading-[normal] font-semibold text-ink"
         >
-          Agregar adulto mayor
+          {title}
         </h2>
         <button
           type="submit"

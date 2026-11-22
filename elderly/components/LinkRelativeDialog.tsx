@@ -46,16 +46,18 @@ export function LinkRelativeDialog({
   } | null>(null);
 
   function showErrorToast() {
-    setToast((current) => ({ id: (current?.id ?? 0) + 1, message: errorToast }));
+    setToast((current) => ({
+      id: (current?.id ?? 0) + 1,
+      message: errorToast,
+    }));
   }
 
   function send(formData: FormData, handlers: SendHandlers) {
     isSendingRef.current = true;
     startTransition(async () => {
-      const result = await createRelativeInvitation(
-        elderlyId,
-        formData,
-      ).catch((): CreateRelativeInvitationResult => ({ status: "error" })); // fallo de red
+      const result = await createRelativeInvitation(elderlyId, formData).catch(
+        (): CreateRelativeInvitationResult => ({ status: "error" }),
+      ); // fallo de red
       isSendingRef.current = false;
 
       if (result.status === "invalid") handlers.showFieldErrors(result.errors);

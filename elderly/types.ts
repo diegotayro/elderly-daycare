@@ -89,6 +89,12 @@ export type ElderlyFormValues = {
 export type ElderlyFormField = keyof ElderlyFormValues;
 export type ElderlyFormErrors = Partial<Record<ElderlyFormField, string>>;
 
+// Resultado mínimo que entiende el diálogo del formulario (alta y edición)
+export type ElderlySaveResult =
+  | { status: "success" }
+  | { status: "invalid"; errors: ElderlyFormErrors }
+  | { status: "error" };
+
 export type CreateElderlyResult =
   | { status: "success"; fullName: string }
   | { status: "invalid"; errors: ElderlyFormErrors }
