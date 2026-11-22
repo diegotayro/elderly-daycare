@@ -1,18 +1,21 @@
 import { avatarTones } from "@/elderly/avatar-tones";
 import { Avatar } from "@/shared/components/Avatar";
 import type { FamilyAccountElderly } from "../types";
-import { PhotoConsentIndicator } from "./PhotoConsentIndicator";
+import { photoConsentLabel } from "@/elderly/photo-consent-labels";
+import { PhotoConsentRequestButton } from "./PhotoConsentRequestButton";
 
 type FamilyElderlyCardProps = {
   title: string; // "MIS ADULTOS MAYORES" | "ADULTOS MAYORES"
   emptyText: string;
   elderly: FamilyAccountElderly[];
+  showConsentRequest: boolean; // solo el familiar puede solicitar el cambio
 };
 
 export function FamilyElderlyCard({
   title,
   emptyText,
   elderly,
+  showConsentRequest,
 }: FamilyElderlyCardProps) {
   return (
     <section className="mb-[18px] rounded-[18px] border border-line bg-surface px-[22px] py-[18px]">
@@ -36,7 +39,7 @@ export function FamilyElderlyCard({
             }) => (
               <li
                 key={id}
-                className={`flex items-center gap-[13px] ${isArchived ? "opacity-60" : ""}`}
+                className={`flex flex-wrap items-center gap-x-[13px] gap-y-3 ${isArchived ? "opacity-60" : ""}`}
               >
                 <Avatar
                   initial={initial}
@@ -57,8 +60,14 @@ export function FamilyElderlyCard({
                     Archivado
                   </span>
                 )}
-                <span className="text-[13px] text-muted-strong">Fotos</span>
-                <PhotoConsentIndicator allowed={photoConsent} />
+                <div className="flex w-full items-center justify-between gap-3 sm:w-auto">
+                  <span className="text-[13px] text-muted-strong">
+                    Fotos: {photoConsentLabel(photoConsent)}
+                  </span>
+                  {showConsentRequest && !isArchived && (
+                    <PhotoConsentRequestButton />
+                  )}
+                </div>
               </li>
             ),
           )}

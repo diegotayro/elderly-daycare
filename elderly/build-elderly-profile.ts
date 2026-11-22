@@ -30,6 +30,8 @@ export function buildElderlyProfile(
     roomName: room.name,
     isArchived: elderly.status === "archived",
     canLinkRelative: isAdmin && elderly.status === "active",
+    photoConsent: elderly.photo_consent,
+    canEditPhotoConsent: isAdmin && elderly.status === "active",
     enrolledAtLabel: formatEnrolledAt(elderly.enrolled_at),
     relatives: getLinkedRelatives(source, elderly.id, { isAdmin }),
     pendingInvitationEmails: source.invitations

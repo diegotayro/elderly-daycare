@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ElderlyDayCare: app para una guardería de adultos mayores. El staff publica en un feed (comidas, siestas, actividades, logros, anuncios) y los familiares ven lo de sus adultos mayores. Roles: `admin`, `staff`, `relative`.
 
-Estado actual: scaffold de Create Next App. Aún no existe el código de dominio; la especificación vive en `references/`.
+Estado actual: features implementadas según `specs/` (ver estado en cada spec). Antes de tocar una feature, leer su spec y reusar lo existente.
 
 ## Comandos
 
@@ -47,7 +47,9 @@ No hay framework de tests configurado todavía.
 ## Convenciones
 
 - Screaming Architecture: organizar por feature de dominio (ej. `auth/`, `elderly/`, `feed/`), no por tipo técnico.
-- Cada cambio de tablas va acompañado de su migración.
+- Cada cambio de tablas va acompañado de su migración en `supabase/migrations/` (prefijo = versión del remoto) y de la actualización manual de `shared/database/types.ts`.
+- Route groups: `app/(app)` = admin/staff (variant `team`), `app/(family)` = familiares, `app/(auth)` = login e invitaciones.
+- Reusar antes de crear: `shared/components/` (Avatar, SkeletonBlock, toast, navegación), `shared/date/` (fechas en zona horaria de Lima), `shared/text/`.
 - Código en inglés; comentarios en español solo cuando aporten valor.
 
 ## UI / Frontend
@@ -66,7 +68,7 @@ No hay framework de tests configurado todavía.
   - `server.ts`: Server Components, Server Actions y Route Handlers.
   - `client.ts`: Client Components.
   - `proxy.ts`: lo usa solo `proxy.ts` de la raíz para refrescar la sesión.
-- La única excepción es el cliente `service_role` (`shared/supabase/admin.ts`, `server-only`), solo para los casos listados en el esquema. Hoy se usa en `auth/get-invitation-preview.ts`, `auth/actions/activate-account.ts`, `staff/actions/invite-staff.ts`, `staff/actions/resend-staff-invitation.ts`, `staff/actions/archive-staff.ts`, `staff/actions/reactivate-staff.ts`, `staff/actions/cancel-staff-invitation.ts`, `staff/actions/delete-staff.ts` y `users/apply-profile-changes.ts` (solo para cambiar el email).
+- La única excepción es el cliente `service_role` (`shared/supabase/admin.ts`, `server-only`), solo para los casos listados en el esquema. Para ver dónde se usa hoy: `grep -r "supabase/admin"`.
 
 ## Flujo de trabajo: Spec Driven Design (SDD)
 

@@ -338,11 +338,19 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 
 ### Switch de consentimiento de fotos del familiar
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 32
 - **Qué:** la tarjeta de adultos mayores de `/family/account` ya muestra el consentimiento de fotos real, pero solo en lectura (SPEC 31). Falta que el familiar pase `photo_consent` de `true` a `false`; nunca al revés.
 - **Origen:** SPEC 31 (`family/components/FamilyElderlyCard.tsx`, `PhotoConsentIndicator`).
 - **Se resuelve en:** la spec siguiente a SPEC 31.
-- **Notas:** "siempre gana el no". Solo el admin puede volver a ponerlo en `true`. Revisar la RLS de `elderly` y el trigger que protege `photo_consent`.
+- **Notas:** "siempre gana el no". Solo el admin puede volver a ponerlo en `true`. Revisar la RLS de `elderly` y el trigger que protege `photo_consent`. Se descartó el switch del familiar: el admin es la única autoridad y el familiar tiene el botón «Solicitar cambio» (SPEC 32).
+
+### Enviar la solicitud de cambio de consentimiento de fotos
+
+- [ ] **Estado:** pendiente
+- **Qué:** hoy «Solicitar cambio» de `/family/account` solo muestra un toast. Opciones: aviso en `/notices` del admin (tabla nueva y un `kind` nuevo en `list_notices`) o correo con Resend (requiere dominio verificado).
+- **Origen:** SPEC 32 (`family/components/PhotoConsentRequestButton.tsx`).
+- **Se resuelve en:** spec futura.
+- **Notas:** ver "Dominio verificado en Resend".
 
 ### El 404 de `/relatives/[id]` se ve con la barra del equipo
 

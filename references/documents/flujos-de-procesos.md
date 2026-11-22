@@ -42,7 +42,8 @@ Un adulto mayor puede tener varios familiares, y siempre gana el "no":
 - Si el familiar NO consiente → `elderly.photo_consent = false`.
 - Si el familiar SÍ consiente → no se cambia nada (se mantiene el valor actual).
 - Ningún familiar puede pasar el consentimiento de `false` a `true`. Solo el admin puede modificarlo después.
-- En "Mi cuenta" del familiar, el estado de fotos de cada adulto mayor es solo de lectura.
+- El admin lo cambia desde `/elderly/[id]` (solo adultos mayores `active`), con un switch que guarda al tocarlo.
+- En «Mi cuenta» del familiar, el estado de fotos es solo de lectura; el botón «Solicitar cambio» por ahora solo indica que se comunique con la guardería.
 
 > En "Activar cuenta" (flujo de Familiar), si el email ya tiene cuenta, la etiqueta pasa a "INGRESE SU CONTRASEÑA" y el vínculo se crea con esa cuenta (ver "Familiar que ya tiene cuenta").
 

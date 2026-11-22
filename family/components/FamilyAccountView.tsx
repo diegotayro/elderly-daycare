@@ -13,11 +13,13 @@ const modeConfig = {
     elderlyTitle: "MIS ADULTOS MAYORES",
     emptyText: "Aún no tienes adultos mayores vinculados.",
     showAccountActions: true,
+    showConsentRequest: true,
   },
   admin: {
     elderlyTitle: "ADULTOS MAYORES",
     emptyText: "No tiene adultos mayores vinculados.",
     showAccountActions: false,
+    showConsentRequest: false,
   },
 } as const;
 
@@ -44,7 +46,8 @@ export function FamilyAccountView({
   editAction,
   heading,
 }: FamilyAccountViewProps) {
-  const { elderlyTitle, emptyText, showAccountActions } = modeConfig[mode];
+  const { elderlyTitle, emptyText, showAccountActions, showConsentRequest } =
+    modeConfig[mode];
   const activeElderly = elderly.filter(({ isArchived }) => !isArchived);
 
   return (
@@ -65,6 +68,7 @@ export function FamilyAccountView({
         title={elderlyTitle}
         emptyText={emptyText}
         elderly={elderly}
+        showConsentRequest={showConsentRequest}
       />
     </AccountView>
   );

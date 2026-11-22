@@ -1,4 +1,6 @@
-export type DetailItem = { label: string; value: string };
+import type { ReactNode } from "react";
+
+export type DetailItem = { label: string; value: ReactNode };
 
 type DetailsListProps = {
   details: DetailItem[];

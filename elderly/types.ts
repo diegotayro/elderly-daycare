@@ -64,10 +64,14 @@ export type ElderlyProfile = {
   roomName: string; // "Roble"
   isArchived: boolean;
   canLinkRelative: boolean; // admin y adulto mayor activo
+  photoConsent: boolean;
+  canEditPhotoConsent: boolean; // admin y adulto mayor active
   enrolledAtLabel: string; // "feb 2025"
   relatives: LinkedRelative[];
   pendingInvitationEmails: string[]; // invitaciones pending de este adulto mayor
 };
+
+export type PhotoConsentResult = { status: "ok" } | { status: "error" };
 
 export type RoomOption = { id: string; name: string };
 

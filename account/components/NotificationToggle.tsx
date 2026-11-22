@@ -1,6 +1,7 @@
 "use client";
 
 import { useOptimistic, useState, useTransition } from "react";
+import { SwitchTrack } from "@/shared/components/SwitchTrack";
 import { Toast } from "@/shared/components/toast/Toast";
 import { accountMessages } from "../account-messages";
 import { updateNotificationPreference } from "../actions/update-notification-preference";
@@ -64,14 +65,7 @@ export function NotificationToggle({
         className="flex w-full cursor-pointer items-center justify-between gap-4 border-b border-line-soft py-2 text-left last:border-b-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral-strong"
       >
         <span className="text-[15px] text-body">{label}</span>
-        <span
-          aria-hidden="true"
-          className={`relative h-6 w-[42px] flex-none rounded-full transition-colors duration-200 motion-reduce:transition-none ${enabled ? "bg-consent-check" : "bg-toggle-off"}`}
-        >
-          <span
-            className={`absolute top-[3px] left-[3px] size-[18px] rounded-full bg-white transition-transform duration-200 motion-reduce:transition-none ${enabled ? "translate-x-[18px]" : "translate-x-0"}`}
-          />
-        </span>
+        <SwitchTrack enabled={enabled} />
       </button>
       {toastKey !== null && (
         <Toast
