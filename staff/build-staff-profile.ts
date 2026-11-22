@@ -72,6 +72,10 @@ export function buildStaffProfile(
     initial: staff.first_name[0],
     tone: source.avatarTones[staff.id] ?? "blue",
     photoUrl: source.avatarUrls[staff.id] ?? null,
+    avatarPermissions: {
+      canChange: staff.status !== "archived",
+      canRemove: true,
+    },
     email: staff.email,
     statusLabel: formatStaffStatus(staff.status),
     joinedAtLabel: formatEnrolledAt(staff.created_at),

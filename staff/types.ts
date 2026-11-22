@@ -6,6 +6,7 @@ import type {
 } from "@/shared/database/types";
 import type { AvatarTone } from "@/elderly/avatar-tones";
 import type { ElderlyIndicator } from "@/elderly/types";
+import type { AvatarPermissions } from "@/users/types";
 
 export type StaffMember = User & { email: string }; // role = staff; el email viene de auth.users
 
@@ -74,6 +75,7 @@ export type StaffProfile = {
   initial: string;
   tone: AvatarTone;
   photoUrl: string | null;
+  avatarPermissions: AvatarPermissions; // con un staff archived solo se puede quitar la foto
   email: string;
   statusLabel: "Activo" | "Pendiente" | "Archivado";
   joinedAtLabel: string; // "feb 2025"

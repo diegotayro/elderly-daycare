@@ -1,5 +1,7 @@
 import { avatarTones } from "@/elderly/avatar-tones";
-import { Avatar } from "@/shared/components/Avatar";
+import { AvatarPhotoButton } from "@/users/components/AvatarPhotoButton";
+import { ChangeAvatarButton } from "@/users/components/ChangeAvatarButton";
+import { userRoleLabels } from "@/users/user-role-labels";
 import type { StaffProfile } from "../types";
 import { StaffStatusActions } from "./StaffStatusActions";
 
@@ -10,7 +12,11 @@ type StaffProfileHeaderProps = {
 export function StaffProfileHeader({ profile }: StaffProfileHeaderProps) {
   return (
     <div className="flex flex-wrap items-center gap-x-[18px] gap-y-3">
-      <Avatar
+      <AvatarPhotoButton
+        userId={profile.id}
+        fullName={profile.fullName}
+        roleLabel={userRoleLabels.staff}
+        canRemove={profile.avatarPermissions.canRemove}
         initial={profile.initial}
         size={84}
         fontSize={34}
@@ -25,6 +31,9 @@ export function StaffProfileHeader({ profile }: StaffProfileHeaderProps) {
       </div>
       <div className="flex flex-wrap gap-2">
         <StaffStatusActions profile={profile} />
+        {profile.avatarPermissions.canChange && (
+          <ChangeAvatarButton userId={profile.id} />
+        )}
         <button
           type="button"
           className="cursor-pointer rounded-xl border-[1.5px] border-line bg-surface px-4 py-[9px] text-sm font-bold text-nav"
