@@ -42,6 +42,7 @@ export type CurrentUser = Pick<
   | "id"
   | "role"
   | "first_name"
+  | "last_name"
   | "full_name"
   | "avatar_url"
   | "notify_on_post"

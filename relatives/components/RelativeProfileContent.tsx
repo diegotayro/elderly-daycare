@@ -32,7 +32,6 @@ export async function RelativeProfileContent({
       photoUrl={profile.photoUrl}
       elderly={profile.elderly}
       avatarPermissions={{ canChange: !isArchived, canRemove: true }}
-      canEdit={!isArchived}
       heading={
         <RelativeProfileHeading
           fullName={profile.fullName}

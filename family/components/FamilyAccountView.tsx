@@ -29,7 +29,7 @@ type FamilyAccountViewProps = {
   photoUrl: string | null;
   elderly: FamilyAccountElderly[];
   avatarPermissions: AvatarPermissions;
-  canEdit: boolean;
+  editAction?: ReactNode;
   heading?: ReactNode;
 };
 
@@ -41,7 +41,7 @@ export function FamilyAccountView({
   photoUrl,
   elderly,
   avatarPermissions,
-  canEdit,
+  editAction,
   heading,
 }: FamilyAccountViewProps) {
   const { elderlyTitle, emptyText, showAccountActions } = modeConfig[mode];
@@ -54,7 +54,7 @@ export function FamilyAccountView({
       email={email}
       detail={buildProfileRelationship(activeElderly)}
       roleLabel={userRoleLabels.relative}
-      canEdit={canEdit}
+      editAction={editAction}
       avatarPermissions={avatarPermissions}
       heading={heading}
       avatarColors={avatarTones.lilac}

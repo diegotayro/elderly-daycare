@@ -16,7 +16,7 @@ type AccountViewProps = {
   email: string;
   detail: string;
   roleLabel: string;
-  canEdit: boolean; // "Editar" del perfil
+  editAction?: ReactNode; // botón "Editar" del perfil, con su modal
   avatarPermissions: AvatarPermissions;
   heading?: ReactNode; // por defecto, el título "Mi cuenta"
   avatarColors?: { bg: string; fg: string };
@@ -36,7 +36,7 @@ export function AccountView({
   email,
   detail,
   roleLabel,
-  canEdit,
+  editAction,
   avatarPermissions,
   heading = <AccountTitle />,
   avatarColors,
@@ -54,7 +54,7 @@ export function AccountView({
         email={email}
         detail={detail}
         roleLabel={roleLabel}
-        canEdit={canEdit}
+        editAction={editAction}
         avatarPermissions={avatarPermissions}
         avatarColors={avatarColors}
         photoUrl={photoUrl}

@@ -20,7 +20,6 @@ export async function FamilyAccountContent() {
       photoUrl={photoUrl}
       elderly={elderly}
       avatarPermissions={OWN_AVATAR_PERMISSIONS}
-      canEdit={false}
     />
   );
 }
