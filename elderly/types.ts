@@ -66,6 +66,9 @@ export type ElderlyProfile = {
   canLinkRelative: boolean; // admin y adulto mayor activo
   photoConsent: boolean;
   canEditPhotoConsent: boolean; // admin y adulto mayor active
+  canEdit: boolean; // admin y adulto mayor active
+  editValues: ElderlyFormValues; // valores iniciales del modal de edición
+  roomOptions: RoomOption[]; // todas las habitaciones; vacío si !canEdit
   enrolledAtLabel: string; // "feb 2025"
   relatives: LinkedRelative[];
   pendingInvitationEmails: string[]; // invitaciones pending de este adulto mayor

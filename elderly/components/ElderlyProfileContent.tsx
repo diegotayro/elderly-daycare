@@ -13,11 +13,11 @@ export async function ElderlyProfileContent({
 }: ElderlyProfileContentProps) {
   const user = await requireTeamUser();
   const { id } = await params;
-  const source = await getElderlyProfileSource(id);
+  const isAdmin = user.role === "admin";
+  const source = await getElderlyProfileSource(id, isAdmin);
   if (!source) notFound();
 
   // El staff no ve archivados aunque RLS se lo permita
-  const isAdmin = user.role === "admin";
   const profile = buildElderlyProfile(source, id, { isAdmin });
   if (!profile || (profile.isArchived && !isAdmin)) notFound();
 

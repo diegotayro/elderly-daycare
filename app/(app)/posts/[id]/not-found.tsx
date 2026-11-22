@@ -10,10 +10,7 @@ export default function PostNotFound() {
         Puede que el enlace sea incorrecto o que la publicación ya no esté
         disponible.
       </p>
-      <Link
-        href="/"
-        className="text-[14.5px] font-extrabold text-coral-link"
-      >
+      <Link href="/" className="text-[14.5px] font-extrabold text-coral-link">
         Volver al feed
       </Link>
     </div>
