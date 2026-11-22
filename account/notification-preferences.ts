@@ -1,5 +1,10 @@
+export const NOTIFICATION_PREFERENCE_KEYS = [
+  "notify_on_post",
+  "daily_summary_enabled",
+] as const;
+
 export type NotificationPreferenceKey =
-  "notify_on_post" | "daily_summary_enabled";
+  (typeof NOTIFICATION_PREFERENCE_KEYS)[number];
 
 export type NotificationPreference = {
   key: NotificationPreferenceKey;

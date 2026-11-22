@@ -5,11 +5,13 @@ import type {
 import { NotificationToggle } from "./NotificationToggle";
 
 type NotificationSettingsCardProps = {
+  userId: string; // dueño de las preferencias
   preferences: NotificationPreference[];
   initialValues: Record<NotificationPreferenceKey, boolean>;
 };
 
 export function NotificationSettingsCard({
+  userId,
   preferences,
   initialValues,
 }: NotificationSettingsCardProps) {
@@ -21,6 +23,8 @@ export function NotificationSettingsCard({
       {preferences.map(({ key, label }) => (
         <NotificationToggle
           key={key}
+          userId={userId}
+          preferenceKey={key}
           label={label}
           initialEnabled={initialValues[key]}
         />

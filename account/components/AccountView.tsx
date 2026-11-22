@@ -62,6 +62,7 @@ export function AccountView({
       {children}
       {notifications && (
         <NotificationSettingsCard
+          userId={userId}
           preferences={notifications.preferences}
           initialValues={notifications.values}
         />
