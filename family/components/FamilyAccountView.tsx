@@ -1,12 +1,8 @@
 import { AccountView } from "@/account/components/AccountView";
-import {
-  familyNotificationPreferences,
-  type NotificationPreferenceKey,
-} from "@/account/notification-preferences";
 import { avatarTones } from "@/elderly/avatar-tones";
 import { userRoleLabels } from "@/users/user-role-labels";
-import { mockFamily } from "../mock-family";
 import { buildProfileRelationship } from "../relationship-text";
+import type { FamilyAccountElderly } from "../types";
 import { FamilyElderlyCard } from "./FamilyElderlyCard";
 
 type FamilyAccountViewProps = {
@@ -14,7 +10,7 @@ type FamilyAccountViewProps = {
   fullName: string;
   email: string;
   photoUrl: string | null;
-  notificationValues: Record<NotificationPreferenceKey, boolean>;
+  elderly: FamilyAccountElderly[];
 };
 
 export function FamilyAccountView({
@@ -22,22 +18,26 @@ export function FamilyAccountView({
   fullName,
   email,
   photoUrl,
-  notificationValues,
+  elderly,
 }: FamilyAccountViewProps) {
+  const activeElderly = elderly.filter(({ isArchived }) => !isArchived);
+
   return (
     <AccountView
       userId={userId}
       fullName={fullName}
       email={email}
-      detail={buildProfileRelationship(mockFamily)}
+      detail={buildProfileRelationship(activeElderly)}
       roleLabel={userRoleLabels.relative}
       canEdit={false}
       avatarColors={avatarTones.lilac}
       photoUrl={photoUrl}
-      preferences={familyNotificationPreferences}
-      notificationValues={notificationValues}
     >
-      <FamilyElderlyCard elderly={mockFamily.elderly} />
+      <FamilyElderlyCard
+        title="MIS ADULTOS MAYORES"
+        emptyText="Aún no tienes adultos mayores vinculados."
+        elderly={elderly}
+      />
     </AccountView>
   );
 }

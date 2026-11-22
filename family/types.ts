@@ -18,6 +18,19 @@ export type FamilyElderly = {
   photoConsent: boolean;
 };
 
+// Adulto mayor vinculado al familiar, para la tarjeta de "Mi cuenta" (de cualquier estado)
+export type FamilyAccountElderly = {
+  id: string;
+  fullName: string; // "Luis Fernández"
+  initial: string; // "L"
+  tone: AvatarTone;
+  ageLabel: string; // "78 años"
+  roomName: string; // "Roble"
+  photoConsent: boolean;
+  isArchived: boolean;
+  relationship: RelationshipType; // del vínculo de este familiar con él
+};
+
 export type FamilyPost = {
   id: string;
   type: PostType;
@@ -64,8 +77,8 @@ export type DailySummary = {
 export type ElderlyFilter =
   { kind: "all" } | { kind: "elderly"; elderlyId: string };
 
+// Solo para "Resumen del día", que sigue con datos de mock
 export type FamilyMock = {
-  relationshipLabel: string; // "Hija", de relationshipLabels (solo perfil de "Mi cuenta")
   elderly: FamilyElderly[];
   summaries: DailySummary[];
 };

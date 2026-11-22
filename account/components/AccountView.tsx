@@ -25,8 +25,11 @@ type AccountViewProps = {
   canEdit: boolean; // "Editar" del perfil; solo el admin en su /account
   avatarColors?: { bg: string; fg: string };
   photoUrl?: string | null;
-  preferences: NotificationPreference[];
-  notificationValues: Record<NotificationPreferenceKey, boolean>;
+  // Sin notificaciones no se muestra la tarjeta (/family/account)
+  notifications?: {
+    preferences: NotificationPreference[];
+    values: Record<NotificationPreferenceKey, boolean>;
+  };
   children?: ReactNode; // entre el perfil y las notificaciones
 };
 
@@ -39,8 +42,7 @@ export function AccountView({
   canEdit,
   avatarColors,
   photoUrl,
-  preferences,
-  notificationValues,
+  notifications,
   children,
 }: AccountViewProps) {
   return (
@@ -60,10 +62,12 @@ export function AccountView({
         photoUrl={photoUrl}
       />
       {children}
-      <NotificationSettingsCard
-        preferences={preferences}
-        initialValues={notificationValues}
-      />
+      {notifications && (
+        <NotificationSettingsCard
+          preferences={notifications.preferences}
+          initialValues={notifications.values}
+        />
+      )}
       <AccountActionsCard />
       <SignOutForm className="block w-full cursor-pointer rounded-[14px] border-[1.5px] border-logout-line bg-logout-bg p-3.5 text-center text-[15px] font-extrabold text-coral-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral-strong">
         Cerrar sesión

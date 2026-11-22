@@ -17,10 +17,12 @@ export async function AccountContent() {
       roleLabel={userRoleLabels[user.role]}
       canEdit={user.role === "admin"}
       photoUrl={photoUrl}
-      preferences={teamNotificationPreferences}
-      notificationValues={{
-        notify_on_post: user.notify_on_post,
-        daily_summary_enabled: user.daily_summary_enabled,
+      notifications={{
+        preferences: teamNotificationPreferences,
+        values: {
+          notify_on_post: user.notify_on_post,
+          daily_summary_enabled: user.daily_summary_enabled,
+        },
       }}
     />
   );

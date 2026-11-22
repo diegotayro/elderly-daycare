@@ -1,7 +1,10 @@
 import { relationshipLabels } from "@/elderly/relationship-labels";
-import type { FamilyMock, SidebarElderlyLink } from "./types";
+import type { RelationshipType } from "@/shared/database/types";
+import type { SidebarElderlyLink } from "./types";
 
 const DEFAULT_RELATIONSHIP = "Familiar";
+
+type RelationshipLink = { relationship: RelationshipType };
 
 function joinNames(names: string[]): string {
   const [first, second, ...rest] = names;
@@ -10,8 +13,15 @@ function joinNames(names: string[]): string {
   return `${first} y ${second}`;
 }
 
+// "A", "A y B", "A, B y C"
+function joinAllNames(names: string[]): string {
+  const last = names.at(-1);
+  if (names.length < 2 || !last) return names[0];
+  return `${names.slice(0, -1).join(", ")} y ${last}`;
+}
+
 // Parentesco común de todos los vínculos; si difieren, uno genérico
-function resolveRelationshipLabel(links: SidebarElderlyLink[]): string {
+function resolveRelationshipLabel(links: RelationshipLink[]): string {
   const [first] = links;
   const allEqual = links.every(
     ({ relationship }) => relationship === first.relationship,
@@ -29,9 +39,12 @@ export function buildSidebarRelationship(links: SidebarElderlyLink[]): string {
   return `${resolveRelationshipLabel(links)} de ${joinNames(names)}`;
 }
 
-export function buildProfileRelationship({
-  relationshipLabel,
-  elderly,
-}: Pick<FamilyMock, "relationshipLabel" | "elderly">): string {
-  return `${relationshipLabel} de ${elderly.map(({ fullName }) => fullName).join(" y ")}`;
+// Los vínculos llegan ordenados y solo con adultos mayores activos
+export function buildProfileRelationship(
+  links: (RelationshipLink & { fullName: string })[],
+): string {
+  if (links.length === 0) return DEFAULT_RELATIONSHIP;
+
+  const names = links.map(({ fullName }) => fullName);
+  return `${resolveRelationshipLabel(links)} de ${joinAllNames(names)}`;
 }
