@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { ProfileChangesSummary } from "@/account/components/ProfileChangesSummary";
+import { profileFieldLabels } from "@/account/account-messages";
 import { diffProfileChanges } from "@/account/diff-profile-changes";
 import type {
   ProfileChanges,
@@ -18,6 +18,7 @@ import {
   getFieldErrorId,
 } from "@/elderly/components/FormField";
 import { NAME_MAX_LENGTH } from "@/elderly/validate-elderly-form";
+import { ChangesSummary } from "@/shared/components/ChangesSummary";
 
 type EditField = ProfileField | "emailConfirmation";
 type FormErrors = Partial<Record<EditField, string>>;
@@ -175,7 +176,9 @@ export function EditUserForm({
         disabled={isPending}
         className="m-0 flex min-h-0 min-w-0 flex-col gap-[18px] overflow-y-auto border-0 px-[26px] py-6"
       >
-        <ProfileChangesSummary changedFields={changedFields} />
+        <ChangesSummary
+          fieldLabels={changedFields.map((field) => profileFieldLabels[field])}
+        />
         <FormField id="firstName" label="NOMBRES" error={errors.firstName}>
           <input {...controlProps("firstName")} maxLength={NAME_MAX_LENGTH} />
         </FormField>
