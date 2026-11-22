@@ -1,4 +1,5 @@
 import { requireTeamUser } from "@/auth/require-user";
+import { OWN_AVATAR_PERMISSIONS } from "@/users/avatar-permissions";
 import { getCurrentUserPhotoUrl } from "@/users/get-current-user-photo-url";
 import { userRoleLabels } from "@/users/user-role-labels";
 import { teamNotificationPreferences } from "../notification-preferences";
@@ -16,6 +17,7 @@ export async function AccountContent() {
       detail={userRoleLabels[user.role]}
       roleLabel={userRoleLabels[user.role]}
       canEdit={user.role === "admin"}
+      avatarPermissions={OWN_AVATAR_PERMISSIONS}
       photoUrl={photoUrl}
       notifications={{
         preferences: teamNotificationPreferences,

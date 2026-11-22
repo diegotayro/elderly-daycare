@@ -45,6 +45,7 @@ export type LinkedRelative = {
   initial: string;
   tone: AvatarTone;
   photoUrl: string | null; // url firmada; null en invitaciones pendientes
+  profileHref: string | null; // solo el admin, en vínculos activos
   detail: string; // "Hija · activa" | "Hijo · invitación enviada"
   status: "active" | "pending";
   statusLabel: string; // "ACTIVA" | "ACTIVO" | "PENDIENTE"

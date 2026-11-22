@@ -8,9 +8,11 @@ import type { ElderlySource, LinkedRelative } from "./types";
 const DEFAULT_RELATIVE_TONE: AvatarTone = "lilac";
 
 // Familiares vinculados = vínculos activos + invitaciones pendientes.
+// Con `isAdmin`, cada vínculo activo enlaza al perfil del familiar, que recuerda desde qué adulto mayor se entró.
 export function getLinkedRelatives(
   source: ElderlySource,
   elderlyId: string,
+  { isAdmin = false }: { isAdmin?: boolean } = {},
 ): LinkedRelative[] {
   const toneOf = (id: string) =>
     source.avatarTones[id] ?? DEFAULT_RELATIVE_TONE;
@@ -30,6 +32,9 @@ export function getLinkedRelatives(
           initial: relative.first_name[0],
           tone: toneOf(relative.id),
           photoUrl: source.avatarUrls[relative.id] ?? null,
+          profileHref: isAdmin
+            ? `/relatives/${relative.id}?from=${elderlyId}`
+            : null,
           detail: `${labels.label} · ${labels.activeDetail}`,
           status: "active" as const,
           statusLabel: labels.activeBadge,
@@ -48,6 +53,7 @@ export function getLinkedRelatives(
       initial: invitation.first_name[0],
       tone: toneOf(invitation.id),
       photoUrl: null,
+      profileHref: null,
       detail: `${relationshipLabels[invitation.relationship].label} · ${pendingRelativeLabels.detail}`,
       status: "pending" as const,
       statusLabel: pendingRelativeLabels.badge,
