@@ -8,6 +8,7 @@ export async function FamilyAccountContent() {
 
   return (
     <FamilyAccountView
+      userId={user.id}
       fullName={user.full_name}
       email={user.email}
       photoUrl={photoUrl}

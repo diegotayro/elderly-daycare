@@ -4,15 +4,25 @@ import type {
   NotificationPreferenceKey,
 } from "../notification-preferences";
 import { SignOutForm } from "@/auth/components/SignOutForm";
+import type { AvatarPermissions } from "@/users/types";
 import { AccountActionsCard } from "./AccountActionsCard";
 import { AccountTitle } from "./AccountTitle";
 import { NotificationSettingsCard } from "./NotificationSettingsCard";
 import { ProfileCard } from "./ProfileCard";
 
+// En "Mi cuenta" cada usuario gestiona su propia foto
+const OWN_AVATAR_PERMISSIONS: AvatarPermissions = {
+  canChange: true,
+  canRemove: true,
+};
+
 type AccountViewProps = {
+  userId: string;
   fullName: string;
   email: string;
   detail: string;
+  roleLabel: string;
+  canEdit: boolean; // "Editar" del perfil; solo el admin en su /account
   avatarColors?: { bg: string; fg: string };
   photoUrl?: string | null;
   preferences: NotificationPreference[];
@@ -21,9 +31,12 @@ type AccountViewProps = {
 };
 
 export function AccountView({
+  userId,
   fullName,
   email,
   detail,
+  roleLabel,
+  canEdit,
   avatarColors,
   photoUrl,
   preferences,
@@ -36,9 +49,13 @@ export function AccountView({
         <AccountTitle />
       </header>
       <ProfileCard
+        userId={userId}
         fullName={fullName}
         email={email}
         detail={detail}
+        roleLabel={roleLabel}
+        canEdit={canEdit}
+        avatarPermissions={OWN_AVATAR_PERMISSIONS}
         avatarColors={avatarColors}
         photoUrl={photoUrl}
       />

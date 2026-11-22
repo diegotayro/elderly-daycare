@@ -1,8 +1,8 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { createClient } from "@/shared/supabase/server";
+import { AVATARS_BUCKET } from "./avatar-storage";
 
-const AVATARS_BUCKET = "avatars";
 const SIGNED_URL_SECONDS = 3600;
 
 export type AvatarOwner = { id: string; avatar_url: string | null };

@@ -10,9 +10,12 @@ export async function AccountContent() {
 
   return (
     <AccountView
+      userId={user.id}
       fullName={user.full_name}
       email={user.email}
       detail={userRoleLabels[user.role]}
+      roleLabel={userRoleLabels[user.role]}
+      canEdit={user.role === "admin"}
       photoUrl={photoUrl}
       preferences={teamNotificationPreferences}
       notificationValues={{

@@ -4,11 +4,13 @@ import {
   type NotificationPreferenceKey,
 } from "@/account/notification-preferences";
 import { avatarTones } from "@/elderly/avatar-tones";
+import { userRoleLabels } from "@/users/user-role-labels";
 import { mockFamily } from "../mock-family";
 import { buildProfileRelationship } from "../relationship-text";
 import { FamilyElderlyCard } from "./FamilyElderlyCard";
 
 type FamilyAccountViewProps = {
+  userId: string;
   fullName: string;
   email: string;
   photoUrl: string | null;
@@ -16,6 +18,7 @@ type FamilyAccountViewProps = {
 };
 
 export function FamilyAccountView({
+  userId,
   fullName,
   email,
   photoUrl,
@@ -23,9 +26,12 @@ export function FamilyAccountView({
 }: FamilyAccountViewProps) {
   return (
     <AccountView
+      userId={userId}
       fullName={fullName}
       email={email}
       detail={buildProfileRelationship(mockFamily)}
+      roleLabel={userRoleLabels.relative}
+      canEdit={false}
       avatarColors={avatarTones.lilac}
       photoUrl={photoUrl}
       preferences={familyNotificationPreferences}
