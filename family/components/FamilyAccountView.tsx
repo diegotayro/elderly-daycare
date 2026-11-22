@@ -11,12 +11,14 @@ import { FamilyElderlyCard } from "./FamilyElderlyCard";
 type FamilyAccountViewProps = {
   fullName: string;
   email: string;
+  photoUrl: string | null;
   notificationValues: Record<NotificationPreferenceKey, boolean>;
 };
 
 export function FamilyAccountView({
   fullName,
   email,
+  photoUrl,
   notificationValues,
 }: FamilyAccountViewProps) {
   return (
@@ -25,6 +27,7 @@ export function FamilyAccountView({
       email={email}
       detail={buildProfileRelationship(mockFamily)}
       avatarColors={avatarTones.lilac}
+      photoUrl={photoUrl}
       preferences={familyNotificationPreferences}
       notificationValues={notificationValues}
     >

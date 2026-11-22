@@ -71,6 +71,7 @@ export function buildStaffProfile(
     fullName: staff.full_name,
     initial: staff.first_name[0],
     tone: source.avatarTones[staff.id] ?? "blue",
+    photoUrl: source.avatarUrls[staff.id] ?? null,
     email: staff.email,
     statusLabel: formatStaffStatus(staff.status),
     joinedAtLabel: formatEnrolledAt(staff.created_at),

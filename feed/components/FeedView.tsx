@@ -11,6 +11,7 @@ import { PostComposerButton } from "./PostComposerButton";
 type FeedViewProps = {
   daycareName: string;
   userFirstName: string;
+  userPhotoUrl: string | null;
   elderlyCount: number;
   todayLabel: string;
   initialPage: FeedPage<FeedPost>;
@@ -19,6 +20,7 @@ type FeedViewProps = {
 export function FeedView({
   daycareName,
   userFirstName,
+  userPhotoUrl,
   elderlyCount,
   todayLabel,
   initialPage,
@@ -48,7 +50,10 @@ export function FeedView({
         elderlyCount={elderlyCount}
         todayLabel={todayLabel}
       />
-      <PostComposerButton userInitial={userFirstName[0]} />
+      <PostComposerButton
+        userInitial={userFirstName[0]}
+        userPhotoUrl={userPhotoUrl}
+      />
       {days.map((day) => (
         <FeedDaySection key={day.date} day={day} />
       ))}

@@ -16,6 +16,7 @@ export function CommentItem({ comment, onDelete }: CommentItemProps) {
         size={38}
         fontSize={15}
         colors={avatarTones[comment.authorTone]}
+        photoUrl={comment.authorPhotoUrl}
       />
       <div className="min-w-0 flex-1 rounded-[14px] border border-line bg-surface px-[15px] py-3">
         <div className="mb-[3px] flex items-baseline gap-2">

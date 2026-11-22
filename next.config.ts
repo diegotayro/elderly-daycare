@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-// Las fotos del feed son URLs firmadas del bucket privado post-photos
+// Las fotos del feed y los avatares son URLs firmadas de buckets privados
 const supabaseHostname = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!)
   .hostname;
 
@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: supabaseHostname,
         pathname: "/storage/v1/object/sign/post-photos/**",
+      },
+      {
+        protocol: "https",
+        hostname: supabaseHostname,
+        pathname: "/storage/v1/object/sign/avatars/**",
       },
     ],
   },

@@ -12,6 +12,7 @@ type SidebarProps = {
   daycareName?: string;
   userName?: string;
   userRoleLabel?: string;
+  userPhotoUrl?: string | null;
   isAdmin?: boolean;
 };
 
@@ -20,6 +21,7 @@ export function Sidebar({
   daycareName,
   userName,
   userRoleLabel,
+  userPhotoUrl,
   isAdmin = false,
 }: SidebarProps) {
   const { showNewPost, userAvatarColors } = navVariants[variant];
@@ -61,7 +63,11 @@ export function Sidebar({
 
       <div className="mt-2.5 border-t border-line pt-3.5">
         <div className="flex items-center gap-[11px] px-2 py-1.5">
-          <Avatar initial={userName?.[0] ?? ""} colors={userAvatarColors} />
+          <Avatar
+            initial={userName?.[0] ?? ""}
+            colors={userAvatarColors}
+            photoUrl={userPhotoUrl}
+          />
           <div className="min-w-0 flex-1">
             <div className="text-sm font-extrabold text-ink">{userName}</div>
             <div className="truncate text-xs text-muted" title={userRoleLabel}>

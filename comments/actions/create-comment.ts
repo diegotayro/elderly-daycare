@@ -6,6 +6,7 @@ import { getLimaToday } from "@/shared/date/get-lima-today";
 import { createClient } from "@/shared/supabase/server";
 import { isUuid } from "@/shared/text/is-uuid";
 import { toCommentView } from "../build-comment-view";
+import { signCommentAvatars } from "../sign-comment-avatars";
 import { COMMENT_COLUMNS, type CommentRow } from "../fetch-comments";
 import type { CreateCommentResult } from "../types";
 import { validateCommentBody } from "../validate-comment-body";
@@ -36,5 +37,9 @@ export async function createComment(
     console.error("createComment: no se pudo crear el comentario", error);
     return { status: "error" };
   }
-  return { status: "ok", comment: toCommentView(data, user, getLimaToday()) };
+  const photoUrls = await signCommentAvatars([data]);
+  return {
+    status: "ok",
+    comment: toCommentView(data, user, getLimaToday(), photoUrls),
+  };
 }

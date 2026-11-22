@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { requireTeamUser } from "@/auth/require-user";
+import { getCurrentUserPhotoUrl } from "@/users/get-current-user-photo-url";
 import { buildTeamPostSubtitle } from "../build-team-post-subtitle";
 import { getTeamPostDetail } from "../get-post-detail";
 import { PostDetailHeader } from "./PostDetailHeader";
@@ -13,7 +14,10 @@ export async function PostDetailContent({ params }: PostDetailContentProps) {
   const user = await requireTeamUser();
   const { id } = await params;
 
-  const detail = await getTeamPostDetail(id, user);
+  const [detail, photoUrl] = await Promise.all([
+    getTeamPostDetail(id, user),
+    getCurrentUserPhotoUrl(),
+  ]);
   if (!detail) notFound();
 
   const { post, comments } = detail;
@@ -30,6 +34,7 @@ export async function PostDetailContent({ params }: PostDetailContentProps) {
       }}
       comments={comments}
       currentUser={user}
+      currentUserPhotoUrl={photoUrl}
       backHref="/"
     >
       <PostDetailHeader

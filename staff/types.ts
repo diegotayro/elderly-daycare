@@ -17,6 +17,7 @@ export type StaffSource = {
   rooms: Room[];
   staffElderly: StaffElderly[];
   avatarTones: Record<string, AvatarTone>; // por id de staff o elderly; solo UI
+  avatarUrls: Record<string, string>; // avatar firmado, por id de staff
 };
 
 // Lo que solo necesita el perfil del staff (la lista no lo lee)
@@ -35,6 +36,7 @@ export type StaffListItem = {
   fullName: string;
   initial: string;
   tone: AvatarTone;
+  photoUrl: string | null;
   summary: string; // "3 adultos mayores vinculados"
   indicator: StaffIndicator;
 };
@@ -71,6 +73,7 @@ export type StaffProfile = {
   fullName: string;
   initial: string;
   tone: AvatarTone;
+  photoUrl: string | null;
   email: string;
   statusLabel: "Activo" | "Pendiente" | "Archivado";
   joinedAtLabel: string; // "feb 2025"

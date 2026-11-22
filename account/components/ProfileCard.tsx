@@ -2,6 +2,7 @@ import { Avatar } from "@/shared/components/Avatar";
 
 type ProfileCardProps = {
   avatarColors?: { bg: string; fg: string };
+  photoUrl?: string | null;
   fullName: string;
   email: string;
   detail: string;
@@ -12,6 +13,7 @@ export function ProfileCard({
   email,
   detail,
   avatarColors,
+  photoUrl,
 }: ProfileCardProps) {
   return (
     <section className="mb-[18px] flex items-center gap-[18px] rounded-[18px] border border-line bg-surface px-[22px] py-5">
@@ -20,6 +22,7 @@ export function ProfileCard({
         size={64}
         fontSize={26}
         colors={avatarColors}
+        photoUrl={photoUrl}
       />
       <div className="min-w-0 flex-1">
         <div className="font-display text-xl leading-[normal] font-semibold text-ink">

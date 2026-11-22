@@ -3,6 +3,7 @@ import { requireRelativeUser } from "@/auth/require-user";
 import { PostDetailHeader } from "@/feed/components/PostDetailHeader";
 import { PostDetailView } from "@/feed/components/PostDetailView";
 import { getFamilyPostDetail } from "@/feed/get-post-detail";
+import { getCurrentUserPhotoUrl } from "@/users/get-current-user-photo-url";
 import { buildRoomLine } from "../build-room-line";
 import { fetchFamilyFeedElderly } from "../fetch-family-feed-elderly";
 import { findPostAuthor } from "../find-post-author";
@@ -18,7 +19,10 @@ export async function FamilyPostDetailContent({
   const { id } = await params;
 
   const elderly = await fetchFamilyFeedElderly(user.id);
-  const detail = await getFamilyPostDetail(id, user, elderly);
+  const [detail, photoUrl] = await Promise.all([
+    getFamilyPostDetail(id, user, elderly),
+    getCurrentUserPhotoUrl(),
+  ]);
   if (!detail) notFound();
 
   const { post, comments } = detail;
@@ -36,6 +40,7 @@ export async function FamilyPostDetailContent({
       }}
       comments={comments}
       currentUser={user}
+      currentUserPhotoUrl={photoUrl}
       backHref="/family"
     >
       <PostDetailHeader

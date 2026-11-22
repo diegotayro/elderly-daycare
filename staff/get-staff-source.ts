@@ -9,6 +9,7 @@ import type {
   StaffElderly,
   User,
 } from "@/shared/database/types";
+import { signAvatarUrls } from "@/users/sign-avatar-urls";
 import { buildAvatarTones } from "./build-avatar-tones";
 import { fetchStaffEmails } from "./fetch-staff-emails";
 import type { StaffSource } from "./types";
@@ -47,5 +48,6 @@ export async function getStaffSource(): Promise<StaffSource> {
     rooms,
     staffElderly,
     avatarTones: buildAvatarTones([...staff, ...elderly]),
+    avatarUrls: await signAvatarUrls(staff),
   };
 }

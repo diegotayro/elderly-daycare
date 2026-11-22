@@ -19,6 +19,7 @@ export function LinkedRelativeRow({ relative }: LinkedRelativeRowProps) {
         size={40}
         fontSize={16}
         colors={avatarTones[relative.tone]}
+        photoUrl={relative.photoUrl}
       />
       <div className="min-w-0 flex-1">
         <div className="text-[14.5px] font-extrabold text-ink">

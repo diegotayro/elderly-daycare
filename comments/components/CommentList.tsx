@@ -26,7 +26,7 @@ const deleteErrorToast: ToastMessage = {
 type CommentListProps = {
   postId: string;
   initialComments: CommentView[];
-  author: { initial: string; tone: AvatarTone };
+  author: { initial: string; tone: AvatarTone; photoUrl: string | null };
 };
 
 // Sin red la Server Action lanza en vez de devolver "error": se trata igual

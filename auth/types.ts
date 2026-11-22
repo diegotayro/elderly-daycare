@@ -43,6 +43,7 @@ export type CurrentUser = Pick<
   | "role"
   | "first_name"
   | "full_name"
+  | "avatar_url"
   | "notify_on_post"
   | "daily_summary_enabled"
 > & {

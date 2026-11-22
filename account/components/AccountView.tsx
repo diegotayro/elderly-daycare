@@ -14,6 +14,7 @@ type AccountViewProps = {
   email: string;
   detail: string;
   avatarColors?: { bg: string; fg: string };
+  photoUrl?: string | null;
   preferences: NotificationPreference[];
   notificationValues: Record<NotificationPreferenceKey, boolean>;
   children?: ReactNode; // entre el perfil y las notificaciones
@@ -24,6 +25,7 @@ export function AccountView({
   email,
   detail,
   avatarColors,
+  photoUrl,
   preferences,
   notificationValues,
   children,
@@ -38,6 +40,7 @@ export function AccountView({
         email={email}
         detail={detail}
         avatarColors={avatarColors}
+        photoUrl={photoUrl}
       />
       {children}
       <NotificationSettingsCard

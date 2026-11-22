@@ -15,6 +15,7 @@ export function StaffProfileHeader({ profile }: StaffProfileHeaderProps) {
         size={84}
         fontSize={34}
         colors={avatarTones[profile.tone]}
+        photoUrl={profile.photoUrl}
       />
       <div className="min-w-[180px] flex-1">
         <h1 className="m-0 font-display text-[28px] leading-[normal] font-semibold text-ink">
