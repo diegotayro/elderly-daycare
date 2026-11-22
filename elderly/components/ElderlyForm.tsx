@@ -2,8 +2,16 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ChevronDownIcon } from "@/shared/components/icons/ChevronDownIcon";
+import { ChangesSummary } from "@/shared/components/ChangesSummary";
+import { diffElderlyChanges } from "../diff-elderly-changes";
+import { elderlyFieldLabels } from "../elderly-field-labels";
 import { readElderlyFormValues } from "../read-elderly-form-values";
-import type { ElderlyFormErrors, ElderlyFormField, RoomOption } from "../types";
+import type {
+  ElderlyFormErrors,
+  ElderlyFormField,
+  ElderlyFormValues,
+  RoomOption,
+} from "../types";
 import {
   MEDICAL_NOTES_MAX_LENGTH,
   NAME_MAX_LENGTH,
@@ -26,6 +34,8 @@ type ElderlyFormProps = {
   today: string;
   title: string;
   titleId: string;
+  // Con valores iniciales el formulario es de edición: solo se puede guardar lo que cambió
+  initialValues?: ElderlyFormValues;
   isPending: boolean;
   onCancel: () => void;
   // El padre guarda y, si el servidor rechaza campos, los devuelve por showFieldErrors
@@ -40,11 +50,15 @@ export function ElderlyForm({
   today,
   title,
   titleId,
+  initialValues,
   isPending,
   onCancel,
   onSave,
 }: ElderlyFormProps) {
   const [errors, setErrors] = useState<ElderlyFormErrors>({});
+  const [changedFields, setChangedFields] = useState<ElderlyFormField[]>([]);
+  const isEditing = initialValues !== undefined;
+  const hasNoChangesToSave = isEditing && changedFields.length === 0;
   const formRef = useRef<HTMLFormElement>(null);
   // Los campos siguen deshabilitados mientras se guarda: el foco se mueve al terminar
   const mustFocusInvalidField = useRef(false);
@@ -82,9 +96,15 @@ export function ElderlyForm({
     onSave(formData, showErrors);
   }
 
-  function clearFieldError(event: FormEvent<HTMLFormElement>) {
+  function handleChange(event: FormEvent<HTMLFormElement>) {
     const field = (event.target as HTMLInputElement).name as ElderlyFormField;
     setErrors((current) => ({ ...current, [field]: undefined }));
+    if (initialValues) {
+      const currentValues = readElderlyFormValues(
+        new FormData(event.currentTarget),
+      );
+      setChangedFields(diffElderlyChanges(initialValues, currentValues));
+    }
   }
 
   function controlProps(field: ElderlyFormField) {
@@ -101,7 +121,7 @@ export function ElderlyForm({
       ref={formRef}
       noValidate
       onSubmit={handleSubmit}
-      onChange={clearFieldError}
+      onChange={handleChange}
       className="flex min-h-0 flex-1 flex-col"
     >
       <header className="flex shrink-0 items-center justify-between border-b border-line px-[26px] py-5">
@@ -121,7 +141,7 @@ export function ElderlyForm({
         </h2>
         <button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || hasNoChangesToSave}
           className="cursor-pointer text-[15px] font-extrabold text-coral-strong disabled:cursor-default disabled:opacity-50"
         >
           {isPending ? "Guardando…" : "Guardar"}
@@ -131,9 +151,17 @@ export function ElderlyForm({
         disabled={isPending}
         className="m-0 flex min-h-0 min-w-0 flex-col gap-[18px] overflow-y-auto border-0 px-[26px] py-6"
       >
+        {isEditing && (
+          <ChangesSummary
+            fieldLabels={changedFields.map(
+              (field) => elderlyFieldLabels[field],
+            )}
+          />
+        )}
         <FormField id="firstName" label="NOMBRES" error={errors.firstName}>
           <input
             {...controlProps("firstName")}
+            defaultValue={initialValues?.firstName}
             maxLength={NAME_MAX_LENGTH}
             placeholder="Ej. Rosa"
             className={fieldControlClassName}
@@ -142,6 +170,7 @@ export function ElderlyForm({
         <FormField id="lastName" label="APELLIDOS" error={errors.lastName}>
           <input
             {...controlProps("lastName")}
+            defaultValue={initialValues?.lastName}
             maxLength={NAME_MAX_LENGTH}
             placeholder="Ej. Méndez Paredes"
             className={fieldControlClassName}
@@ -154,6 +183,7 @@ export function ElderlyForm({
         >
           <input
             {...controlProps("birthDate")}
+            defaultValue={initialValues?.birthDate}
             type="date"
             max={today}
             className={fieldControlClassName}
@@ -166,6 +196,7 @@ export function ElderlyForm({
         >
           <input
             {...controlProps("enrolledAt")}
+            defaultValue={initialValues?.enrolledAt}
             type="date"
             className={fieldControlClassName}
           />
@@ -174,7 +205,7 @@ export function ElderlyForm({
           <div className="relative">
             <select
               {...controlProps("roomId")}
-              defaultValue={rooms[0]?.id}
+              defaultValue={initialValues?.roomId ?? rooms[0]?.id}
               className={`${fieldControlClassName} cursor-pointer appearance-none pr-11 font-bold`}
             >
               {rooms.map((room) => (
@@ -196,6 +227,7 @@ export function ElderlyForm({
         >
           <input
             {...controlProps("allergies")}
+            defaultValue={initialValues?.allergies}
             placeholder="Ej. Maní, Lactosa"
             className={fieldControlClassName}
           />
@@ -207,6 +239,7 @@ export function ElderlyForm({
         >
           <textarea
             {...controlProps("medicalNotes")}
+            defaultValue={initialValues?.medicalNotes}
             maxLength={MEDICAL_NOTES_MAX_LENGTH}
             placeholder="Indicaciones, medicación, contactos…"
             className={`${fieldControlClassName} min-h-[90px] resize-y leading-normal`}

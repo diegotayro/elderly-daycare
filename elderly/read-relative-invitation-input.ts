@@ -1,7 +1,4 @@
-import type {
-  RelativeInvitationField,
-  RelativeInvitationInput,
-} from "./types";
+import type { RelativeInvitationField, RelativeInvitationInput } from "./types";
 
 export function readRelativeInvitationInput(
   formData: FormData,

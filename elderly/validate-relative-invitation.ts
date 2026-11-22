@@ -20,7 +20,9 @@ export function validateRelativeInvitation(
   input: RelativeInvitationInput,
 ): RelativeInvitationErrors {
   const candidates: RelativeInvitationErrors = {
-    firstName: isBlank(input.firstName) ? messages.firstNameRequired : undefined,
+    firstName: isBlank(input.firstName)
+      ? messages.firstNameRequired
+      : undefined,
     lastName: isBlank(input.lastName) ? messages.lastNameRequired : undefined,
     email: validateEmail(input.email),
     relationship: Object.hasOwn(relationshipLabels, input.relationship)

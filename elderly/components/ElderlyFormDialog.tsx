@@ -5,6 +5,7 @@ import { Toast } from "@/shared/components/toast/Toast";
 import type { ToastMessage } from "@/shared/components/toast/types";
 import type {
   ElderlyFormErrors,
+  ElderlyFormValues,
   ElderlySaveResult,
   RoomOption,
 } from "../types";
@@ -20,6 +21,7 @@ type ElderlyFormDialogProps<TResult extends ElderlySaveResult> = {
   title: string;
   rooms: RoomOption[];
   today: string;
+  initialValues?: ElderlyFormValues;
   trigger: ReactNode; // el botón que abre el modal
   action: (formData: FormData) => Promise<TResult>;
   getSuccessToast: (
@@ -31,6 +33,7 @@ export function ElderlyFormDialog<TResult extends ElderlySaveResult>({
   title,
   rooms,
   today,
+  initialValues,
   trigger,
   action,
   getSuccessToast,
@@ -116,6 +119,7 @@ export function ElderlyFormDialog<TResult extends ElderlySaveResult>({
           rooms={rooms}
           today={today}
           title={title}
+          initialValues={initialValues}
           titleId={titleId}
           isPending={isPending}
           onCancel={() => dialogRef.current?.close()}

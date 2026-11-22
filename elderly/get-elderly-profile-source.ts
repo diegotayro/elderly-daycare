@@ -32,7 +32,7 @@ export const getElderlyProfileSource = cache(
 
     const [roomResult, { guardianElderly, relatives }, invitations] =
       await Promise.all([
-      supabase.from("rooms").select("*").eq("id", elderly.room_id),
+        supabase.from("rooms").select("*").eq("id", elderly.room_id),
         fetchRelativeLinks(supabase, [id]),
         fetchPendingInvitations(supabase, [id]),
       ]);
