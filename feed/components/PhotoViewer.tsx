@@ -7,18 +7,21 @@ import {
   useState,
   type KeyboardEvent,
   type MouseEvent,
+  type ReactNode,
 } from "react";
 import { ChevronLeftIcon } from "@/shared/components/icons/ChevronLeftIcon";
 import { ChevronRightIcon } from "@/shared/components/icons/ChevronRightIcon";
 import { CloseIcon } from "@/shared/components/icons/CloseIcon";
 import { photoViewerMessages } from "../photo-viewer-messages";
-import type { FeedPhoto, PhotoViewerPost } from "../types";
+import type { FeedPhoto } from "../types";
 import { usePhotoTrack } from "../use-photo-track";
 import {
-  PhotoDownloadButton,
   VIEWER_BUTTON_CIRCLE_CLASS_NAME,
   VIEWER_BUTTON_CLASS_NAME,
 } from "./PhotoDownloadButton";
+
+// Lo que el visor necesita de cada foto: los posts y los avatares la cumplen
+export type ViewerPhoto = Pick<FeedPhoto, "url" | "width" | "height">;
 
 // Lo que no cierra el visor al hacer clic: la foto y los controles
 const CONTROL_SELECTOR = "[data-viewer-control]";
@@ -28,7 +31,7 @@ const ARROW_CLASS_NAME = `${VIEWER_BUTTON_CLASS_NAME} absolute top-1/2 -translat
 const FALLBACK_PHOTO_SIZE = { width: 1200, height: 900 };
 
 type ViewerSlideProps = {
-  photo: FeedPhoto;
+  photo: ViewerPhoto;
   hasFailed: boolean;
   onError: () => void;
 };
@@ -62,16 +65,23 @@ function ViewerSlide({ photo, hasFailed, onError }: ViewerSlideProps) {
 }
 
 type PhotoViewerProps = {
-  photos: FeedPhoto[];
+  photos: ViewerPhoto[];
   initialIndex: number;
-  post: PhotoViewerPost;
+  heading: string;
+  subtitle: string;
+  caption?: string; // sin caption no hay pie
+  // Acción de la cabecera (a la derecha) según la foto activa; sin ella queda un espacio vacío
+  renderHeaderAction?: (activeIndex: number) => ReactNode;
   onClose: () => void;
 };
 
 export function PhotoViewer({
   photos,
   initialIndex,
-  post,
+  heading,
+  subtitle,
+  caption,
+  renderHeaderAction,
   onClose,
 }: PhotoViewerProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -150,18 +160,11 @@ export function PhotoViewer({
         </button>
         <div className="min-w-0 text-center">
           <div className="truncate font-display text-base font-semibold">
-            {post.heading}
+            {heading}
           </div>
-          <div className="truncate text-[13px] text-white/60">
-            {post.subtitle}
-          </div>
+          <div className="truncate text-[13px] text-white/60">{subtitle}</div>
         </div>
-        <div data-viewer-control>
-          <PhotoDownloadButton
-            postId={post.postId}
-            position={photos[activeIndex].position}
-          />
-        </div>
+        <div data-viewer-control>{renderHeaderAction?.(activeIndex)}</div>
       </header>
 
       <div className="relative min-h-0 flex-1">
@@ -210,24 +213,28 @@ export function PhotoViewer({
         )}
       </div>
 
-      <footer className="px-[26px] pt-4 pb-[34px] text-center">
-        {hasSeveralPhotos && (
-          <p
-            aria-live="polite"
-            className="m-0 mb-2 text-[13px] font-bold text-white/60"
-          >
-            {photoViewerMessages.counter(activeIndex + 1, total)}
-          </p>
-        )}
-        <div className="mx-auto max-h-[20dvh] max-w-[560px] overflow-y-auto">
-          <p
-            data-viewer-control
-            className="m-0 text-[15px] leading-[1.55] break-words whitespace-pre-line text-white/85"
-          >
-            {post.caption}
-          </p>
-        </div>
-      </footer>
+      {(caption !== undefined || hasSeveralPhotos) && (
+        <footer className="px-[26px] pt-4 pb-[34px] text-center">
+          {hasSeveralPhotos && (
+            <p
+              aria-live="polite"
+              className="m-0 mb-2 text-[13px] font-bold text-white/60"
+            >
+              {photoViewerMessages.counter(activeIndex + 1, total)}
+            </p>
+          )}
+          {caption !== undefined && (
+            <div className="mx-auto max-h-[20dvh] max-w-[560px] overflow-y-auto">
+              <p
+                data-viewer-control
+                className="m-0 text-[15px] leading-[1.55] break-words whitespace-pre-line text-white/85"
+              >
+                {caption}
+              </p>
+            </div>
+          )}
+        </footer>
+      )}
     </dialog>
   );
 }
