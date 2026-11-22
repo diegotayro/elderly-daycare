@@ -275,6 +275,8 @@ Ancianos inscritos en la guardería.
 |`status`|`elderly_status`|NOT NULL default `active`. `active` / `archived` (borrado lógico).|
 |`created_at` / `updated_at`|`timestamptz`||
 
+> **Nota `photo_consent`:** después de la activación solo lo cambia el admin, con su sesión (`elderly_update_admin`), desde `/elderly/[id]` y solo en adultos mayores `active`. El familiar solo puede dejarlo en `false` al activar su cuenta (`accept_invitation`).
+
 > **Nota `allergy_tags`:** Array de Postgres por simplicidad. Cada alergia es específica de la persona, así que no se usan códigos ni traducción. Al guardar, el texto se separa por comas, se limpian los espacios y se quitan los repetidos sin distinguir mayúsculas ni tildes. La UI las muestra en mayúsculas (`MANÍ`). Si algún día se quiere normalizar, se puede pasar a una tabla `allergies` + `elderly_allergies`.
 
 ### RLS

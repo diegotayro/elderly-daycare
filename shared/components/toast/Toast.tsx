@@ -64,9 +64,11 @@ export function Toast({ message, onClose }: ToastProps) {
       </span>
       <div className="min-w-0 flex-1">
         <p className="m-0 text-[15px] font-extrabold text-ink">{title}</p>
-        <p className="m-0 mt-0.5 text-[13.5px] text-muted-strong">
-          {description}
-        </p>
+        {description && (
+          <p className="m-0 mt-0.5 text-[13.5px] text-muted-strong">
+            {description}
+          </p>
+        )}
       </div>
       <button
         type="button"
