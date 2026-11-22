@@ -67,6 +67,8 @@ export type ElderlyProfile = {
   photoConsent: boolean;
   canEditPhotoConsent: boolean; // admin y adulto mayor active
   canEdit: boolean; // admin y adulto mayor active
+  canArchive: boolean; // admin y adulto mayor active
+  canReactivate: boolean; // admin y adulto mayor archived
   editValues: ElderlyFormValues; // valores iniciales del modal de edición
   roomOptions: RoomOption[]; // todas las habitaciones; vacío si !canEdit
   today: string; // "hoy" (Lima): tope de la fecha de nacimiento en el modal de edición
@@ -74,6 +76,8 @@ export type ElderlyProfile = {
   relatives: LinkedRelative[];
   pendingInvitationEmails: string[]; // invitaciones pending de este adulto mayor
 };
+
+export type ElderlyStatusResult = { status: "success" } | { status: "error" };
 
 export type PhotoConsentResult = { status: "ok" } | { status: "error" };
 

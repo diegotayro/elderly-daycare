@@ -1,21 +1,28 @@
 "use client";
 
-import { useEffect, useId, useRef, useTransition } from "react";
-import type { StaffConfirmContent } from "../staff-status-messages";
+import { type ReactNode, useEffect, useId, useRef, useTransition } from "react";
 
-type ConfirmStaffActionDialogProps = {
-  content: StaffConfirmContent | null; // null: cerrado
-  uncoveredElderly: string[];
+export type ConfirmDialogContent = {
+  title: string;
+  description: string;
+  dismissLabel: string;
+  confirmLabel: string;
+  pendingLabel: string;
+};
+
+type ConfirmDialogProps = {
+  content: ConfirmDialogContent | null; // null: cerrado
+  children?: ReactNode; // contenido extra bajo la descripción
   onConfirm: () => Promise<boolean>; // true: se puede cerrar el modal
   onClose: () => void;
 };
 
-export function ConfirmStaffActionDialog({
+export function ConfirmDialog({
   content,
-  uncoveredElderly,
+  children,
   onConfirm,
   onClose,
-}: ConfirmStaffActionDialogProps) {
+}: ConfirmDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const isOpen = content !== null;
@@ -32,9 +39,6 @@ export function ConfirmStaffActionDialog({
       if (await onConfirm()) dialogRef.current?.close();
     });
   }
-
-  const showUncovered =
-    content?.showUncoveredElderly && uncoveredElderly.length > 0;
 
   return (
     <dialog
@@ -56,18 +60,7 @@ export function ConfirmStaffActionDialog({
           <p className="m-0 mb-4 text-[15px] text-muted-strong">
             {content.description}
           </p>
-          {showUncovered && (
-            <div className="mb-4 text-[15px] text-muted-strong">
-              <p className="m-0 mb-1.5">
-                Estos adultos mayores se quedarán sin cuidador/a:
-              </p>
-              <ul className="m-0 list-disc pl-5 font-bold text-ink">
-                {uncoveredElderly.map((fullName) => (
-                  <li key={fullName}>{fullName}</li>
-                ))}
-              </ul>
-            </div>
-          )}
+          {children}
           <div className="mt-6 flex justify-end gap-3">
             <button
               type="button"

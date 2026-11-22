@@ -33,7 +33,7 @@ Lista de pantallas, modales y componentes que faltan. Marcar cada uno al termina
 ### Adultos mayores (admin)
 
 - [x] **12. Modal "Editar adulto mayor"**: el botón "Editar" del perfil abre un modal con el mismo formulario del alta, precargado; solo el admin y solo en adultos mayores `active`. Guarda únicamente lo que cambió e incluye la habitación (el `photo_consent` se cambia desde el perfil, SPEC 32). (SPEC 33)
-- [ ] **13. Archivar / reactivar adulto mayor y ver los archivados**: la lista solo muestra "ACTIVOS".
+- [x] **13. Archivar / reactivar adulto mayor y ver los archivados**: la sección "ARCHIVADOS" de `/elderly` existe desde SPEC 16; los botones "Archivar" (con confirmación) y "Reactivar" del perfil, solo para el admin, llegan en SPEC 34.
 - [ ] **14. Gestión de familiares e invitaciones**: en "Familiares vinculados" faltan las acciones cancelar invitación, generar una nueva si venció (estado "Vencida"), desvincular (borrar en `guardian_elderly`) y archivar al familiar.
 - [x] **27. Perfil del familiar para el admin** (`/relatives/[id]`): foto, nombre, email, parentesco y sus adultos mayores (con "Archivado" y consentimiento de fotos en solo lectura), con "Cambiar foto" y "Editar". Se entra desde "Familiares vinculados" de `/elderly/[id]`. (SPEC 31)
 
