@@ -429,7 +429,7 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 
 ### Reactivar un adulto mayor archivado
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 34
 - **Qué:** el admin ya ve a los archivados en `/elderly` (sección "ARCHIVADOS") y en su perfil, pero no puede reactivarlos ni archivar desde la UI.
 - **Origen:** SPEC 16.
 - **Se resuelve en:** una spec de gestión de estado de adultos mayores.

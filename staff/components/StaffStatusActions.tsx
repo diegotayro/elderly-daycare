@@ -2,6 +2,7 @@
 
 import { unstable_rethrow, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import { Toast } from "@/shared/components/toast/Toast";
 import type { ToastMessage } from "@/shared/components/toast/types";
 import { archiveStaff } from "../actions/archive-staff";
@@ -20,8 +21,8 @@ import {
   type StaffConfirmAction,
 } from "../staff-status-messages";
 import type { DeleteStaffResult, StaffProfile } from "../types";
-import { ConfirmStaffActionDialog } from "./ConfirmStaffActionDialog";
 import { ResendInvitationButton } from "./ResendInvitationButton";
+import { UncoveredElderlyList } from "./UncoveredElderlyList";
 
 const actionClassName =
   "cursor-pointer rounded-xl border-[1.5px] border-line bg-surface px-4 py-[9px] text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral disabled:cursor-default disabled:opacity-50";
@@ -103,6 +104,9 @@ export function StaffStatusActions({ profile }: StaffStatusActionsProps) {
     });
   }
 
+  const confirmContent =
+    openAction && buildStaffConfirmContent(openAction, profile.fullName);
+
   return (
     <>
       {profile.canResendInvitation && (
@@ -145,14 +149,15 @@ export function StaffStatusActions({ profile }: StaffStatusActionsProps) {
           Eliminar
         </button>
       )}
-      <ConfirmStaffActionDialog
-        content={
-          openAction && buildStaffConfirmContent(openAction, profile.fullName)
-        }
-        uncoveredElderly={profile.uncoveredElderly}
+      <ConfirmDialog
+        content={confirmContent}
         onConfirm={confirm}
         onClose={() => setOpenAction(null)}
-      />
+      >
+        {confirmContent?.showUncoveredElderly && (
+          <UncoveredElderlyList fullNames={profile.uncoveredElderly} />
+        )}
+      </ConfirmDialog>
       {toast && (
         <Toast
           key={toast.id}

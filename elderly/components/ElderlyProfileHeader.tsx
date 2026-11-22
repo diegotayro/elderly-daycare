@@ -2,6 +2,7 @@ import { Avatar } from "@/shared/components/Avatar";
 import { avatarTones } from "../avatar-tones";
 import type { ElderlyProfile } from "../types";
 import { EditElderlyDialog } from "./EditElderlyDialog";
+import { ElderlyStatusActions } from "./ElderlyStatusActions";
 
 type ElderlyProfileHeaderProps = {
   profile: ElderlyProfile;
@@ -9,14 +10,14 @@ type ElderlyProfileHeaderProps = {
 
 export function ElderlyProfileHeader({ profile }: ElderlyProfileHeaderProps) {
   return (
-    <div className="flex items-center gap-[18px]">
+    <div className="flex flex-wrap items-center gap-x-[18px] gap-y-3">
       <Avatar
         initial={profile.initial}
         size={84}
         fontSize={34}
         colors={avatarTones[profile.tone]}
       />
-      <div className="min-w-0 flex-1">
+      <div className="min-w-[200px] flex-1">
         <h1 className="m-0 font-display text-[28px] leading-[normal] font-semibold text-ink">
           {profile.fullName}
         </h1>
@@ -31,14 +32,17 @@ export function ElderlyProfileHeader({ profile }: ElderlyProfileHeaderProps) {
           )}
         </div>
       </div>
-      {profile.canEdit && (
-        <EditElderlyDialog
-          elderlyId={profile.id}
-          editValues={profile.editValues}
-          roomOptions={profile.roomOptions}
-          today={profile.today}
-        />
-      )}
+      <div className="flex flex-wrap justify-end gap-2">
+        {profile.canEdit && (
+          <EditElderlyDialog
+            elderlyId={profile.id}
+            editValues={profile.editValues}
+            roomOptions={profile.roomOptions}
+            today={profile.today}
+          />
+        )}
+        <ElderlyStatusActions profile={profile} />
+      </div>
     </div>
   );
 }

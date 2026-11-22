@@ -95,6 +95,15 @@ Un adulto mayor puede tener varios familiares, y siempre gana el "no":
 1. El admin elige "Cancelar" en una invitación pending.
 2. Se marca status = cancelled. El código deja de funcionar.
 
+### Archivar y reactivar adulto mayor
+
+1. El admin elige "Archivar" en el perfil de un adulto mayor active y confirma. "Reactivar" no pide confirmación.
+2. Server Action verifica que quien llama es admin activo y que el adulto mayor es de su guardería y está en el estado esperado (active para archivar, archived para reactivar).
+3. Archivar: se marca status = archived y, con la sesión del admin, todas sus invitaciones pending (vencidas por fecha incluidas) pasan a cancelled. Si cancelarlas falla, se revierte el status a active y se avisa del error.
+4. Reactivar: se marca status = active. Las invitaciones canceladas no vuelven; el admin genera nuevas con "Vincular".
+5. Se conservan `staff_elderly`, `guardian_elderly`, posts, fotos, reacciones y comentarios. No cambian la habitación ni el photo_consent.
+6. Un adulto mayor archivado queda de solo lectura: no se edita, no se vincula a familiares ni se cambia su consentimiento de fotos hasta reactivarlo.
+
 ### Invitaciones vencidas
 
 - Una invitación con expires_at en el pasado se trata como vencida, aunque su status siga pending.

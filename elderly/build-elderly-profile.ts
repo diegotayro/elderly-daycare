@@ -36,6 +36,8 @@ export function buildElderlyProfile(
     photoConsent: elderly.photo_consent,
     canEditPhotoConsent: isAdmin && elderly.status === "active",
     canEdit,
+    canArchive: canEdit,
+    canReactivate: isAdmin && elderly.status === "archived",
     editValues: toElderlyFormValues(elderly),
     today: source.referenceDate,
     roomOptions: canEdit ? buildRoomOptions(source) : [],

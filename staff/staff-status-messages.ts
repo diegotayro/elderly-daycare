@@ -1,14 +1,10 @@
+import type { ConfirmDialogContent } from "@/shared/components/ConfirmDialog";
 import type { ToastMessage } from "@/shared/components/toast/types";
 
 export type StaffConfirmAction = "archive" | "cancel-invitation" | "delete";
 
-export type StaffConfirmContent = {
-  title: string;
-  description: string;
+export type StaffConfirmContent = ConfirmDialogContent & {
   showUncoveredElderly: boolean;
-  dismissLabel: string;
-  confirmLabel: string;
-  pendingLabel: string;
 };
 
 export function buildStaffConfirmContent(
