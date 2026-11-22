@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { getCurrentUser } from "@/auth/get-current-user";
 import { getLimaToday } from "@/shared/date/get-lima-today";
 import { createClient } from "@/shared/supabase/server";
+import { fetchRoomIds } from "../fetch-room-ids";
 import { parseAllergyTags } from "../parse-allergy-tags";
 import { readElderlyFormValues } from "../read-elderly-form-values";
 import type { CreateElderlyResult } from "../types";
@@ -19,21 +20,12 @@ export async function createElderly(
   const input = readElderlyFormValues(formData);
   const supabase = createClient(await cookies());
 
-  // RLS limita las habitaciones a las de su guardería
-  const { data: rooms, error: roomsError } = await supabase
-    .from("rooms")
-    .select("id");
-  if (roomsError) {
-    console.error(
-      "createElderly: no se pudieron leer las habitaciones",
-      roomsError,
-    );
-    return { status: "error" };
-  }
+  const roomIds = await fetchRoomIds(supabase);
+  if (!roomIds) return { status: "error" };
 
   const errors = validateElderlyForm(input, {
     today: getLimaToday(),
-    roomIds: rooms.map((room) => room.id),
+    roomIds,
   });
   if (Object.keys(errors).length > 0) return { status: "invalid", errors };
 

@@ -98,6 +98,8 @@ export type ElderlySaveResult =
   | { status: "invalid"; errors: ElderlyFormErrors }
   | { status: "error" };
 
+export type UpdateElderlyResult = ElderlySaveResult;
+
 export type CreateElderlyResult =
   | { status: "success"; fullName: string }
   | { status: "invalid"; errors: ElderlyFormErrors }

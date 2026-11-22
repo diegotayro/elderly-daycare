@@ -5,6 +5,7 @@ import {
   formatEnrolledAt,
 } from "./elderly-formatters";
 import { getLinkedRelatives } from "./get-linked-relatives";
+import { toElderlyFormValues } from "./to-elderly-form-values";
 import type { ElderlyProfile, ElderlySource } from "./types";
 
 type BuildElderlyProfileOptions = { isAdmin: boolean };
@@ -35,15 +36,7 @@ export function buildElderlyProfile(
     photoConsent: elderly.photo_consent,
     canEditPhotoConsent: isAdmin && elderly.status === "active",
     canEdit,
-    editValues: {
-      firstName: elderly.first_name,
-      lastName: elderly.last_name,
-      birthDate: elderly.birth_date,
-      enrolledAt: elderly.enrolled_at,
-      roomId: elderly.room_id,
-      allergies: elderly.allergy_tags.join(", "),
-      medicalNotes: elderly.medical_notes ?? "",
-    },
+    editValues: toElderlyFormValues(elderly),
     roomOptions: canEdit ? buildRoomOptions(source) : [],
     enrolledAtLabel: formatEnrolledAt(elderly.enrolled_at),
     relatives: getLinkedRelatives(source, elderly.id, { isAdmin }),
