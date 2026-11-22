@@ -154,25 +154,25 @@ users/components/EditUserForm.tsx      # usa ChangesSummary
 
 ## Criterios de aceptación
 
-- [ ] El admin ve "Editar" en el perfil de un adulto mayor `active`, en la misma ubicación y estilo del mockup.
-- [ ] El admin no ve "Editar" en el perfil de un adulto mayor `archived`.
-- [ ] El staff no ve "Editar" en ningún perfil.
-- [ ] Pulsar "Editar" abre el modal "Editar adulto mayor" con los siete campos precargados con los valores actuales.
-- [ ] "Habitación" lista todas las habitaciones de la guardería, con la actual seleccionada.
-- [ ] Al abrir el modal, "Guardar" está deshabilitado y no se ve la línea "Cambiará: …".
-- [ ] Al cambiar Nombres y Habitación se lee "Cambiará: Nombres, Habitación" y "Guardar" se habilita.
-- [ ] Al volver a los valores originales, la línea desaparece y "Guardar" se deshabilita.
-- [ ] Agregar solo espacios al final de Nombres no cuenta como cambio.
-- [ ] Guardar con datos válidos cierra el modal, muestra el toast "Cambios guardados" y el perfil muestra los datos nuevos sin recargar.
-- [ ] Solo se actualizan en `elderly` las columnas que cambiaron (verificable en `updated_at` y en los valores de la fila).
-- [ ] Las validaciones del alta aplican igual (nombre vacío, fecha de nacimiento futura, ingreso anterior al nacimiento, más de 15 alergias, notas de más de 2000 caracteres).
-- [ ] Vaciar Notas médicas guarda `null` y el bloque de notas desaparece del perfil.
-- [ ] Llamar a `updateElderly` como staff o sobre un `archived` devuelve `error` y no modifica la fila.
-- [ ] Si el guardado falla, el modal sigue abierto con los datos ingresados y aparece el toast de error.
-- [ ] Cancelar o Esc cierra el modal sin guardar; al reabrirlo muestra los valores actuales.
-- [ ] "Agregar adulto mayor" en `/elderly` funciona igual que antes.
-- [ ] "Editar staff", "Editar familiar" y "Editar perfil" siguen mostrando la línea "Cambiará: …".
-- [ ] `npm run lint` y `npm run build` pasan sin errores.
+- [x] El admin ve "Editar" en el perfil de un adulto mayor `active`, en la misma ubicación y estilo del mockup.
+- [x] El admin no ve "Editar" en el perfil de un adulto mayor `archived`.
+- [x] El staff no ve "Editar" en ningún perfil.
+- [x] Pulsar "Editar" abre el modal "Editar adulto mayor" con los siete campos precargados con los valores actuales.
+- [x] "Habitación" lista todas las habitaciones de la guardería, con la actual seleccionada.
+- [x] Al abrir el modal, "Guardar" está deshabilitado y no se ve la línea "Cambiará: …".
+- [x] Al cambiar Nombres y Habitación se lee "Cambiará: Nombres, Habitación" y "Guardar" se habilita.
+- [x] Al volver a los valores originales, la línea desaparece y "Guardar" se deshabilita.
+- [x] Agregar solo espacios al final de Nombres no cuenta como cambio.
+- [x] Guardar con datos válidos cierra el modal, muestra el toast "Cambios guardados" y el perfil muestra los datos nuevos sin recargar.
+- [x] Solo se actualizan en `elderly` las columnas que cambiaron (verificable en `updated_at` y en los valores de la fila).
+- [x] Las validaciones del alta aplican igual (nombre vacío, fecha de nacimiento futura, ingreso anterior al nacimiento, más de 15 alergias, notas de más de 2000 caracteres).
+- [x] Vaciar Notas médicas guarda `null` y el bloque de notas desaparece del perfil.
+- [x] Llamar a `updateElderly` como staff o sobre un `archived` devuelve `error` y no modifica la fila.
+- [x] Si el guardado falla, el modal sigue abierto con los datos ingresados y aparece el toast de error.
+- [x] Cancelar o Esc cierra el modal sin guardar; al reabrirlo muestra los valores actuales.
+- [x] "Agregar adulto mayor" en `/elderly` funciona igual que antes.
+- [x] "Editar staff", "Editar familiar" y "Editar perfil" siguen mostrando la línea "Cambiará: …".
+- [x] `npm run lint` y `npm run build` pasan sin errores.
 
 ---
 

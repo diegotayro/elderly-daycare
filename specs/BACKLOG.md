@@ -422,9 +422,9 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 ### Botones "Editar" y "Resumen del día" del perfil
 
 - [ ] **Estado:** pendiente
-- **Qué:** ambos botones de `/elderly/[id]` enlazan a `/`.
+- **Qué:** el botón "Resumen del día" de `/elderly/[id]` enlaza a `/`. ("Editar" lo resolvió la SPEC 33.)
 - **Origen:** SPEC 02, `elderly/components/ElderlyProfileHeader.tsx` y `ElderlyProfileView.tsx`.
-- **Se resuelve en:** las specs de edición de adultos mayores y de resumen del día.
+- **Se resuelve en:** la spec de resumen del día.
 - **Notas:** el mockup define su ubicación y estilo; falta el destino y la lógica.
 
 ### Reactivar un adulto mayor archivado
