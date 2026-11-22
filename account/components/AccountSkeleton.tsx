@@ -3,10 +3,12 @@ import { AccountTitle } from "./AccountTitle";
 
 type AccountSkeletonProps = {
   withElderlyCard?: boolean;
+  withNotifications?: boolean;
 };
 
 export function AccountSkeleton({
   withElderlyCard = false,
+  withNotifications = true,
 }: AccountSkeletonProps) {
   return (
     <div
@@ -21,7 +23,9 @@ export function AccountSkeleton({
       {withElderlyCard && (
         <SkeletonBlock className="mb-[18px] h-[169px] rounded-[18px]" />
       )}
-      <SkeletonBlock className="mb-[18px] h-[150px] rounded-[18px]" />
+      {withNotifications && (
+        <SkeletonBlock className="mb-[18px] h-[150px] rounded-[18px]" />
+      )}
       <SkeletonBlock className="mb-[18px] h-[107px] rounded-[18px]" />
       <SkeletonBlock className="h-[50px] rounded-[14px]" />
     </div>
