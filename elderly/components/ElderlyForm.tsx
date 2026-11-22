@@ -2,16 +2,16 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ChevronDownIcon } from "@/shared/components/icons/ChevronDownIcon";
-import { readNewElderlyInput } from "../read-new-elderly-input";
-import type { NewElderlyErrors, NewElderlyField, RoomOption } from "../types";
+import { readElderlyFormValues } from "../read-elderly-form-values";
+import type { ElderlyFormErrors, ElderlyFormField, RoomOption } from "../types";
 import {
   MEDICAL_NOTES_MAX_LENGTH,
   NAME_MAX_LENGTH,
-  validateNewElderly,
-} from "../validate-new-elderly";
+  validateElderlyForm,
+} from "../validate-elderly-form";
 import { FormField, fieldControlClassName, getFieldErrorId } from "./FormField";
 
-const FIELD_ORDER: NewElderlyField[] = [
+const FIELD_ORDER: ElderlyFormField[] = [
   "firstName",
   "lastName",
   "birthDate",
@@ -21,7 +21,7 @@ const FIELD_ORDER: NewElderlyField[] = [
   "medicalNotes",
 ];
 
-type AddElderlyFormProps = {
+type ElderlyFormProps = {
   rooms: RoomOption[];
   today: string;
   titleId: string;
@@ -30,19 +30,19 @@ type AddElderlyFormProps = {
   // El padre guarda y, si el servidor rechaza campos, los devuelve por showFieldErrors
   onSave: (
     formData: FormData,
-    showFieldErrors: (errors: NewElderlyErrors) => void,
+    showFieldErrors: (errors: ElderlyFormErrors) => void,
   ) => void;
 };
 
-export function AddElderlyForm({
+export function ElderlyForm({
   rooms,
   today,
   titleId,
   isPending,
   onCancel,
   onSave,
-}: AddElderlyFormProps) {
-  const [errors, setErrors] = useState<NewElderlyErrors>({});
+}: ElderlyFormProps) {
+  const [errors, setErrors] = useState<ElderlyFormErrors>({});
   const formRef = useRef<HTMLFormElement>(null);
   // Los campos siguen deshabilitados mientras se guarda: el foco se mueve al terminar
   const mustFocusInvalidField = useRef(false);
@@ -58,7 +58,7 @@ export function AddElderlyForm({
     }
   }, [isPending, errors]);
 
-  function showErrors(nextErrors: NewElderlyErrors) {
+  function showErrors(nextErrors: ElderlyFormErrors) {
     mustFocusInvalidField.current = true;
     setErrors(nextErrors);
   }
@@ -67,7 +67,7 @@ export function AddElderlyForm({
     event.preventDefault();
     if (isPending) return;
     const formData = new FormData(event.currentTarget);
-    const clientErrors = validateNewElderly(readNewElderlyInput(formData), {
+    const clientErrors = validateElderlyForm(readElderlyFormValues(formData), {
       today,
       roomIds: rooms.map((room) => room.id),
     });
@@ -81,11 +81,11 @@ export function AddElderlyForm({
   }
 
   function clearFieldError(event: FormEvent<HTMLFormElement>) {
-    const field = (event.target as HTMLInputElement).name as NewElderlyField;
+    const field = (event.target as HTMLInputElement).name as ElderlyFormField;
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
-  function controlProps(field: NewElderlyField) {
+  function controlProps(field: ElderlyFormField) {
     return {
       id: field,
       name: field,

@@ -7,10 +7,10 @@ import type { ToastMessage } from "@/shared/components/toast/types";
 import { createElderly } from "../actions/create-elderly";
 import type {
   CreateElderlyResult,
-  NewElderlyErrors,
+  ElderlyFormErrors,
   RoomOption,
 } from "../types";
-import { AddElderlyForm } from "./AddElderlyForm";
+import { ElderlyForm } from "./ElderlyForm";
 
 const errorToast: ToastMessage = {
   tone: "error",
@@ -55,7 +55,7 @@ export function AddElderlyDialog({ rooms, today }: AddElderlyDialogProps) {
 
   function save(
     formData: FormData,
-    showFieldErrors: (errors: NewElderlyErrors) => void,
+    showFieldErrors: (errors: ElderlyFormErrors) => void,
   ) {
     isSavingRef.current = true;
     startTransition(async () => {
@@ -111,7 +111,7 @@ export function AddElderlyDialog({ rooms, today }: AddElderlyDialogProps) {
         onClose={handleDialogClose}
         className="m-0 h-dvh max-h-none w-full max-w-none overflow-hidden border-0 border-line bg-auth-bg p-0 text-ink backdrop:bg-ink/40 open:flex open:flex-col sm:mx-auto sm:mt-10 sm:mb-auto sm:h-fit sm:max-h-[calc(100dvh-80px)] sm:max-w-[520px] sm:rounded-3xl sm:border sm:shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]"
       >
-        <AddElderlyForm
+        <ElderlyForm
           key={formKey}
           rooms={rooms}
           today={today}

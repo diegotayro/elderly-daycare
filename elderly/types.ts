@@ -76,7 +76,7 @@ export type PhotoConsentResult = { status: "ok" } | { status: "error" };
 export type RoomOption = { id: string; name: string };
 
 // Valores del formulario tal como llegan del FormData
-export type NewElderlyInput = {
+export type ElderlyFormValues = {
   firstName: string;
   lastName: string;
   birthDate: string; // "1947-03-12" o "" si está vacío o incompleto
@@ -86,12 +86,12 @@ export type NewElderlyInput = {
   medicalNotes: string;
 };
 
-export type NewElderlyField = keyof NewElderlyInput;
-export type NewElderlyErrors = Partial<Record<NewElderlyField, string>>;
+export type ElderlyFormField = keyof ElderlyFormValues;
+export type ElderlyFormErrors = Partial<Record<ElderlyFormField, string>>;
 
 export type CreateElderlyResult =
   | { status: "success"; fullName: string }
-  | { status: "invalid"; errors: NewElderlyErrors }
+  | { status: "invalid"; errors: ElderlyFormErrors }
   | { status: "error" };
 
 // Valores del formulario de invitación tal como llegan del FormData

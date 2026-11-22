@@ -1,6 +1,6 @@
 import { newElderlyMessages as messages } from "./new-elderly-messages";
 import { parseAllergyTags } from "./parse-allergy-tags";
-import type { NewElderlyErrors, NewElderlyInput } from "./types";
+import type { ElderlyFormErrors, ElderlyFormValues } from "./types";
 
 type ValidationRules = {
   today: string; // ISO "aaaa-mm-dd"
@@ -59,11 +59,11 @@ function validateEnrolledAt(
   }
 }
 
-export function validateNewElderly(
-  input: NewElderlyInput,
+export function validateElderlyForm(
+  input: ElderlyFormValues,
   rules: ValidationRules,
-): NewElderlyErrors {
-  const candidates: NewElderlyErrors = {
+): ElderlyFormErrors {
+  const candidates: ElderlyFormErrors = {
     firstName: validateName(
       input.firstName,
       messages.firstNameRequired,

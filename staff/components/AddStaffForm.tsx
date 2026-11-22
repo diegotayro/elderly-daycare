@@ -6,7 +6,7 @@ import {
   fieldControlClassName,
   getFieldErrorId,
 } from "@/elderly/components/FormField";
-import { NAME_MAX_LENGTH } from "@/elderly/validate-new-elderly";
+import { NAME_MAX_LENGTH } from "@/elderly/validate-elderly-form";
 import { readNewStaffInput } from "../read-new-staff-input";
 import { validateNewStaff } from "../validate-new-staff";
 import type { NewStaffErrors, NewStaffField } from "../types";
