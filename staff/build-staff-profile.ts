@@ -76,6 +76,13 @@ export function buildStaffProfile(
       canChange: staff.status !== "archived",
       canRemove: true,
     },
+    notificationValues:
+      staff.status === "archived"
+        ? null
+        : {
+            notify_on_post: staff.notify_on_post,
+            daily_summary_enabled: staff.daily_summary_enabled,
+          },
     email: staff.email,
     statusLabel: formatStaffStatus(staff.status),
     joinedAtLabel: formatEnrolledAt(staff.created_at),
