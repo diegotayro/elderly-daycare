@@ -40,7 +40,8 @@ export function ElderlyFormDialog<TResult extends ElderlySaveResult>({
 }: ElderlyFormDialogProps<TResult>) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
-  // Cambiar la key remonta el formulario: valores por defecto y sin errores
+  // Cambiar la key remonta el formulario: valores por defecto y sin errores.
+  // También se remonta si cambian los valores iniciales (llegan con refresh() tras guardar).
   const [formKey, setFormKey] = useState(0);
   const [isPending, startTransition] = useTransition();
   // El evento close llega después de close(): necesita saber si el guardado ya terminó
@@ -115,7 +116,7 @@ export function ElderlyFormDialog<TResult extends ElderlySaveResult>({
         className="m-0 h-dvh max-h-none w-full max-w-none overflow-hidden border-0 border-line bg-auth-bg p-0 text-ink backdrop:bg-ink/40 open:flex open:flex-col sm:mx-auto sm:mt-10 sm:mb-auto sm:h-fit sm:max-h-[calc(100dvh-80px)] sm:max-w-[520px] sm:rounded-3xl sm:border sm:shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]"
       >
         <ElderlyForm
-          key={formKey}
+          key={`${formKey}-${JSON.stringify(initialValues)}`}
           rooms={rooms}
           today={today}
           title={title}

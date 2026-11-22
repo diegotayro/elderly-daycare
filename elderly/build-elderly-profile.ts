@@ -37,6 +37,7 @@ export function buildElderlyProfile(
     canEditPhotoConsent: isAdmin && elderly.status === "active",
     canEdit,
     editValues: toElderlyFormValues(elderly),
+    today: source.referenceDate,
     roomOptions: canEdit ? buildRoomOptions(source) : [],
     enrolledAtLabel: formatEnrolledAt(elderly.enrolled_at),
     relatives: getLinkedRelatives(source, elderly.id, { isAdmin }),

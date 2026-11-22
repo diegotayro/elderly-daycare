@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { Avatar } from "@/shared/components/Avatar";
 import { avatarTones } from "../avatar-tones";
 import type { ElderlyProfile } from "../types";
+import { EditElderlyDialog } from "./EditElderlyDialog";
 
 type ElderlyProfileHeaderProps = {
   profile: ElderlyProfile;
@@ -31,12 +31,14 @@ export function ElderlyProfileHeader({ profile }: ElderlyProfileHeaderProps) {
           )}
         </div>
       </div>
-      <Link
-        href="/"
-        className="rounded-xl border-[1.5px] border-line bg-surface px-4 py-[9px] text-sm font-bold text-nav"
-      >
-        Editar
-      </Link>
+      {profile.canEdit && (
+        <EditElderlyDialog
+          elderlyId={profile.id}
+          editValues={profile.editValues}
+          roomOptions={profile.roomOptions}
+          today={profile.today}
+        />
+      )}
     </div>
   );
 }

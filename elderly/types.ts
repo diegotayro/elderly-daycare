@@ -69,6 +69,7 @@ export type ElderlyProfile = {
   canEdit: boolean; // admin y adulto mayor active
   editValues: ElderlyFormValues; // valores iniciales del modal de edición
   roomOptions: RoomOption[]; // todas las habitaciones; vacío si !canEdit
+  today: string; // "hoy" (Lima): tope de la fecha de nacimiento en el modal de edición
   enrolledAtLabel: string; // "feb 2025"
   relatives: LinkedRelative[];
   pendingInvitationEmails: string[]; // invitaciones pending de este adulto mayor
