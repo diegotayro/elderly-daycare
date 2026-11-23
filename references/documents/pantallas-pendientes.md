@@ -17,7 +17,7 @@ Lista de pantallas, modales y componentes que faltan. Marcar cada uno al termina
 - [ ] **4. Detalle de publicación** (`detalle-publicacion.dc.html`): post completo, "Me encanta", comentarios y caja para comentar.
 - [x] **5. Foto a pantalla completa** (`foto.dc.html`): visor oscuro con los datos del post. Capa `<dialog>` sobre el feed y el detalle (SPEC 30).
 - [x] **6. Mi cuenta familiar** (`familia-cuenta.dc.html`): sus adultos mayores con el estado de fotos (solo lectura) y sus notificaciones. Ruta `/family/account` (SPEC 18, datos mock; desde SPEC 31 con datos reales, foto y sin la tarjeta de notificaciones).
-- [x] **7. Resumen del día** (`resumen-dia.dc.html`): el esquema dice que **todavía no** se construye. Solo se crea la tabla. Ruta `/family/summary` (SPEC 18, datos mock).
+- [x] **7. Resumen del día** (`resumen-dia.dc.html`): la tabla `daily_summaries` y `list_summary_posts` existen desde SPEC 37. Ruta `/family/summary` (SPEC 18, datos mock); la pantalla real va en SPEC 38.
 
 ---
 

@@ -149,8 +149,33 @@ export type ListNoticesRow = {
   post_id: string | null; // null en account_activated
 };
 
+// Resumen del día: ánimo y siesta del equipo; comidas y momentos se calculan de los posts
+export type DailySummaryRow = {
+  id: string;
+  elderly_id: string;
+  date: string; // "aaaa-mm-dd"
+  mood: string | null;
+  sleep_minutes: number | null;
+  sent_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+// Fila que devuelve la función list_summary_posts (SECURITY INVOKER: la RLS decide qué posts ve quien llama)
+export type ListSummaryPostsRow = {
+  id: string;
+  type: PostType;
+  title: string | null;
+  body: string;
+  published_at: string;
+};
+
 // Funciones RPC (argumentos → retorno)
 export type DatabaseFunctions = {
+  list_summary_posts: {
+    Args: { p_elderly_id: string; p_day: string };
+    Returns: ListSummaryPostsRow[];
+  };
   post_has_history: { Args: { p_post_id: string }; Returns: boolean };
   posts_with_history: { Args: { p_post_ids: string[] }; Returns: string[] };
   update_post: {

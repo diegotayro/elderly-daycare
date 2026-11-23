@@ -526,34 +526,41 @@ Comentarios en publicaciones.
 
 ## 13. `daily_summaries` (resumen del día)
 
-> **Pendiente para una implementación posterior.** Crear la tabla y su RLS, pero no construir todavía la pantalla, el cron ni las notificaciones del resumen diario.
-
-Un registro por elderly por día.
+Un registro por adulto mayor por día. **Resumen híbrido:** el staff solo escribe el ánimo y los minutos de siesta; comidas, momentos y "Lo más lindo de hoy" se calculan en vivo de los posts del día con `list_summary_posts` (SPEC 37). La tabla existe desde SPEC 37; la pantalla real va en SPEC 38. El cron, el correo y la notificación de las 19:00 siguen pendientes.
 
 |Campo|Tipo|Notas|
 |---|---|---|
 |`id`|`uuid` PK||
-|`elderly_id`|`uuid` FK → `elderly`||
-|`date`|`date`||
-|`meals_count`|`int`|Comidas.|
-|`sleep_minutes`|`int`|Sueño en minutos (ej. 90 = 1h30).|
-|`activities_count`|`int`|Actividades.|
-|`mood`|`text`|Ánimo, ej. "Contenta y participativa".|
-|`highlight`|`text`|"Lo más lindo de hoy".|
-|`created_at` / `updated_at`|`timestamptz`||
-|||UNIQUE (`elderly_id`, `date`).|
+|`elderly_id`|`uuid` FK → `elderly` `ON DELETE RESTRICT`||
+|`date`|`date`|Día en hora de Lima.|
+|`mood`|`text` null|Ánimo, ej. "Contento y participativo". De 1 a 80 caracteres sin espacios de los extremos (`daily_summaries_mood_length`).|
+|`sleep_minutes`|`int` null|De 0 a 300 (`daily_summaries_sleep_minutes_range`). 0 = no durmió.|
+|`sent_at`|`timestamptz` null|`null` = borrador; con valor = enviado a las familias.|
+|`created_at` / `updated_at`|`timestamptz`|`updated_at` con el trigger `set_updated_at`.|
+|||UNIQUE (`elderly_id`, `date`) (`daily_summaries_elderly_date_key`); `daily_summaries_sent_requires_fields`: `sent_at is null or (mood is not null and sleep_minutes is not null)`.|
 
-> Se puede guardar o **calcularlo** agregando los `posts` del día. Para una clase, la tabla guardada es más fácil de demostrar.
+### Trigger y helper
+
+- `protect_daily_summaries_columns` (`before update`): `elderly_id` y `date` son inmutables; `sent_at` no vuelve a `null` ni cambia una vez puesto (`summary already sent`). Se puede corregir `mood` y `sleep_minutes` después de enviar. `EXECUTE` revocado a todos.
+- `can_write_daily_summary(p_elderly_id)` (`SECURITY DEFINER STABLE`): `true` si el adulto mayor está `active` y el usuario es admin de su guardería o staff con ese adulto mayor asignado.
 
 ### RLS
 
-|Acción|Quién|Regla|
+|Policy|Acción|Regla|
 |---|---|---|
-|select|relative|solo de sus ancianos|
-|select|admin|ancianos de su guardería|
-|select|staff|solo sus ancianos asignados|
-|insert / update|staff|solo sus ancianos asignados (el cron usa `service_role`)|
-|delete|nadie||
+|`daily_summaries_select_relative`|select|rol `relative`, solo sus adultos mayores y **solo enviados** (`sent_at is not null`)|
+|`daily_summaries_select_staff`|select|staff, solo sus asignados (borradores y enviados)|
+|`daily_summaries_select_admin`|select|admin, adultos mayores de su guardería (con o sin `active`)|
+|`daily_summaries_insert_team`|insert|`can_write_daily_summary(elderly_id)` y `date` entre ayer y hoy (hora de Lima)|
+|`daily_summaries_update_team`|update|lo mismo, en `using` y `with check`|
+
+Sin policy de `delete`: nadie borra. El cron del resumen diario (futuro) usará `service_role`.
+
+### Función `list_summary_posts`
+
+`list_summary_posts(p_elderly_id, p_day)`, `SECURITY INVOKER STABLE`, `search_path` vacío, `EXECUTE` solo `authenticated`. Devuelve `id`, `type`, `title`, `body`, `published_at` de los posts publicados en `p_day` (hora de Lima), distintos de `announcement`, que alcanzan al adulto mayor: `audience = elderly` etiquetado en `post_elderly`, `audience = room` de su habitación **actual**, o `audience = daycare`. Orden por `published_at` ascendente. La RLS de `posts` decide qué ve quien llama. La app deriva: comidas = `meal`; "Lo más lindo de hoy" = `nap`, `activity` y `achievement`; momentos = cantidad de estos.
+
+> Los posts de habitación se asocian a la habitación actual: si el adulto mayor cambia de habitación, sus resúmenes pasados muestran los posts de la nueva (no hay historial de habitaciones). Si un post se edita o borra después de enviar, el resumen cambia. El linter marca `can_write_daily_summary` como "ejecutable por `authenticated`" (como los demás helpers de policy); `list_summary_posts` es `INVOKER`.
 
 ---
 
@@ -633,6 +640,10 @@ Crear un usuario de prueba por rol y comprobar:
 35. Agregar fotos con un etiquetado sin consentimiento → falla; agregar ese etiquetado a un post con fotos → falla; quitar las fotos y agregar el etiquetado en la misma llamada → funciona. Si falla cualquier parte de `update_post`, no cambia nada.
 36. **Staff:** subir o borrar archivos de un post propio con historial → falla. **Admin:** subir a un post de su guardería → funciona.
 37. `posts_with_history`: devuelve solo los ids visibles con historial.
+38. **Resumen:** el staff asignado inserta un borrador de hoy sin `mood` ni `sleep_minutes` y uno de ayer → OK; de anteayer o de mañana → falla. El admin inserta y actualiza el de su guardería → OK; de otra guardería, o de un adulto mayor `archived` → falla.
+39. **Resumen:** `sent_at` sin `mood` o sin `sleep_minutes`, `mood` vacío o de 81 caracteres, `sleep_minutes` -1 o 301, o un segundo resumen del mismo día → falla. Tras enviar: cambiar `elderly_id`, `date` o `sent_at` → falla; editar `mood` → OK y `sent_at` no cambia. `delete` → 0 filas.
+40. **Resumen:** el relative ve solo los enviados de sus adultos mayores; el staff ve borradores y enviados de sus asignados y no los de otros.
+41. `list_summary_posts`: devuelve los posts del día que etiquetan al adulto mayor, los de su habitación y los de la guardería; no los `announcement`, los de otro día ni los de otra habitación. Un post de las 23:30 de Lima cuenta en ese día. Un relative no recibe posts que su RLS no le deja ver.
 
 ---
 
