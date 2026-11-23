@@ -1,6 +1,6 @@
 # SPEC 38 — Resumen del día en el perfil del adulto mayor y en el área familiar
 
-> **Estado:** Borrador
+> **Estado:** Aprobado
 > **Depende de:** SPEC 16, SPEC 18, SPEC 25, SPEC 27, SPEC 29, SPEC 33, SPEC 36, SPEC 37
 > **Fecha:** 2026-11-23
 > **Objetivo:** Que el staff asignado y el admin llenen y envíen el resumen del día desde el perfil del adulto mayor, y que el familiar vea en `/family/summary` los resúmenes enviados, con navegación entre días.
@@ -230,52 +230,52 @@ Se borra `family/mock-family.ts`.
 
 **Título en posts `elderly`:**
 
-- [ ] El campo TÍTULO aparece con "adultos mayores", "Toda la habitación" y "Toda la guardería", y no se vacía al cambiar de audiencia.
-- [ ] Un post `elderly` con título se guarda con ese título; uno sin título, con `title = null`.
-- [ ] Un título de 121 caracteres en un post `elderly` muestra el error "El título puede tener hasta 120 caracteres." y no se publica.
-- [ ] Editar un post `elderly` permite agregar, cambiar o quitar el título.
-- [ ] En `/` y `/family`, un post `elderly` sin título sigue mostrando los nombres como encabezado.
-- [ ] En `/`, un post `elderly` con título muestra el título como encabezado, "14:20 · {autor}" debajo y la línea "Para: {nombres}".
-- [ ] En `/family` y `/family/posts/[id]`, un post `elderly` con título muestra el título y debajo "Para {nombres} · {hora} · {autor}".
-- [ ] Los posts `room` y `daycare` se ven igual que antes.
+- [x] El campo TÍTULO aparece con "adultos mayores", "Toda la habitación" y "Toda la guardería", y no se vacía al cambiar de audiencia.
+- [x] Un post `elderly` con título se guarda con ese título; uno sin título, con `title = null`.
+- [x] Un título de 121 caracteres en un post `elderly` muestra el error "El título puede tener hasta 120 caracteres." y no se publica.
+- [x] Editar un post `elderly` permite agregar, cambiar o quitar el título.
+- [x] En `/` y `/family`, un post `elderly` sin título sigue mostrando los nombres como encabezado.
+- [x] En `/`, un post `elderly` con título muestra el título como encabezado, "14:20 · {autor}" debajo y la línea "Para: {nombres}".
+- [x] En `/family` y `/family/posts/[id]`, un post `elderly` con título muestra el título y debajo "Para {nombres} · {hora} · {autor}".
+- [x] Los posts `room` y `daycare` se ven igual que antes.
 
 **Equipo (`/elderly/[id]/summary`):**
 
-- [ ] El botón "Resumen del día" del perfil lleva a `/elderly/[id]/summary`.
-- [ ] La vista replica `resumen-dia.dc.html` (sin chips) a 1440×900 y se ve sin scroll horizontal a 390×844.
-- [ ] El título de la pestaña es "Resumen del día · {nombre completo} · Casa Nogal".
-- [ ] Staff no asignado abre la ruta de otro adulto mayor → 404.
-- [ ] Comidas = posts `meal` del día; momentos = cantidad de ítems de "Lo más lindo de hoy"; los `announcement` no aparecen.
-- [ ] Un post de la habitación del adulto mayor y uno de toda la guardería cuentan; uno de otra habitación no.
-- [ ] Cada ítem de "Lo más lindo de hoy" enlaza a `/posts/[id]`.
-- [ ] Sin resumen: estado "Sin resumen", siesta "—", ánimo "Pendiente" y botón "Completar resumen".
-- [ ] "Guardar borrador" con campos vacíos → toast "Borrador guardado" y estado "Borrador".
-- [ ] "Enviar a familias" sin ánimo o sin siesta → errores por campo y no se guarda.
-- [ ] Ánimo de 81 caracteres o siesta de 5 h 1 min → error por campo.
-- [ ] Enviar con datos → toast "Resumen enviado", estado "Enviado a las HH:MM" y botón "Editar resumen".
-- [ ] Editar un enviado muestra "Cancelar" y "Guardar"; guardar no cambia la hora de envío.
-- [ ] Con `?date=` de anteayer, no aparece el botón del modal.
-- [ ] Con el adulto mayor `archived` (admin), no aparece el botón del modal.
-- [ ] Las flechas saltan al día anterior/siguiente disponible y se deshabilitan sin destino; el selector no permite días futuros.
-- [ ] `?date=` inválido o futuro muestra hoy.
+- [x] El botón "Resumen del día" del perfil lleva a `/elderly/[id]/summary`.
+- [x] La vista replica `resumen-dia.dc.html` (sin chips) a 1440×900 y se ve sin scroll horizontal a 390×844.
+- [x] El título de la pestaña es "Resumen del día · {nombre completo} · Casa Nogal".
+- [x] Staff no asignado abre la ruta de otro adulto mayor → 404.
+- [x] Comidas = posts `meal` del día; momentos = cantidad de ítems de "Lo más lindo de hoy"; los `announcement` no aparecen.
+- [x] Un post de la habitación del adulto mayor y uno de toda la guardería cuentan; uno de otra habitación no.
+- [x] Cada ítem de "Lo más lindo de hoy" enlaza a `/posts/[id]`.
+- [x] Sin resumen: estado "Sin resumen", siesta "—", ánimo "Pendiente" y botón "Completar resumen".
+- [x] "Guardar borrador" con campos vacíos → toast "Borrador guardado" y estado "Borrador".
+- [x] "Enviar a familias" sin ánimo o sin siesta → errores por campo y no se guarda.
+- [x] Ánimo de 81 caracteres o siesta de 5 h 1 min → error por campo.
+- [x] Enviar con datos → toast "Resumen enviado", estado "Enviado a las HH:MM" y botón "Editar resumen".
+- [x] Editar un enviado muestra "Cancelar" y "Guardar"; guardar no cambia la hora de envío.
+- [x] Con `?date=` de anteayer, no aparece el botón del modal.
+- [x] Con el adulto mayor `archived` (admin), no aparece el botón del modal.
+- [x] Las flechas saltan al día anterior/siguiente disponible y se deshabilitan sin destino; el selector no permite días futuros.
+- [x] `?date=` inválido o futuro muestra hoy.
 
 **Familiar (`/family/summary`):**
 
-- [ ] Ya no existe `family/mock-family.ts` y no hay datos mock en la pantalla.
-- [ ] Un borrador no se ve; tras enviarlo, aparece.
-- [ ] Si hoy no hay resumen enviado, muestra el último enviado con su fecha.
-- [ ] Sin resúmenes enviados: "Todavía no hay resúmenes de {nombre}".
-- [ ] Con un solo adulto mayor vinculado no se muestran chips; con dos, cambiar de chip cambia la URL y el resumen.
-- [ ] Las flechas solo navegan entre resúmenes enviados.
-- [ ] Cada ítem de "Lo más lindo de hoy" enlaza a `/family/posts/[id]`.
-- [ ] Un familiar no puede ver el resumen de un adulto mayor ajeno cambiando `?elderly=` (muestra el primero propio).
+- [x] Ya no existe `family/mock-family.ts` y no hay datos mock en la pantalla.
+- [x] Un borrador no se ve; tras enviarlo, aparece.
+- [x] Si hoy no hay resumen enviado, muestra el último enviado con su fecha.
+- [x] Sin resúmenes enviados: "Todavía no hay resúmenes de {nombre}".
+- [x] Con un solo adulto mayor vinculado no se muestran chips; con dos, cambiar de chip cambia la URL y el resumen.
+- [x] Las flechas solo navegan entre resúmenes enviados.
+- [x] Cada ítem de "Lo más lindo de hoy" enlaza a `/family/posts/[id]`.
+- [x] Un familiar no puede ver el resumen de un adulto mayor ajeno cambiando `?elderly=` (muestra el primero propio).
 
 **Avisos y general:**
 
-- [ ] El staff con todos sus asignados activos enviados hoy no ve "Recuerda enviar el resumen del día" después de las 17:00; con uno pendiente, sí.
-- [ ] La consola no muestra errores ni warnings de hidratación en las dos rutas.
-- [ ] `npm run lint` y `npm run build` pasan.
-- [ ] Capturas en `.playwright-mcp/` de ambas vistas (1440×900 y 390×844) y del modal.
+- [x] El staff con todos sus asignados activos enviados hoy no ve "Recuerda enviar el resumen del día" después de las 17:00; con uno pendiente, sí.
+- [x] La consola no muestra errores ni warnings de hidratación en las dos rutas.
+- [x] `npm run lint` y `npm run build` pasan.
+- [x] Capturas en `.playwright-mcp/` de ambas vistas (1440×900 y 390×844) y del modal.
 
 ---
 

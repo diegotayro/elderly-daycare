@@ -1,6 +1,6 @@
 # SPEC 37 — Tabla `daily_summaries` y lectura de los posts del resumen
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 13, SPEC 15, SPEC 22
 > **Fecha:** 2026-11-23
 > **Objetivo:** Crear la tabla `daily_summaries` (ánimo, siesta y envío), su RLS y la función que lista los posts del día de un adulto mayor, para que SPEC 38 construya el resumen del día.

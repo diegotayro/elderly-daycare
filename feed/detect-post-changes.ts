@@ -21,12 +21,6 @@ function isSameAudience(a: AudienceSelection, b: AudienceSelection): boolean {
   return true;
 }
 
-// El título solo cuenta con room o daycare
-function getEffectiveTitle(audience: AudienceSelection, title: string): string {
-  const hasTitle = audience.kind === "room" || audience.kind === "daycare";
-  return hasTitle ? title.trim() : "";
-}
-
 // true si el formulario difiere de la publicación original (habilita "Guardar")
 export function detectPostChanges(
   initial: NewPostInput,
@@ -38,7 +32,6 @@ export function detectPostChanges(
     !isSameAudience(initial.audience, current.audience) ||
     initial.type !== current.fields.type ||
     initial.body.trim() !== current.fields.body.trim() ||
-    getEffectiveTitle(initial.audience, initial.title) !==
-      getEffectiveTitle(current.audience, current.fields.title)
+    initial.title.trim() !== current.fields.title.trim()
   );
 }

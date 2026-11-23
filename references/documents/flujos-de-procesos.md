@@ -126,7 +126,7 @@ Un adulto mayor puede tener varios familiares, y siempre gana el "no":
     
 2. Elige el tipo (cualquiera), escribe la descripción y, si quiere, agrega fotos.
     
-    - **Título (opcional):** solo con `room` y `daycare`. Vacío se guarda como `null`. Los posts `elderly` no llevan título.
+    - **Título (opcional):** con cualquier audiencia. Vacío se guarda como `null`. En un post `elderly` con título, el título es el encabezado y el feed del familiar muestra debajo "Para {nombres}".
     - **Fotos:** cada foto original puede pesar hasta 20 MB. Antes de publicar, el navegador las comprime a WebP, con el lado mayor de 1280 px y hasta 200 KB. Si alguna no se puede procesar (por ejemplo, un formato que el navegador no lee), no se publica nada y se avisa cuál foto es.
     - **Consentimiento de fotos, `audience = elderly`:** el adulto mayor sin consentimiento se marca con una cámara tachada. Si hay fotos y algún etiquetado no tiene consentimiento, no se puede publicar: se pide quitar las fotos o quitar a esa persona.
     - **Consentimiento de fotos, `audience = room` o `daycare`:** al agregar fotos, si hay algún adulto mayor activo sin consentimiento en esa habitación (o en cualquiera, para `daycare`), se muestra un aviso genérico, sin nombres, que no bloquea. Cuenta también a los adultos mayores no asignados al staff.
@@ -150,3 +150,19 @@ Un adulto mayor puede tener varios familiares, y siempre gana el "no":
 
 1. El autor o el admin elige quitar una foto.
 2. Se borra su archivo en Storage y su fila en `post_photos`.
+
+## Flujos del resumen del día
+
+### Completar y enviar el resumen
+
+1. El admin (de su guardería) o el staff asignado entra al resumen desde el botón "Resumen del día" del perfil del adulto mayor (`/elderly/[id]/summary`). Solo se puede completar el de hoy y el de ayer (hora de Lima), y solo si el adulto mayor está `active`.
+2. Las comidas y los momentos se calculan de los posts del día (`list_summary_posts`): comidas = posts `meal`; "Lo más lindo de hoy" = posts `nap`, `activity` y `achievement`. El equipo escribe solo el ánimo (máx. 80 caracteres) y la siesta (0 a 300 min).
+3. "Guardar borrador" acepta campos vacíos (valida longitud y rango si hay valor). "Enviar a familias" exige ánimo y siesta y fija `sent_at`.
+4. Un resumen enviado se puede corregir hoy y ayer; guardar los cambios no modifica `sent_at` y no vuelve a borrador.
+5. Server Action `saveDailySummary`: valida de nuevo, hace `upsert` por `(elderly_id, date)` con la sesión de quien llama; la RLS decide el permiso y la ventana de fechas.
+
+### Ver el resumen (familiar)
+
+1. En `/family/summary` el familiar ve solo resúmenes enviados de sus adultos mayores activos vinculados. Sin fecha, ve el último enviado.
+2. Navega entre días con las flechas (solo resúmenes enviados) o el selector de fecha. Un día sin resumen enviado muestra "No hay resumen de este día".
+3. El aviso "Recuerda enviar el resumen del día" del staff (desde las 17:00) se oculta cuando todos sus adultos mayores activos tienen el resumen de hoy enviado.

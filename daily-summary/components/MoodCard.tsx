@@ -1,7 +1,7 @@
 import { SmileIcon } from "@/shared/components/icons/SmileIcon";
 
 type MoodCardProps = {
-  mood: string;
+  mood: string | null; // null = el equipo aún no lo escribió
 };
 
 export function MoodCard({ mood }: MoodCardProps) {
@@ -13,7 +13,7 @@ export function MoodCard({ mood }: MoodCardProps) {
       <div>
         <div className="text-[13px] text-muted">Ánimo del día</div>
         <div className="font-display text-lg leading-[normal] font-semibold text-ink">
-          {mood}
+          {mood ?? "Pendiente"}
         </div>
       </div>
     </div>

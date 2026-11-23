@@ -81,8 +81,8 @@ export async function updatePost(
   const audience = input.audience;
   if (audience.kind === "none") return { status: "error" };
   const { add, remove } = diffElderlyIds(input, loaded.readableElderlyIds);
-  // Solo room y daycare llevan título; vacío se guarda como null
-  const title = audience.kind === "elderly" ? "" : input.title.trim();
+  // Título opcional en cualquier audiencia; vacío se guarda como null
+  const title = input.title.trim();
 
   const supabase = createClient(await cookies());
   const { error } = await supabase.rpc("update_post", {
