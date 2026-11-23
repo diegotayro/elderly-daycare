@@ -67,10 +67,11 @@ Viven en `public`, son `SECURITY DEFINER STABLE` con `search_path` vacío y `EXE
 |`current_user_relative_ids()`|`setof uuid`: ids de los familiares (`guardian_elderly`) de los ancianos del usuario logueado, solo si es staff de su guardería. Vacío para los demás roles. Existe para que la policy de `users` no lea `guardian_elderly` directamente: `guardian_elderly_insert_admin` lee `users`, y leerse mutuamente da recursión infinita entre policies.|
 
 |`can_view_post(p_post_id)`|`boolean`: única implementación de la regla del feed (ver abajo). `false` si el post no existe o su autor no es de la guardería del usuario. Admin: `true`. Staff y relative: según `audience` (nunca `type`); staff además si es el autor. La usan las policies de `posts`, `post_elderly`, `post_photos`, `reactions`, `comments` y Storage. Para un admin equivale a "el autor del post es de su guardería", por eso las policies de borrado del admin la reusan en vez de leer `users` (leerla con RLS produce recursión con `users_select_comment_authors`).|
-|`can_post_to_room(p_room_id)`|`boolean`: admin, la habitación es de su guardería; staff, la habitación es la de alguno de sus asignados. Lo usan `posts_insert_team` y `posts_update_author`.|
+|`can_post_to_room(p_room_id)`|`boolean`: admin, la habitación es de su guardería; staff, la habitación es la de alguno de sus asignados. Lo usan `posts_insert_team` y el trigger `protect_posts_columns` (al cambiar la habitación de un post `room`).|
 |`post_has_tag_without_photo_consent(p_post_id)`|`boolean`: algún adulto mayor etiquetado en el post tiene `photo_consent = false`. `SECURITY DEFINER` para que no dependa de qué adultos mayores ve quien sube la foto.|
 |`staff_has_history(p_staff_id)`|`boolean`: el staff tiene alguna fila en `posts` (`author_id`), `comments` (`author_id`) o `reactions` (`user_id`). `false` si quien llama no es admin o si `p_staff_id` no es un staff de su guardería. Lo usa el perfil de `/staff/[id]` (mostrar "Eliminar") y `deleteStaff` (validar); la FK `on delete restrict` sigue siendo la protección final.|
-|`post_has_history(p_post_id)`|`boolean`: alguien distinto del autor del post reaccionó (`reactions.user_id`) o comentó (`comments.author_id`). `false` si el post no existe. Lo usan las policies de borrado del autor en `posts` y en Storage, el detalle `/posts/[id]` (mostrar "Eliminar" al staff) y `deletePost` (validar).|
+|`post_has_history(p_post_id)`|`boolean`: alguien distinto del autor del post reaccionó (`reactions.user_id`) o comentó (`comments.author_id`). `false` si el post no existe. Lo usan las policies de borrado del autor en `posts` y en Storage, el detalle `/posts/[id]` (mostrar "Eliminar" al staff), `deletePost` (validar), y, desde SPEC 36, las policies de edición del autor (`posts`, `post_elderly`, `post_photos` y Storage), `posts_with_history` y `updatePost`.|
+|`posts_with_history(p_post_ids)`|`setof uuid`: los ids de la lista que el usuario puede ver (`can_view_post`) y tienen historial (`post_has_history`). `SECURITY DEFINER STABLE`; reusa `post_has_history`, no duplica la regla. La usa el feed para calcular `canEdit` del staff en una sola llamada por página.|
 
 Además existe `post_id_from_path(p_path)`, `IMMUTABLE` y no `SECURITY DEFINER`: devuelve la primera carpeta de una ruta de Storage como `uuid`, o `null` si no tiene formato UUID (así una ruta inválida se niega sin error).
 
@@ -124,10 +125,11 @@ Todas con `search_path` vacío y `EXECUTE` revocado a `public` y `anon` (solo `a
 |Función|Tipo|Devuelve|
 |---|---|---|
 |`create_post(p_audience, p_room_id, p_type, p_title, p_body, p_elderly_ids)`|`SECURITY INVOKER`, `volatile`|`uuid` del post. Inserta en `posts` (`author_id = auth.uid()`) y una fila en `post_elderly` por cada id, en una sola transacción: si falla cualquier parte (RLS, `posts_require_elderly_tag`, etc.) no se guarda nada. Aplican `posts_insert_team` y `post_elderly_insert_author`. No usa `RETURNING`: genera el `uuid` antes, porque `posts_select_visible` (`can_view_post`) no ve la fila recién insertada y rechazaría el `RETURNING`.|
+|`update_post(p_post_id, p_audience, p_room_id, p_type, p_title, p_body, p_add_elderly_ids, p_remove_elderly_ids, p_new_photos, p_removed_photo_ids)`|`SECURITY INVOKER`, `volatile`|`void`. Edita el post en una sola transacción, en este orden (para que las policies de consentimiento vean el estado correcto): borra las filas de `post_photos` quitadas; si `p_audience <> 'elderly'` borra todas las etiquetas, si no las de `p_remove_elderly_ids`; actualiza `posts` (si no actualiza ninguna fila, por RLS o historial, lanza `post not editable`); inserta las etiquetas de `p_add_elderly_ids` y las fotos de `p_new_photos` (`jsonb`: `[{url, width, height, position}]`). Aplican las policies de edición y los constraint triggers diferidos. Los archivos del bucket los gestiona la app (SPEC 36).|
 |`room_has_elderly_without_photo_consent(p_room_id)`|`SECURITY DEFINER STABLE`|`boolean`: `true` si `can_post_to_room(p_room_id)` es `true` y en esa habitación hay algún adulto mayor `active` con `photo_consent = false`, asignado o no al usuario. `false` en cualquier otro caso (habitación donde no puede publicar, de otra guardería o inexistente, usuario `relative`, `pending` o `archived`). Cumple la regla 7: solo devuelve `true/false`, nunca nombres ni filas. Alimenta el aviso genérico de "Nueva publicación" para `room` y `daycare`.|
 |`visible_post_days(p_before, p_limit)`|`SECURITY INVOKER STABLE`|`setof date`: días distintos (hora de Lima) con posts que el usuario puede ver (RLS), anteriores a `p_before`, del más nuevo al más viejo, con `limit p_limit`. Sirve para "Cargar días anteriores".|
 
-> El linter marca `room_has_elderly_without_photo_consent` como "ejecutable por `authenticated`": es esperado, porque necesita leer adultos mayores que la RLS le oculta al staff y solo devuelve un booleano. `create_post` y `visible_post_days` son `INVOKER` y no generan aviso.
+> El linter marca `room_has_elderly_without_photo_consent` como "ejecutable por `authenticated`": es esperado, porque necesita leer adultos mayores que la RLS le oculta al staff y solo devuelve un booleano. `create_post`, `update_post` y `visible_post_days` son `INVOKER` y no generan aviso. `posts_with_history` es `DEFINER` por el mismo motivo que `post_has_history`.
 
 ### Funciones de avisos
 
@@ -400,7 +402,7 @@ Una publicación tiene un tipo (qué es) y una audiencia (para quién es).
 |Campo|Tipo|Notas|
 |---|---|---|
 |`id`|`uuid` PK||
-|`author_id`|`uuid` FK → `users`|Staff o admin que publica. `ON DELETE RESTRICT`. Inmutable (trigger `protect_posts_columns`).|
+|`author_id`|`uuid` FK → `users`|Staff o admin que publica. `ON DELETE RESTRICT`. Inmutable (trigger `protect_posts_columns`). La audiencia sí se puede cambiar (SPEC 36).|
 |`audience`|`post_audience`|`elderly`: adultos mayores etiquetados en `post_elderly`. `room`: toda una habitación. `daycare`: toda la guardería.|
 |`room_id`|`uuid` FK → `rooms`|Obligatorio si `audience = room`; `null` en los demás casos (`posts_room_id_matches_audience`). `ON DELETE RESTRICT`.|
 |`type`|`post_type`|Qué es el post. Cualquier tipo puede ir con cualquier audiencia.|
@@ -409,7 +411,7 @@ Una publicación tiene un tipo (qué es) y una audiencia (para quién es).
 |`published_at`|`timestamptz`||
 |`created_at` / `updated_at`|`timestamptz`||
 
-> **Reglas de audiencia:** con `audience = elderly`, el post se crea junto con sus adultos mayores etiquetados (al menos uno), en una sola operación. Al editar un post `elderly`, los cambios de adultos mayores etiquetados se guardan juntos en una sola operación. **Un post `elderly` siempre debe tener al menos un adulto mayor etiquetado mientras exista.** Con `room` o `daycare`, no lleva adultos mayores etiquetados. La audiencia no se puede cambiar después de crear el post (ni el autor): lo garantiza el trigger `protect_posts_columns`. La regla "al menos un etiquetado" la validan constraint triggers `deferrable initially deferred` (`posts_require_elderly_tag`, `post_elderly_keep_one_tag`): el error llega al hacer commit, así que post y etiquetas deben insertarse en la misma transacción.
+> **Reglas de audiencia:** con `audience = elderly`, el post se crea junto con sus adultos mayores etiquetados (al menos uno), en una sola operación. Al editar un post `elderly`, los cambios de adultos mayores etiquetados se guardan juntos en una sola operación. **Un post `elderly` siempre debe tener al menos un adulto mayor etiquetado mientras exista.** Con `room` o `daycare`, no lleva adultos mayores etiquetados. **La audiencia se puede cambiar** al editar (adultos mayores, habitación o toda la guardería): al pasar a `room` o `daycare` se borran todas las etiquetas, y al pasar a `elderly` se necesita al menos una. El autor es inmutable: lo garantiza el trigger `protect_posts_columns`, que además exige `can_post_to_room(room_id)` solo cuando la habitación cambia (el staff conserva la actual aunque ya no tenga asignados en ella). La regla "al menos un etiquetado" la validan constraint triggers `deferrable initially deferred` (`posts_require_elderly_tag`, que se dispara al insertar y al cambiar `audience`, y `post_elderly_keep_one_tag`): el error llega al hacer commit, así que post y etiquetas deben insertarse en la misma transacción.
 
 > **Al borrar un post:** sus filas en `post_elderly`, `post_photos`, `reactions` y `comments` se borran en cascada. Los archivos de Storage no se borran solos: primero se borran los archivos de `{post_id}/` (mientras el post existe, para que pase la regla de Storage) y después el post.
 
@@ -419,7 +421,7 @@ Una publicación tiene un tipo (qué es) y una audiencia (para quién es).
 | ------ | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | select | todos         | puede ver el post (regla del feed)                                                                                                                                                                                                                                                                                                               |
 | insert | staff/admin   | Todas estas condiciones se cumplen a la vez (una sola policy): `author_id` = él mismo (cualquier tipo), **y además**, según la audiencia: `elderly` → a quiénes etiqueta se valida en `post_elderly`; `room` → admin: cualquier habitación de su guardería, staff: solo habitaciones donde está alguno de sus asignados; `daycare` → solo admin. |
-| update | autor         | sus posts; sigue siendo el autor; no cambia la audiencia; si es `room`, la habitación cumple las reglas de insert                                                                                                                                                                                                                                |
+| update | autor sin historial (staff) o admin | `posts_update_author`: el autor, rol `staff` o `admin` y `not post_has_history(id)`; el `with check` exige que siga siendo el autor y que `audience <> 'daycare'` o sea admin (la habitación la valida el trigger). `posts_update_admin`: `is_admin()` y `can_view_post(id)`, cualquier post de su guardería con o sin historial |
 | delete | autor sin historial (staff) o admin | el autor solo si `not post_has_history(id)` (nadie más reaccionó ni comentó); el admin cualquier post de su guardería, con o sin historial (moderación) |
 
 ---
@@ -441,8 +443,8 @@ Tabla intermedia. Es la clave para filtrar el feed del relative.
 |Acción|Quién|Regla|
 |---|---|---|
 |select|todos|puede ver el post (regla del feed)|
-|insert|autor del post|solo si el post tiene `audience = elderly`. Staff: solo sus asignados; admin: cualquier adulto mayor de su guardería. **No** se puede etiquetar a un adulto mayor sin `photo_consent` si el post ya tiene fotos|
-|delete|autor del post o admin|el admin solo en posts de su guardería. **Un post `elderly` siempre debe tener al menos un adulto mayor etiquetado mientras exista:** al editarlo no se pueden quitar todos; al borrar el post completo, sus filas en `post_elderly` se borran junto con él.|
+|insert|autor del post o admin|solo si el post tiene `audience = elderly`. Autor: sin historial (`not post_has_history(post_id)`); staff solo sus asignados, admin cualquier adulto mayor `active` de su guardería (`post_elderly_insert_admin`, en cualquier post de su guardería). **No** se puede etiquetar a un adulto mayor sin `photo_consent` si el post ya tiene fotos|
+|delete|autor del post sin historial o admin|el autor solo si `not post_has_history(post_id)`; el admin solo en posts de su guardería. **Un post `elderly` siempre debe tener al menos un adulto mayor etiquetado mientras exista:** al editarlo no se pueden quitar todos; al borrar el post completo, sus filas en `post_elderly` se borran junto con él.|
 
 ---
 
@@ -464,10 +466,10 @@ Fotos adjuntas a una publicación, con soporte para vista a pantalla completa.
 |Acción|Quién|Regla|
 |---|---|---|
 |select|todos|puede ver el post (regla del feed)|
-|insert|autor del post|**ningún** anciano etiquetado en el post tiene `photo_consent = false`|
-|delete|autor del post o admin|el admin solo en posts de su guardería|
+|insert|autor del post sin historial o admin|**ningún** anciano etiquetado en el post tiene `photo_consent = false`; el autor solo si `not post_has_history(post_id)`; el admin (`post_photos_insert_admin`) en cualquier post de su guardería|
+|delete|autor del post sin historial o admin|el autor solo si `not post_has_history(post_id)`; el admin solo en posts de su guardería|
 
-> **Al borrar una foto**, también se borra su archivo en Storage.
+> **Al quitar una foto** al editar (`update_post`), la fila se borra en la transacción y `updatePost` borra su archivo del bucket después. Si ese borrado falla, el archivo queda huérfano y se borra al eliminar el post.
 
 > **`photo_consent` se valida en los dos sentidos:** aquí y en `post_elderly`. Así no importa en qué orden la app guarde las fotos y las etiquetas.
 
@@ -567,7 +569,7 @@ Las fotos viven en `storage.objects`, que tiene su **propia** RLS. Si el bucket 
 |Acción|Quién|Regla|
 |---|---|---|
 |select|todos|puede ver el post de la ruta (regla del feed)|
-|insert|autor del post|es el autor del post de la ruta|
+|insert|autor del post sin historial o admin|el autor del post de la ruta y `not post_has_history(post_id)`, y ningún etiquetado sin consentimiento; el admin (`post_photos_objects_insert_admin`) en cualquier post de su guardería|
 |delete|autor del post sin historial o admin|el autor solo si `not post_has_history(post_id)`, para no borrar los archivos de un post que luego no podrá borrar; el admin en cualquier post de su guardería|
 
 ---
@@ -624,6 +626,13 @@ Crear un usuario de prueba por rol y comprobar:
 28. **Staff autor:** borrar un post sin historial → funciona; con historial → borra 0 filas. Borrar en Storage un archivo de un post con historial → borra 0; de uno sin historial → funciona.
 29. **Staff:** borrar el post de otro staff → borra 0 filas.
 30. **Admin:** borrar un post con historial de un staff de su guardería (fila y archivos) → funciona; de otra guardería → borra 0.
+31. **Staff autor:** `update_post` sin historial cambia tipo, textos, audiencia y fotos; con historial falla (`post not editable`) y no cambia nada. Otro staff no puede editar el post. Pasar a `daycare` → falla.
+32. **Admin:** `update_post` sobre el post de un staff de su guardería, con o sin historial → funciona; de otra guardería → falla.
+33. `author_id` no cambia con un `update` directo; `audience` sí. Un staff conserva la habitación actual de un post `room` aunque ya no tenga asignados en ella, y no puede cambiarla a una sin asignados.
+34. De `elderly` a `room` borra todas las etiquetas; de `room` a `elderly` sin etiquetas → falla; quitar todas las etiquetas sin cambiar la audiencia → falla.
+35. Agregar fotos con un etiquetado sin consentimiento → falla; agregar ese etiquetado a un post con fotos → falla; quitar las fotos y agregar el etiquetado en la misma llamada → funciona. Si falla cualquier parte de `update_post`, no cambia nada.
+36. **Staff:** subir o borrar archivos de un post propio con historial → falla. **Admin:** subir a un post de su guardería → funciona.
+37. `posts_with_history`: devuelve solo los ids visibles con historial.
 
 ---
 

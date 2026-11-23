@@ -14,9 +14,10 @@ const POST_TYPE_ORDER: PostType[] = [
 
 type PostTypePickerProps = {
   error?: string;
+  defaultType?: string;
 };
 
-export function PostTypePicker({ error }: PostTypePickerProps) {
+export function PostTypePicker({ error, defaultType }: PostTypePickerProps) {
   return (
     <fieldset
       aria-invalid={error ? true : undefined}
@@ -39,6 +40,7 @@ export function PostTypePicker({ error }: PostTypePickerProps) {
                 type="radio"
                 name="type"
                 value={type}
+                defaultChecked={type === defaultType}
                 className="sr-only"
               />
               {label}

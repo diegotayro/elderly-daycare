@@ -3,6 +3,7 @@
 import { getCurrentUser } from "@/auth/get-current-user";
 import { getLimaToday } from "@/shared/date/get-lima-today";
 import { buildFeed } from "../build-feed";
+import { getEditablePostIds } from "../get-editable-post-ids";
 import { getFeedDaysBefore } from "../get-feed-days";
 import type { FeedPage, FeedPost } from "../types";
 
@@ -18,5 +19,9 @@ export async function loadMoreTeamFeed(
   }
 
   const page = await getFeedDaysBefore(before, user.id);
-  return buildFeed(page, { currentUserId: user.id, today: getLimaToday() });
+  return buildFeed(page, {
+    currentUserId: user.id,
+    today: getLimaToday(),
+    editablePostIds: await getEditablePostIds(page, user),
+  });
 }

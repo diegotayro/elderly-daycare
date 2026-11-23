@@ -43,8 +43,8 @@ Lista de pantallas, modales y componentes que faltan. Marcar cada uno al termina
 
 ### Publicaciones
 
-- [ ] **16. Modal "Editar publicación"**: el botón "Editar" del post existe. Puede reusar el de crear, pero con la audiencia bloqueada y al menos un etiquetado.
-- [ ] **17. Confirmaciones de borrado**: eliminar un post, quitar una foto y que el admin borre un comentario (moderación). Eliminar un post: resuelto en SPEC 35.
+- [x] **16. Modal "Editar publicación"**: resuelto en SPEC 36. Reusa el formulario de crear; por decisión del usuario la audiencia se puede cambiar (siempre con al menos un etiquetado si es `elderly`).
+- [ ] **17. Confirmaciones de borrado**: eliminar un post, quitar una foto y que el admin borre un comentario (moderación). Eliminar un post: resuelto en SPEC 35. Quitar una foto: resuelto en SPEC 36 (en el modal de edición).
 - [ ] **18. Advertencia de consentimiento de fotos**: al subir fotos a un post `room` o `daycare`, mostrar qué adultos mayores no tienen consentimiento.
 - [ ] **19. Editar y eliminar comentario propio**: el detalle solo muestra cómo se crean.
 

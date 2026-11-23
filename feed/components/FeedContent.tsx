@@ -7,6 +7,7 @@ import { getCurrentUserPhotoUrl } from "@/users/get-current-user-photo-url";
 import { buildFeed } from "../build-feed";
 import { buildTodayLabel } from "../build-day-label";
 import { feedNoticeMessages } from "../delete-post-messages";
+import { getEditablePostIds } from "../get-editable-post-ids";
 import { getInitialFeedDays } from "../get-feed-days";
 import { readFeedNotice } from "../read-feed-notice";
 import { FeedView } from "./FeedView";
@@ -33,7 +34,11 @@ export async function FeedContent({ searchParams }: FeedContentProps) {
     getInitialFeedDays(today, user.id),
     getCurrentUserPhotoUrl(),
   ]);
-  const initialPage = buildFeed(dataPage, { currentUserId: user.id, today });
+  const initialPage = buildFeed(dataPage, {
+    currentUserId: user.id,
+    today,
+    editablePostIds: await getEditablePostIds(dataPage, user),
+  });
 
   return (
     <>

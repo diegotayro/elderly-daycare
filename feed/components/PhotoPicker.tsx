@@ -5,25 +5,32 @@ import { AlertIcon } from "@/shared/components/icons/AlertIcon";
 import { CloseIcon } from "@/shared/components/icons/CloseIcon";
 import { PlusIcon } from "@/shared/components/icons/PlusIcon";
 import { MAX_PHOTOS } from "../new-post-limits";
+import type { EditablePhoto } from "../types";
 import { FieldError } from "./FieldError";
 
+type PhotoSource = { file: File } | { url: string };
+
 type PhotoThumbnailProps = {
-  file: File;
+  source: PhotoSource;
   position: number;
   isFocusTarget: boolean;
   onRemove: () => void;
 };
 
 function PhotoThumbnail({
-  file,
+  source,
   position,
   isFocusTarget,
   onRemove,
 }: PhotoThumbnailProps) {
   const imageRef = useRef<HTMLImageElement>(null);
 
+  const file = "file" in source ? source.file : null;
+  const remoteUrl = "url" in source ? source.url : null;
+
   // La URL se asigna y se libera en el mismo efecto para no filtrar memoria
   useEffect(() => {
+    if (!file) return;
     const url = URL.createObjectURL(file);
     if (imageRef.current) imageRef.current.src = url;
     return () => URL.revokeObjectURL(url);
@@ -31,8 +38,13 @@ function PhotoThumbnail({
 
   return (
     <div className="relative size-24 flex-none overflow-hidden rounded-[14px] border border-line bg-photo">
-      {/* eslint-disable-next-line @next/next/no-img-element -- vista previa local (blob:) */}
-      <img ref={imageRef} alt="" className="size-full object-cover" />
+      {/* eslint-disable-next-line @next/next/no-img-element -- vista previa local (blob:) o URL firmada */}
+      <img
+        ref={imageRef}
+        src={remoteUrl ?? undefined}
+        alt=""
+        className="size-full object-cover"
+      />
       <button
         type="button"
         data-photo-focus={isFocusTarget ? "" : undefined}
@@ -47,21 +59,27 @@ function PhotoThumbnail({
 }
 
 type PhotoPickerProps = {
+  keptPhotos: EditablePhoto[]; // fotos actuales de la publicación (solo en edición)
   photos: File[];
   error: string | null;
   warning: string | null;
   onAdd: (files: File[]) => void;
   onRemove: (index: number) => void;
+  onRemoveKept: (photoId: string) => void;
 };
 
 export function PhotoPicker({
+  keptPhotos,
   photos,
   error,
   warning,
   onAdd,
   onRemove,
+  onRemoveKept,
 }: PhotoPickerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const totalCount = keptPhotos.length + photos.length;
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     onAdd(Array.from(event.target.files ?? []));
@@ -74,16 +92,27 @@ export function PhotoPicker({
         FOTOS
       </div>
       <div className="flex flex-wrap gap-3">
+        {keptPhotos.map((photo, index) => (
+          <PhotoThumbnail
+            key={photo.id}
+            source={{ url: photo.url }}
+            position={index + 1}
+            isFocusTarget={index === 0 && totalCount >= MAX_PHOTOS}
+            onRemove={() => onRemoveKept(photo.id)}
+          />
+        ))}
         {photos.map((file, index) => (
           <PhotoThumbnail
             key={`${index}-${file.name}-${file.lastModified}`}
-            file={file}
-            position={index + 1}
-            isFocusTarget={index === 0 && photos.length >= MAX_PHOTOS}
+            source={{ file }}
+            position={keptPhotos.length + index + 1}
+            isFocusTarget={
+              keptPhotos.length === 0 && index === 0 && totalCount >= MAX_PHOTOS
+            }
             onRemove={() => onRemove(index)}
           />
         ))}
-        {photos.length < MAX_PHOTOS && (
+        {totalCount < MAX_PHOTOS && (
           <button
             type="button"
             data-photo-focus

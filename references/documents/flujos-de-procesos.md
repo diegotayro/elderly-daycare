@@ -137,8 +137,8 @@ Un adulto mayor puede tener varios familiares, y siempre gana el "no":
 
 ### Editar publicación
 
-1. Solo el autor puede editar. La audiencia no se puede cambiar.
-2. En un post `elderly`, los cambios de etiquetas se guardan juntos en una sola operación, y siempre debe quedar al menos un adulto mayor etiquetado.
+1. El admin (cualquier post de su guardería) o el autor staff sin historial. Se puede cambiar la audiencia, el tipo, los textos y las fotos, en una sola operación (`update_post`). Las fotos quitadas se borran también del bucket.
+2. Al pasar a un post `elderly` o editarlo, siempre debe quedar al menos un adulto mayor etiquetado; al salir de `elderly`, se borran todas las etiquetas.
 
 ### Borrar publicación
 

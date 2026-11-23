@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { detectPostChanges, type PostFormFields } from "../detect-post-changes";
+import { editPostMessages } from "../edit-post-messages";
 import { findPhotoConsentWarning } from "../find-photo-consent-warning";
 import { MAX_BODY_LENGTH, MAX_TITLE_LENGTH } from "../new-post-limits";
 import { selectPhotos } from "../select-photos";
@@ -8,10 +10,12 @@ import { toggleAudience } from "../toggle-audience";
 import { validateNewPost } from "../validate-new-post";
 import type {
   AudienceSelection,
+  EditablePhoto,
   NewPostErrors,
   NewPostField,
   NewPostInput,
   NewPostOptions,
+  PostForEdit,
 } from "../types";
 import {
   fieldControlClassName,
@@ -42,17 +46,24 @@ function isNewPostField(name: string): name is NewPostField {
   return FIELD_ORDER.includes(name as NewPostField);
 }
 
+export type PostSubmission = {
+  input: NewPostInput; // photoCount = fotos que quedarán (actuales − quitadas + nuevas)
+  files: File[]; // fotos nuevas
+  removedPhotoIds: string[]; // solo en edición
+};
+
 type NewPostFormProps = {
   options: NewPostOptions;
   titleId: string;
   isPending: boolean;
   onCancel: () => void;
-  // El padre publica y, si el servidor rechaza campos, los devuelve por showFieldErrors
-  onPublish: (
-    input: NewPostInput,
-    photos: File[],
+  // El padre guarda y, si el servidor rechaza campos, los devuelve por showFieldErrors
+  onSubmit: (
+    submission: PostSubmission,
     showFieldErrors: (errors: NewPostErrors) => void,
   ) => void;
+  // Con `edit` el formulario parte de la publicación y se comporta como "Editar publicación"
+  edit?: PostForEdit;
 };
 
 export function NewPostForm({
@@ -60,11 +71,22 @@ export function NewPostForm({
   titleId,
   isPending,
   onCancel,
-  onPublish,
+  onSubmit,
+  edit,
 }: NewPostFormProps) {
   const audienceLabelId = useId();
   const formRef = useRef<HTMLFormElement>(null);
-  const [audience, setAudience] = useState<AudienceSelection>({ kind: "none" });
+  const [audience, setAudience] = useState<AudienceSelection>(
+    edit?.input.audience ?? { kind: "none" },
+  );
+  const [fields, setFields] = useState<PostFormFields>({
+    type: edit?.input.type ?? "",
+    title: edit?.input.title ?? "",
+    body: edit?.input.body ?? "",
+  });
+  const [keptPhotos, setKeptPhotos] = useState<EditablePhoto[]>(
+    edit?.photos ?? [],
+  );
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [errors, setErrors] = useState<NewPostErrors>({});
@@ -72,11 +94,42 @@ export function NewPostForm({
   const mustFocusInvalidField = useRef(false);
   const defaultRoomId = options.rooms[0]?.id ?? "";
   const hasTitleField = audience.kind === "room" || audience.kind === "daycare";
+  const totalPhotoCount = keptPhotos.length + photos.length;
   const photoConsentWarning = findPhotoConsentWarning(
     audience,
-    photos.length,
+    totalPhotoCount,
     options,
   );
+
+  // Etiquetas y habitación fuera de las opciones: aparecen mientras sigan elegidas
+  const selectedElderlyIds =
+    audience.kind === "elderly" ? audience.elderlyIds : [];
+  const extraElderly = edit?.extraElderly ?? [];
+  const elderlyChips = [
+    ...options.elderly,
+    ...extraElderly.filter((elderly) =>
+      selectedElderlyIds.includes(elderly.id),
+    ),
+  ];
+  const extraRoom =
+    edit?.extraRoom &&
+    audience.kind === "room" &&
+    audience.roomId === edit.extraRoom.id
+      ? edit.extraRoom
+      : null;
+  const rooms = extraRoom ? [...options.rooms, extraRoom] : options.rooms;
+
+  const removedPhotoIds = (edit?.photos ?? [])
+    .filter((photo) => !keptPhotos.some((kept) => kept.id === photo.id))
+    .map((photo) => photo.id);
+  const canSave =
+    !edit ||
+    detectPostChanges(edit.input, {
+      audience,
+      fields,
+      removedPhotoCount: removedPhotoIds.length,
+      newPhotoCount: photos.length,
+    });
 
   // Si el modal se abrió mientras cargaban las opciones, el foco inicial llega ahora
   useEffect(() => {
@@ -114,23 +167,17 @@ export function NewPostForm({
     clearError("photos");
   }
 
-  function readInput(formData: FormData): NewPostInput {
-    return {
-      audience,
-      type: String(formData.get("type") ?? ""),
-      title: String(formData.get("title") ?? ""),
-      body: String(formData.get("body") ?? ""),
-      photoCount: photos.length,
-    };
-  }
-
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (isPending) return;
-    const input = readInput(new FormData(event.currentTarget));
+    if (isPending || !canSave) return;
+    const input: NewPostInput = {
+      audience,
+      ...fields,
+      photoCount: totalPhotoCount,
+    };
     const clientErrors = validateNewPost(input, {
-      roomIds: options.rooms.map((room) => room.id),
-      elderly: options.elderly,
+      roomIds: rooms.map((room) => room.id),
+      elderly: [...options.elderly, ...extraElderly],
       canPostToDaycare: options.canPostToDaycare,
     });
 
@@ -139,18 +186,32 @@ export function NewPostForm({
       return;
     }
     setErrors({});
-    onPublish(input, photos, showErrors);
+    onSubmit({ input, files: photos, removedPhotoIds }, showErrors);
   }
 
   function handleChange(event: FormEvent<HTMLFormElement>) {
     const { name } = event.target as HTMLInputElement;
     if (isNewPostField(name)) clearError(name);
+
+    const formData = new FormData(event.currentTarget);
+    // El título no está en el formulario con audiencia de adultos mayores: se conserva
+    setFields((current) => ({
+      type: String(formData.get("type") ?? current.type),
+      title: String(formData.get("title") ?? current.title),
+      body: String(formData.get("body") ?? current.body),
+    }));
   }
 
   function addPhotos(incoming: File[]) {
-    const { accepted, error } = selectPhotos(photos, incoming);
+    const { accepted, error } = selectPhotos(totalPhotoCount, incoming);
     setPhotos([...photos, ...accepted]);
     setPhotoError(error);
+    clearError("photos");
+  }
+
+  function removeKeptPhoto(photoId: string) {
+    setKeptPhotos(keptPhotos.filter((photo) => photo.id !== photoId));
+    setPhotoError(null);
     clearError("photos");
   }
 
@@ -181,14 +242,20 @@ export function NewPostForm({
           id={titleId}
           className="m-0 font-display text-lg leading-[normal] font-semibold text-ink"
         >
-          Nueva publicación
+          {edit ? editPostMessages.dialogTitle : "Nueva publicación"}
         </h2>
         <button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || !canSave}
           className="cursor-pointer text-[15px] font-extrabold text-coral-strong disabled:cursor-default disabled:opacity-50"
         >
-          {isPending ? "Publicando…" : "Publicar"}
+          {edit
+            ? isPending
+              ? editPostMessages.savingLabel
+              : editPostMessages.saveLabel
+            : isPending
+              ? "Publicando…"
+              : "Publicar"}
         </button>
       </header>
       <fieldset
@@ -198,8 +265,8 @@ export function NewPostForm({
         <AudiencePicker
           labelId={audienceLabelId}
           error={errors.audience}
-          elderly={options.elderly}
-          rooms={options.rooms}
+          elderly={elderlyChips}
+          rooms={rooms}
           canPostToDaycare={options.canPostToDaycare}
           selection={audience}
           onToggle={(chip) =>
@@ -211,7 +278,7 @@ export function NewPostForm({
             changeAudience(() => ({ kind: "room", roomId }))
           }
         />
-        <PostTypePicker error={errors.type} />
+        <PostTypePicker error={errors.type} defaultType={fields.type} />
         {hasTitleField && (
           <div>
             <label
@@ -225,6 +292,7 @@ export function NewPostForm({
               name="title"
               type="text"
               maxLength={MAX_TITLE_LENGTH}
+              defaultValue={fields.title}
               aria-invalid={errors.title ? true : undefined}
               aria-describedby={
                 errors.title ? getFieldErrorId("title") : undefined
@@ -246,6 +314,7 @@ export function NewPostForm({
             id="body"
             name="body"
             maxLength={MAX_BODY_LENGTH}
+            defaultValue={fields.body}
             aria-invalid={errors.body ? true : undefined}
             aria-describedby={errors.body ? getFieldErrorId("body") : undefined}
             placeholder="Cuenta cómo le fue hoy…"
@@ -254,11 +323,13 @@ export function NewPostForm({
           <FieldError fieldId="body" message={errors.body} />
         </div>
         <PhotoPicker
+          keptPhotos={keptPhotos}
           photos={photos}
           error={errors.photos ?? photoError}
           warning={photoConsentWarning}
           onAdd={addPhotos}
           onRemove={removePhoto}
+          onRemoveKept={removeKeptPhoto}
         />
       </fieldset>
     </form>

@@ -14,11 +14,13 @@ function isPositiveInteger(value: unknown): value is number {
   return Number.isInteger(value) && (value as number) > 0;
 }
 
-// Cada foto debe estar en {postId}/{position}.webp, con la posición según el orden
-function isValidPhoto(postId: string, photo: unknown, position: number) {
+// Cada foto debe estar en {postId}/{position}.webp
+function isValidPhoto(postId: string, photo: unknown) {
   if (typeof photo !== "object" || photo === null) return false;
-  const { path, width, height } = photo as Record<string, unknown>;
+  const { path, width, height, position } = photo as Record<string, unknown>;
   return (
+    Number.isInteger(position) &&
+    (position as number) >= 0 &&
     path === `${postId}/${position}.webp` &&
     isPositiveInteger(width) &&
     isPositiveInteger(height)
@@ -38,17 +40,17 @@ export async function attachPostPhotos(
     Array.isArray(photos) &&
     photos.length >= 1 &&
     photos.length <= MAX_PHOTOS &&
-    photos.every((photo, position) => isValidPhoto(postId, photo, position));
+    photos.every((photo) => isValidPhoto(postId, photo));
   if (!hasValidShape) return { status: "error" };
 
   const supabase = createClient(await cookies());
   const { error } = await supabase.from("post_photos").insert(
-    photos.map((photo, position) => ({
+    photos.map((photo) => ({
       post_id: postId,
       url: photo.path,
       width: photo.width,
       height: photo.height,
-      position,
+      position: photo.position,
     })),
   );
   if (error) {

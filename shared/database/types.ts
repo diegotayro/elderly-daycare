@@ -152,4 +152,20 @@ export type ListNoticesRow = {
 // Funciones RPC (argumentos → retorno)
 export type DatabaseFunctions = {
   post_has_history: { Args: { p_post_id: string }; Returns: boolean };
+  posts_with_history: { Args: { p_post_ids: string[] }; Returns: string[] };
+  update_post: {
+    Args: {
+      p_post_id: string;
+      p_audience: PostAudience;
+      p_room_id: string | null;
+      p_type: PostType;
+      p_title: string | null;
+      p_body: string;
+      p_add_elderly_ids: string[];
+      p_remove_elderly_ids: string[];
+      p_new_photos: { url: string; width: number; height: number; position: number }[];
+      p_removed_photo_ids: string[];
+    };
+    Returns: undefined;
+  };
 };
