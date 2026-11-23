@@ -3,6 +3,7 @@ import { requireTeamUser } from "@/auth/require-user";
 import { getCurrentUserPhotoUrl } from "@/users/get-current-user-photo-url";
 import { buildTeamPostSubtitle } from "../build-team-post-subtitle";
 import { getTeamPostDetail } from "../get-post-detail";
+import { DeletePostButton } from "./DeletePostButton";
 import { PostDetailHeader } from "./PostDetailHeader";
 import { PostDetailView } from "./PostDetailView";
 
@@ -36,6 +37,9 @@ export async function PostDetailContent({ params }: PostDetailContentProps) {
       currentUser={user}
       currentUserPhotoUrl={photoUrl}
       backHref="/"
+      headerAction={
+        <DeletePostButton postId={post.id} canDelete={post.canDelete} />
+      }
     >
       <PostDetailHeader
         avatarInitial={post.avatarInitial}

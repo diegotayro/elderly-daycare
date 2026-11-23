@@ -142,7 +142,7 @@ Un adulto mayor puede tener varios familiares, y siempre gana el "no":
 
 ### Borrar publicación
 
-1. El autor o el admin (solo en posts de su guardería) elige "Eliminar".
+1. El admin (cualquier post de su guardería) o el autor staff si no tiene historial (reacciones o comentarios de otras personas) elige «Eliminar» en el detalle `/posts/[id]` y lo confirma.
 2. Server Action: primero borra los archivos de Storage de `{post_id}/`, mientras el post todavía existe (la regla de Storage comprueba que quien borra es el autor o el admin).
 3. Después borra el post. Sus filas en `post_elderly`, `post_photos`, `reactions` y `comments` se borran en cascada.
 

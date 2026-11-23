@@ -18,6 +18,7 @@ export type FeedPost = {
   reactionCount: number;
   reactedByMe: boolean;
   commentCount: number;
+  canDelete: boolean; // admin, o staff autor sin historial (solo en el detalle del equipo)
 };
 
 export type AudienceElderlyOption = {
@@ -98,6 +99,11 @@ export type CreatePostResult =
   | { status: "error" };
 
 export type SetReactionResult = { status: "ok" } | { status: "error" };
+
+// En éxito, deletePost hace redirect y no devuelve nada
+export type DeletePostResult = { status: "error" } | { status: "has-history" };
+
+export type FeedNotice = "post-deleted";
 
 export type AttachPhotoInput = {
   path: string; // "{postId}/{position}.webp"

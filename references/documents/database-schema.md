@@ -70,6 +70,7 @@ Viven en `public`, son `SECURITY DEFINER STABLE` con `search_path` vacío y `EXE
 |`can_post_to_room(p_room_id)`|`boolean`: admin, la habitación es de su guardería; staff, la habitación es la de alguno de sus asignados. Lo usan `posts_insert_team` y `posts_update_author`.|
 |`post_has_tag_without_photo_consent(p_post_id)`|`boolean`: algún adulto mayor etiquetado en el post tiene `photo_consent = false`. `SECURITY DEFINER` para que no dependa de qué adultos mayores ve quien sube la foto.|
 |`staff_has_history(p_staff_id)`|`boolean`: el staff tiene alguna fila en `posts` (`author_id`), `comments` (`author_id`) o `reactions` (`user_id`). `false` si quien llama no es admin o si `p_staff_id` no es un staff de su guardería. Lo usa el perfil de `/staff/[id]` (mostrar "Eliminar") y `deleteStaff` (validar); la FK `on delete restrict` sigue siendo la protección final.|
+|`post_has_history(p_post_id)`|`boolean`: alguien distinto del autor del post reaccionó (`reactions.user_id`) o comentó (`comments.author_id`). `false` si el post no existe. Lo usan las policies de borrado del autor en `posts` y en Storage, el detalle `/posts/[id]` (mostrar "Eliminar" al staff) y `deletePost` (validar).|
 
 Además existe `post_id_from_path(p_path)`, `IMMUTABLE` y no `SECURITY DEFINER`: devuelve la primera carpeta de una ruta de Storage como `uuid`, o `null` si no tiene formato UUID (así una ruta inválida se niega sin error).
 
@@ -419,7 +420,7 @@ Una publicación tiene un tipo (qué es) y una audiencia (para quién es).
 | select | todos         | puede ver el post (regla del feed)                                                                                                                                                                                                                                                                                                               |
 | insert | staff/admin   | Todas estas condiciones se cumplen a la vez (una sola policy): `author_id` = él mismo (cualquier tipo), **y además**, según la audiencia: `elderly` → a quiénes etiqueta se valida en `post_elderly`; `room` → admin: cualquier habitación de su guardería, staff: solo habitaciones donde está alguno de sus asignados; `daycare` → solo admin. |
 | update | autor         | sus posts; sigue siendo el autor; no cambia la audiencia; si es `room`, la habitación cumple las reglas de insert                                                                                                                                                                                                                                |
-| delete | autor o admin | el admin solo en posts de su guardería (moderación)                                                                                                                                                                                                                                                                                              |
+| delete | autor sin historial (staff) o admin | el autor solo si `not post_has_history(id)` (nadie más reaccionó ni comentó); el admin cualquier post de su guardería, con o sin historial (moderación) |
 
 ---
 
@@ -567,7 +568,7 @@ Las fotos viven en `storage.objects`, que tiene su **propia** RLS. Si el bucket 
 |---|---|---|
 |select|todos|puede ver el post de la ruta (regla del feed)|
 |insert|autor del post|es el autor del post de la ruta|
-|delete|autor del post o admin|el admin solo en posts de su guardería|
+|delete|autor del post sin historial o admin|el autor solo si `not post_has_history(post_id)`, para no borrar los archivos de un post que luego no podrá borrar; el admin en cualquier post de su guardería|
 
 ---
 
@@ -619,6 +620,10 @@ Crear un usuario de prueba por rol y comprobar:
 24. **Avatares:** el admin sube y borra en la carpeta de un staff o relative `active` o `pending` de su guardería; en uno `archived` solo borra; en la de otro admin o de otra guardería no puede ni subir ni borrar.
 25. **Avatares:** un relative firma la foto de un staff de su guardería y no la de otra guardería. Un usuario `pending` o `archived` no sube, borra ni firma.
 26. `get_relative_email`: devuelve el email solo a un admin y solo de un familiar de su guardería; a otros roles, `null`.
+27. `post_has_history`: `false` para un post sin reacciones ni comentarios o solo con los de su autor; `true` con una reacción o un comentario de otra persona.
+28. **Staff autor:** borrar un post sin historial → funciona; con historial → borra 0 filas. Borrar en Storage un archivo de un post con historial → borra 0; de uno sin historial → funciona.
+29. **Staff:** borrar el post de otro staff → borra 0 filas.
+30. **Admin:** borrar un post con historial de un staff de su guardería (fila y archivos) → funciona; de otra guardería → borra 0.
 
 ---
 

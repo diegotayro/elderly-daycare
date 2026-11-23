@@ -25,6 +25,7 @@ type PostDetailViewProps = {
   currentUser: Pick<CurrentUser, "id" | "first_name">;
   currentUserPhotoUrl: string | null;
   backHref: string; // "/" o "/family"
+  headerAction?: ReactNode; // a la derecha de "Volver al feed"
   children: ReactNode; // cabecera de la tarjeta, según el rol
 };
 
@@ -35,6 +36,7 @@ export function PostDetailView({
   currentUser,
   currentUserPhotoUrl,
   backHref,
+  headerAction,
   children,
 }: PostDetailViewProps) {
   const author = {
@@ -46,13 +48,16 @@ export function PostDetailView({
   return (
     <CommentInputProvider>
       <div className="mx-auto w-full max-w-[680px] px-4 pt-5 pb-8 lg:px-10 lg:pt-[34px] lg:pb-10">
-        <Link
-          href={backHref}
-          className="mb-[18px] flex min-h-11 items-center gap-[7px] text-sm font-bold text-muted-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral-strong"
-        >
-          <ChevronLeftIcon size={18} />
-          Volver al feed
-        </Link>
+        <div className="mb-[18px] flex items-center justify-between gap-3">
+          <Link
+            href={backHref}
+            className="flex min-h-11 items-center gap-[7px] text-sm font-bold text-muted-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral-strong"
+          >
+            <ChevronLeftIcon size={18} />
+            Volver al feed
+          </Link>
+          {headerAction}
+        </div>
 
         <article className="rounded-[22px] border border-line bg-surface px-[18px] py-5 shadow-[0_6px_22px_-14px_rgba(120,90,60,0.5)] lg:px-[26px] lg:py-6">
           {children}
