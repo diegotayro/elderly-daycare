@@ -1,4 +1,5 @@
 import "server-only";
+import { cookies } from "next/headers";
 import type { CurrentUser } from "@/auth/types";
 import { toCommentView } from "@/comments/build-comment-view";
 import { fetchComments } from "@/comments/fetch-comments";
@@ -8,6 +9,7 @@ import { toFamilyPost } from "@/family/build-family-feed";
 import type { FamilyFeedElderly, FamilyPost } from "@/family/types";
 import { formatRelativeTime } from "@/shared/date/format-relative-time";
 import { getLimaToday } from "@/shared/date/get-lima-today";
+import { createClient } from "@/shared/supabase/server";
 import { isUuid } from "@/shared/text/is-uuid";
 import { toFeedPost } from "./build-feed";
 import { fetchPost } from "./fetch-post";
@@ -44,6 +46,22 @@ async function loadDetail(
   };
 }
 
+// Admin: siempre. Staff: solo si es el autor y nadie más reaccionó ni comentó.
+async function canDeletePost(
+  post: FeedPost,
+  user: CurrentUser,
+): Promise<boolean> {
+  if (user.role === "admin") return true;
+  if (!post.publishedByMe) return false;
+
+  const supabase = createClient(await cookies());
+  const { data, error } = await supabase.rpc("post_has_history", {
+    p_post_id: post.id,
+  });
+  if (error) throw error;
+  return data === false;
+}
+
 export async function getTeamPostDetail(
   postId: string,
   user: CurrentUser,
@@ -56,6 +74,7 @@ export async function getTeamPostDetail(
     post: {
       ...post,
       time: formatRelativeTime(detail.postData.publishedAt, detail.today),
+      canDelete: await canDeletePost(post, user),
     },
     comments: detail.comments,
   };

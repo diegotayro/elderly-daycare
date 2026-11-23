@@ -148,3 +148,8 @@ export type ListNoticesRow = {
   is_first_link: boolean | null; // solo account_activated
   post_id: string | null; // null en account_activated
 };
+
+// Funciones RPC (argumentos → retorno)
+export type DatabaseFunctions = {
+  post_has_history: { Args: { p_post_id: string }; Returns: boolean };
+};

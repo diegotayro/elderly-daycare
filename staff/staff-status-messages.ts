@@ -1,5 +1,6 @@
 import type { ConfirmDialogContent } from "@/shared/components/ConfirmDialog";
 import type { ToastMessage } from "@/shared/components/toast/types";
+import type { StaffListNotice } from "./types";
 
 export type StaffConfirmAction = "archive" | "cancel-invitation" | "delete";
 
@@ -78,3 +79,16 @@ export function reactivatedToast(staffFullName: string): ToastMessage {
     description: `${staffFullName} ya puede iniciar sesión.`,
   };
 }
+
+export const staffListNoticeMessages: Record<StaffListNotice, ToastMessage> = {
+  "invitation-cancelled": {
+    tone: "success",
+    title: "Invitación cancelada",
+    description: "Ya no aparece en la lista.",
+  },
+  "staff-deleted": {
+    tone: "success",
+    title: "Staff eliminado",
+    description: "Ya no aparece en la lista.",
+  },
+};

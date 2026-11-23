@@ -49,6 +49,7 @@ export function toFeedPost(post: FeedPostData, currentUserId: string): FeedPost 
     reactionCount: post.reactionCount,
     reactedByMe: post.reactedByMe,
     commentCount: post.commentCount,
+    canDelete: false,
   };
 }
 
