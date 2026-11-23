@@ -7,10 +7,10 @@ export const metadata: Metadata = {
   title: "Resumen del día · Casa Nogal",
 };
 
-export default function FamilySummaryPage() {
+export default function FamilySummaryPage(props: PageProps<"/family/summary">) {
   return (
     <Suspense fallback={<DailySummarySkeleton />}>
-      <DailySummaryContent />
+      <DailySummaryContent searchParams={props.searchParams} />
     </Suspense>
   );
 }

@@ -27,7 +27,6 @@ export async function FamilyPostDetailContent({
 
   const { post, comments } = detail;
   const author = findPostAuthor(post, elderly);
-  const subtitle = `${post.time} · ${post.authorLabel}`;
 
   return (
     <PostDetailView
@@ -35,7 +34,7 @@ export async function FamilyPostDetailContent({
       viewerPost={{
         postId: post.id,
         heading: post.heading,
-        subtitle,
+        subtitle: post.subtitle,
         caption: post.body,
       }}
       comments={comments}
@@ -48,7 +47,7 @@ export async function FamilyPostDetailContent({
         avatarTone={author?.tone}
         type={post.type}
         heading={post.heading}
-        subtitle={subtitle}
+        subtitle={post.subtitle}
       />
       {post.audience === "room" && (
         <div className="mb-2.5 text-[12.5px] text-muted">

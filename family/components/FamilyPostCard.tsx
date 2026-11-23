@@ -26,9 +26,7 @@ export function FamilyPostCard({ post, author }: FamilyPostCardProps) {
           <div className="font-display text-[16.5px] font-semibold text-ink">
             {post.heading}
           </div>
-          <div className="text-[12.5px] text-muted">
-            {post.time} · {post.authorLabel}
-          </div>
+          <div className="text-[12.5px] text-muted">{post.subtitle}</div>
         </div>
         <PostTypeBadge type={post.type} />
       </div>
@@ -46,7 +44,7 @@ export function FamilyPostCard({ post, author }: FamilyPostCardProps) {
           viewerPost={{
             postId: post.id,
             heading: post.heading,
-            subtitle: `${post.time} · ${post.authorLabel}`,
+            subtitle: post.subtitle,
             caption: post.body,
           }}
         />

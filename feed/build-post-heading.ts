@@ -14,6 +14,7 @@ type HeadingSource = Pick<
 export function buildPostHeading(post: HeadingSource): string {
   switch (post.audience) {
     case "elderly":
+      if (post.title) return post.title;
       // Si ninguno es legible, se usa un texto genérico en vez de dejar el encabezado vacío
       return joinElderlyNames(post.elderly) || "Adulto mayor";
     case "room":

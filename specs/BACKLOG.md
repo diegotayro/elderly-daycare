@@ -308,7 +308,7 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 
 ### Chips con un solo adulto mayor
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 38
 - **Qué:** decidir si los chips de adulto mayor del resumen se ocultan cuando el familiar tiene un solo adulto mayor vinculado. El feed ya las oculta (SPEC 25).
 - **Origen:** SPEC 18, `family/components/ElderlyFilterChips.tsx`; el feed se resolvió en SPEC 25.
 - **Se resuelve en:** la spec que conecte "Resumen del día" a Supabase.
@@ -317,9 +317,7 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 ### Enlaces al detalle de publicación y al visor de foto
 
 - [ ] **Estado:** pendiente
-- **Qué:** siguen sin enlazar (la foto del post ya abre el visor desde SPEC 30):
-  - los ítems de "Lo más lindo de hoy" de `/family/summary`;
-  - la tarjeta completa del feed, que hoy solo enlaza desde el ícono de comentarios.
+- **Qué:** la tarjeta completa del feed familiar sigue sin enlazar: hoy solo enlaza desde el ícono de comentarios. (La foto del post abre el visor desde SPEC 30 y los ítems de "Lo más lindo de hoy" enlazan al detalle desde SPEC 38.)
 - **Origen:** SPEC 18, `family/components/SummaryHighlightItem.tsx`; el detalle (`/posts/[id]` y `/family/posts/[id]`) y los enlaces desde el ícono de comentarios de `/` y `/family` y desde los avisos de `/notices` se resolvieron en SPEC 29.
 - **Se resuelve en:** la que conecte "Resumen del día" a Supabase.
 - **Notas:**
@@ -362,7 +360,7 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 
 ### Conectar las pantallas del familiar a Supabase
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 38
 - **Qué:** el feed de `/family` ya es real desde SPEC 25 (posts por `audience`, conteos, autor, hora y chips) y "Mi cuenta" desde SPEC 31. Sigue saliendo del mock (`mockFamily`) solo el resumen (`daily_summaries`, que el esquema marca como diferido) y su `dateLabel`.
 - **Origen:** SPEC 18, `family/mock-family.ts`; el feed se resolvió en SPEC 25 y "Mi cuenta" en SPEC 31.
 - **Se resuelve en:** la spec de datos del resumen diario (`daily_summaries`).
@@ -421,7 +419,7 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 
 ### Botones "Editar" y "Resumen del día" del perfil
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 38
 - **Qué:** el botón "Resumen del día" de `/elderly/[id]` enlaza a `/`. ("Editar" lo resolvió la SPEC 33.)
 - **Origen:** SPEC 02, `elderly/components/ElderlyProfileHeader.tsx` y `ElderlyProfileView.tsx`.
 - **Se resuelve en:** la spec de resumen del día.
@@ -608,7 +606,7 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 
 ### Recordatorio del resumen que sepa si ya se envió
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 38
 - **Qué:** el recordatorio "Recuerda enviar el resumen del día" de `/notices` aparece desde las 17:00 aunque el resumen ya se haya enviado.
 - **Origen:** SPEC 27 (`notices/fetch-notices.ts`).
 - **Se resuelve en:** la spec que conecte `daily_summaries` (resumen del día).

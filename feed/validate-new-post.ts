@@ -36,9 +36,7 @@ function isValidAudience(
 }
 
 function validateTitle(input: NewPostInput): string | undefined {
-  const hasTitle =
-    input.audience.kind === "room" || input.audience.kind === "daycare";
-  if (hasTitle && input.title.trim().length > MAX_TITLE_LENGTH) {
+  if (input.title.trim().length > MAX_TITLE_LENGTH) {
     return messages.titleTooLong;
   }
 }

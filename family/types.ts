@@ -40,6 +40,7 @@ export type FamilyPost = {
   roomElderlyNames: string[]; // solo en room: nombres de pila de sus vinculados en esa habitación
   elderlyIds: string[]; // solo los etiquetados que el familiar puede leer
   heading: string; // "Luis" | título | "Habitación Roble"
+  subtitle: string; // "14:20 · Cuidador/a Caro" | "Para Luis, Jorge · 14:20 · Cuidador/a Caro"
   time: string; // "14:20"
   authorLabel: string; // "Cuidador/a Caro"
   body: string;
@@ -56,32 +57,8 @@ export type FamilyFeedElderly = Pick<
   roomId: string;
 };
 
-export type SummaryHighlight = {
-  id: string;
-  type: PostType; // define el color
-  title: string; // "¡Caminó sin su andador!"
-  time: string; // "14:20"
-  detail: string; // "Un gran paso, estaba feliz de contarlo."
-};
-
-export type DailySummary = {
-  elderlyId: string;
-  dateLabel: string; // "martes 17 de junio"
-  mealsCount: number;
-  sleepMinutes: number; // como daily_summaries.sleep_minutes
-  momentsCount: number;
-  mood: string; // "Contento y participativo"
-  highlights: SummaryHighlight[];
-};
-
 export type ElderlyFilter =
   { kind: "all" } | { kind: "elderly"; elderlyId: string };
-
-// Solo para "Resumen del día", que sigue con datos de mock
-export type FamilyMock = {
-  elderly: FamilyElderly[];
-  summaries: DailySummary[];
-};
 
 export type SidebarElderlyLink = {
   firstName: string;

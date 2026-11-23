@@ -51,7 +51,7 @@ export type AudienceChip =
 export type NewPostInput = {
   audience: AudienceSelection;
   type: string; // valor crudo del FormData
-  title: string; // solo cuenta con room o daycare
+  title: string; // opcional en cualquier audiencia
   body: string;
   photoCount: number;
 };

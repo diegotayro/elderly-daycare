@@ -93,7 +93,6 @@ export function NewPostForm({
   // Los campos siguen deshabilitados mientras se publica: el foco se mueve al terminar
   const mustFocusInvalidField = useRef(false);
   const defaultRoomId = options.rooms[0]?.id ?? "";
-  const hasTitleField = audience.kind === "room" || audience.kind === "daycare";
   const totalPhotoCount = keptPhotos.length + photos.length;
   const photoConsentWarning = findPhotoConsentWarning(
     audience,
@@ -194,7 +193,6 @@ export function NewPostForm({
     if (isNewPostField(name)) clearError(name);
 
     const formData = new FormData(event.currentTarget);
-    // El título no está en el formulario con audiencia de adultos mayores: se conserva
     setFields((current) => ({
       type: String(formData.get("type") ?? current.type),
       title: String(formData.get("title") ?? current.title),
@@ -279,8 +277,7 @@ export function NewPostForm({
           }
         />
         <PostTypePicker error={errors.type} defaultType={fields.type} />
-        {hasTitleField && (
-          <div>
+        <div>
             <label
               htmlFor="title"
               className="mb-2.5 block text-xs font-extrabold tracking-[0.7px] text-muted-strong"
@@ -302,7 +299,6 @@ export function NewPostForm({
             />
             <FieldError fieldId="title" message={errors.title} />
           </div>
-        )}
         <div>
           <label
             htmlFor="body"

@@ -1,6 +1,6 @@
 import { buildAuthorLabel } from "@/feed/build-author-label";
 import { buildDayLabel } from "@/feed/build-day-label";
-import { buildPostHeading } from "@/feed/build-post-heading";
+import { buildPostHeading, joinElderlyNames } from "@/feed/build-post-heading";
 import type {
   FeedDataDay,
   FeedDataPage,
@@ -34,6 +34,14 @@ export function toFamilyPost(
           .map((elderly) => elderly.firstName)
       : [];
 
+  const time = limaTimeFormatter.format(new Date(post.publishedAt));
+  const authorLabel = buildAuthorLabel(post);
+  const recipients =
+    post.audience === "elderly" && post.title
+      ? joinElderlyNames(post.elderly)
+      : "";
+  const byline = `${time} · ${authorLabel}`;
+
   return {
     id: post.id,
     type: post.type,
@@ -43,8 +51,9 @@ export function toFamilyPost(
     roomElderlyNames,
     elderlyIds: post.elderly.map((elderly) => elderly.id),
     heading: buildPostHeading(post),
-    time: limaTimeFormatter.format(new Date(post.publishedAt)),
-    authorLabel: buildAuthorLabel(post),
+    subtitle: recipients ? `Para ${recipients} · ${byline}` : byline,
+    time,
+    authorLabel,
     body: post.body,
     photos: post.photos,
     reactionCount: post.reactionCount,

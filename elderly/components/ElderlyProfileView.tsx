@@ -32,7 +32,7 @@ export function ElderlyProfileView({ profile }: ElderlyProfileViewProps) {
         </div>
         <div className="flex w-full flex-col gap-3.5 lg:w-[300px] lg:flex-none">
           <Link
-            href="/"
+            href={`/elderly/${profile.id}/summary`}
             className="flex w-full items-center justify-center gap-[9px] rounded-[14px] bg-ink p-[13px] text-[15px] font-extrabold text-white"
           >
             <SunIcon size={18} strokeWidth={2} />

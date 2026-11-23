@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useRef, useState, useTransition, type ReactNode } from "react";
+import { formDialogClassName } from "@/shared/components/form-dialog-class-name";
 import { Toast } from "@/shared/components/toast/Toast";
 import type { ToastMessage } from "@/shared/components/toast/types";
 import type {
@@ -113,7 +114,7 @@ export function ElderlyFormDialog<TResult extends ElderlySaveResult>({
           if (isSavingRef.current) event.preventDefault();
         }}
         onClose={handleDialogClose}
-        className="m-0 h-dvh max-h-none w-full max-w-none overflow-hidden border-0 border-line bg-auth-bg p-0 text-ink backdrop:bg-ink/40 open:flex open:flex-col sm:mx-auto sm:mt-10 sm:mb-auto sm:h-fit sm:max-h-[calc(100dvh-80px)] sm:max-w-[520px] sm:rounded-3xl sm:border sm:shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]"
+        className={formDialogClassName}
       >
         <ElderlyForm
           key={`${formKey}-${JSON.stringify(initialValues)}`}

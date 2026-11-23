@@ -51,8 +51,8 @@ export async function createPost(rawInput: unknown): Promise<CreatePostResult> {
   const target = toPostTarget(input.audience);
   if (!target) return { status: "error" };
 
-  // Solo room y daycare llevan título; vacío se guarda como null
-  const title = target.audience === "elderly" ? "" : input.title.trim();
+  // Título opcional en cualquier audiencia; vacío se guarda como null
+  const title = input.title.trim();
 
   const supabase = createClient(await cookies());
   const { data: postId, error } = await supabase.rpc("create_post", {
