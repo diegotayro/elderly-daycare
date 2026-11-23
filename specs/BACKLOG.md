@@ -531,7 +531,7 @@ Las pantallas `/family`, `/family/summary` y `/family/account` se maquetaron en 
 
 ### Borrar los archivos de Storage al borrar un post o una foto
 
-- [ ] **Estado:** pendiente
+- [x] **Estado:** resuelto en SPEC 36
 - **Qué:** al quitar una foto (fila de `post_photos`), su archivo del bucket `post-photos` no se borra solo. Borrar un post completo ya lo hace (`feed/remove-post-with-photos.ts`, SPEC 35).
 - **Origen:** SPEC 22 (`database/22-feed-tables-and-visibility`); el mecanismo se implementó en SPEC 25 (`feed/actions/discard-post.ts`).
 - **Se resuelve en:** SPEC 36 (editar una publicación). Borrar un post se resolvió en SPEC 35.

@@ -20,9 +20,14 @@ const limaTimeFormatter = new Intl.DateTimeFormat("es", {
 type FeedContext = {
   currentUserId: string;
   today: string; // "aaaa-mm-dd" en Lima
+  editablePostIds: Set<string>;
 };
 
-export function toFeedPost(post: FeedPostData, currentUserId: string): FeedPost {
+export function toFeedPost(
+  post: FeedPostData,
+  currentUserId: string,
+  canEdit = false,
+): FeedPost {
   const namesLabel = joinElderlyNames(post.elderly);
   const roomName = post.roomName ?? "";
 
@@ -50,6 +55,7 @@ export function toFeedPost(post: FeedPostData, currentUserId: string): FeedPost 
     reactedByMe: post.reactedByMe,
     commentCount: post.commentCount,
     canDelete: false,
+    canEdit,
   };
 }
 
@@ -57,7 +63,13 @@ function toFeedDay(day: FeedDataDay, context: FeedContext): FeedDay<FeedPost> {
   return {
     date: day.date,
     label: buildDayLabel(day.date, context.today, "team"),
-    posts: day.posts.map((post) => toFeedPost(post, context.currentUserId)),
+    posts: day.posts.map((post) =>
+      toFeedPost(
+        post,
+        context.currentUserId,
+        context.editablePostIds.has(post.id),
+      ),
+    ),
   };
 }
 

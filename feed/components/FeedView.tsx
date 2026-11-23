@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { loadMoreTeamFeed } from "../actions/load-more-team-feed";
 import type { FeedDay, FeedPage, FeedPost } from "../types";
+import { EditPostDialogProvider } from "./EditPostDialogProvider";
 import { FeedDaySection } from "./FeedDaySection";
 import { FeedHeader } from "./FeedHeader";
 import { LoadMoreButton } from "./LoadMoreButton";
@@ -43,21 +44,23 @@ export function FeedView({
   }
 
   return (
-    <div className="mx-auto w-full max-w-[760px] px-4 pt-5 pb-8 lg:px-10 lg:pt-[34px] lg:pb-20">
-      <FeedHeader
-        daycareName={daycareName}
-        userFirstName={userFirstName}
-        elderlyCount={elderlyCount}
-        todayLabel={todayLabel}
-      />
-      <PostComposerButton
-        userInitial={userFirstName[0]}
-        userPhotoUrl={userPhotoUrl}
-      />
-      {days.map((day) => (
-        <FeedDaySection key={day.date} day={day} />
-      ))}
-      {hasMore && <LoadMoreButton onLoad={loadMore} />}
-    </div>
+    <EditPostDialogProvider>
+      <div className="mx-auto w-full max-w-[760px] px-4 pt-5 pb-8 lg:px-10 lg:pt-[34px] lg:pb-20">
+        <FeedHeader
+          daycareName={daycareName}
+          userFirstName={userFirstName}
+          elderlyCount={elderlyCount}
+          todayLabel={todayLabel}
+        />
+        <PostComposerButton
+          userInitial={userFirstName[0]}
+          userPhotoUrl={userPhotoUrl}
+        />
+        {days.map((day) => (
+          <FeedDaySection key={day.date} day={day} />
+        ))}
+        {hasMore && <LoadMoreButton onLoad={loadMore} />}
+      </div>
+    </EditPostDialogProvider>
   );
 }

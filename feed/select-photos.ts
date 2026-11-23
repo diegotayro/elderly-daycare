@@ -9,7 +9,7 @@ function getPhotoError(file: File): string | null {
 }
 
 export function selectPhotos(
-  current: File[],
+  currentCount: number,
   incoming: File[],
 ): PhotoSelectionResult {
   const accepted: File[] = [];
@@ -19,7 +19,7 @@ export function selectPhotos(
     const fileError = getPhotoError(file);
     if (fileError) {
       error ??= fileError;
-    } else if (current.length + accepted.length >= MAX_PHOTOS) {
+    } else if (currentCount + accepted.length >= MAX_PHOTOS) {
       error ??= messages.tooManyPhotos;
     } else {
       accepted.push(file);

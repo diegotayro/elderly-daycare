@@ -1,6 +1,6 @@
 # SPEC 36 — Editar una publicación
 
-> **Estado:** Borrador
+> **Estado:** Implementado
 > **Depende de:** SPEC 22, SPEC 25, SPEC 33, SPEC 35
 > **Fecha:** 2026-11-23
 > **Objetivo:** Que el admin edite cualquier publicación de su guardería y el staff las suyas sin historial, desde "Editar" en la tarjeta del feed, cambiando audiencia, tipo, textos y fotos en una sola operación.
@@ -234,38 +234,38 @@ specs/BACKLOG.md
 
 **Base de datos**
 
-- [ ] Como staff autor sin historial, `update_post` cambia tipo, textos, audiencia y fotos; con historial falla y no cambia nada.
-- [ ] Como admin, `update_post` sobre el post de un staff de su guardería funciona, incluso con historial; de otra guardería falla.
-- [ ] Un staff no puede editar el post de otro staff.
-- [ ] `author_id` no cambia con un `update` directo; `audience` sí.
-- [ ] Un staff no puede pasar un post a `daycare`.
-- [ ] Un staff conserva la habitación actual de un post `room` aunque ya no tenga asignados en ella, y no puede cambiarla a una habitación sin asignados.
-- [ ] Pasar de `elderly` a `room` borra todas las etiquetas; de `room` a `elderly` sin etiquetas falla; quitar todas las etiquetas sin cambiar la audiencia falla.
-- [ ] Agregar fotos con un etiquetado sin consentimiento falla; agregar un etiquetado sin consentimiento a un post con fotos falla; quitar las fotos y agregar ese etiquetado en la misma llamada funciona.
-- [ ] Si falla cualquier parte de `update_post`, no cambia nada (post, etiquetas ni fotos).
-- [ ] Como staff, subir o borrar archivos de un post propio con historial falla; como admin, subir a un post de su guardería funciona.
-- [ ] `posts_with_history` devuelve solo los ids con historial.
-- [ ] Crear una publicación con fotos (SPEC 25) y eliminarla (SPEC 35) siguen funcionando.
-- [ ] El archivo de la migración tiene el mismo nombre que su registro en el remoto y `shared/database/types.ts` incluye las funciones nuevas.
+- [x] Como staff autor sin historial, `update_post` cambia tipo, textos, audiencia y fotos; con historial falla y no cambia nada.
+- [x] Como admin, `update_post` sobre el post de un staff de su guardería funciona, incluso con historial; de otra guardería falla.
+- [x] Un staff no puede editar el post de otro staff.
+- [x] `author_id` no cambia con un `update` directo; `audience` sí.
+- [x] Un staff no puede pasar un post a `daycare`.
+- [x] Un staff conserva la habitación actual de un post `room` aunque ya no tenga asignados en ella, y no puede cambiarla a una habitación sin asignados.
+- [x] Pasar de `elderly` a `room` borra todas las etiquetas; de `room` a `elderly` sin etiquetas falla; quitar todas las etiquetas sin cambiar la audiencia falla.
+- [x] Agregar fotos con un etiquetado sin consentimiento falla; agregar un etiquetado sin consentimiento a un post con fotos falla; quitar las fotos y agregar ese etiquetado en la misma llamada funciona.
+- [x] Si falla cualquier parte de `update_post`, no cambia nada (post, etiquetas ni fotos).
+- [x] Como staff, subir o borrar archivos de un post propio con historial falla; como admin, subir a un post de su guardería funciona.
+- [x] `posts_with_history` devuelve solo los ids con historial.
+- [x] Crear una publicación con fotos (SPEC 25) y eliminarla (SPEC 35) siguen funcionando.
+- [x] El archivo de la migración tiene el mismo nombre que su registro en el remoto y `shared/database/types.ts` incluye las funciones nuevas.
 
 **UI**
 
-- [ ] El admin ve "Editar" en todas las tarjetas del feed. El staff lo ve solo en las suyas sin historial.
-- [ ] "Editar" abre el modal "Editar publicación" con los valores y las fotos actuales.
-- [ ] "Guardar" está deshabilitado sin cambios y vuelve a deshabilitarse al deshacerlos.
-- [ ] Se puede cambiar la audiencia entre adultos mayores, habitación y (solo admin) toda la guardería, y el feed muestra el nuevo "Para:" tras guardar.
-- [ ] Un etiquetado archivado aparece marcado, se puede quitar y, una vez quitado, no se puede volver a marcar.
-- [ ] Quitar una foto y guardar borra su fila de `post_photos` y su archivo del bucket.
-- [ ] Agregar fotos respeta el máximo de 5 en total y la compresión del alta; la foto nueva aparece al final del carrusel.
-- [ ] Las reglas de consentimiento del alta se aplican al estado final.
-- [ ] Mientras guarda, el modal no se cierra con Esc ni con "Cancelar".
-- [ ] Tras guardar, se cierra el modal, el feed se actualiza sin recargar y aparece "Cambios guardados".
-- [ ] Si `update_post` falla después de subir fotos nuevas, sus archivos se borran del bucket y el modal conserva lo escrito.
-- [ ] Si alguien comenta mientras el staff edita, al guardar aparece "No se puede editar", no cambia nada y "Editar" desaparece.
-- [ ] Llamar a `updatePost` como relative, con un id inválido o sobre un post ajeno (staff) devuelve `error`.
-- [ ] "Nueva publicación" funciona igual que antes (abrir, validar, publicar con y sin fotos, deshacer si falla).
-- [ ] El modal no se desborda a 375 px de ancho.
-- [ ] `npm run lint` y `npm run build` pasan sin errores.
+- [x] El admin ve "Editar" en todas las tarjetas del feed. El staff lo ve solo en las suyas sin historial.
+- [x] "Editar" abre el modal "Editar publicación" con los valores y las fotos actuales.
+- [x] "Guardar" está deshabilitado sin cambios y vuelve a deshabilitarse al deshacerlos.
+- [x] Se puede cambiar la audiencia entre adultos mayores, habitación y (solo admin) toda la guardería, y el feed muestra el nuevo "Para:" tras guardar.
+- [x] Un etiquetado archivado aparece marcado, se puede quitar y, una vez quitado, no se puede volver a marcar.
+- [x] Quitar una foto y guardar borra su fila de `post_photos` y su archivo del bucket.
+- [x] Agregar fotos respeta el máximo de 5 en total y la compresión del alta; la foto nueva aparece al final del carrusel.
+- [x] Las reglas de consentimiento del alta se aplican al estado final.
+- [x] Mientras guarda, el modal no se cierra con Esc ni con "Cancelar".
+- [x] Tras guardar, se cierra el modal, el feed se actualiza sin recargar y aparece "Cambios guardados".
+- [x] Si `update_post` falla después de subir fotos nuevas, sus archivos se borran del bucket y el modal conserva lo escrito.
+- [x] Si alguien comenta mientras el staff edita, al guardar aparece "No se puede editar", no cambia nada y "Editar" desaparece.
+- [x] Llamar a `updatePost` como relative, con un id inválido o sobre un post ajeno (staff) devuelve `error`.
+- [x] "Nueva publicación" funciona igual que antes (abrir, validar, publicar con y sin fotos, deshacer si falla).
+- [x] El modal no se desborda a 375 px de ancho.
+- [x] `npm run lint` y `npm run build` pasan sin errores.
 
 ---
 

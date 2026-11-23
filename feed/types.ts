@@ -19,6 +19,7 @@ export type FeedPost = {
   reactedByMe: boolean;
   commentCount: number;
   canDelete: boolean; // admin, o staff autor sin historial (solo en el detalle del equipo)
+  canEdit: boolean; // admin, o staff autor sin historial (solo en el feed del equipo)
 };
 
 export type AudienceElderlyOption = {
@@ -72,6 +73,33 @@ export type FeedPhoto = {
   position: number; // post_photos.position
 };
 
+export type EditablePhoto = FeedPhoto & { id: string }; // id = post_photos.id
+
+export type PostForEdit = {
+  id: string;
+  input: NewPostInput; // valores actuales (photoCount = fotos actuales)
+  photos: EditablePhoto[]; // ordenadas por position
+  nextPhotoPosition: number; // max(position) + 1, o 0
+  extraElderly: AudienceElderlyOption[]; // etiquetados fuera de las opciones
+  extraRoom: RoomOption | null; // habitación actual fuera de las opciones
+};
+
+export type EditPostInput = NewPostInput & {
+  removedPhotoIds: string[];
+  newPhotos: AttachPhotoInput[]; // ya subidas
+};
+
+export type GetPostForEditResult =
+  | { status: "ok"; post: PostForEdit; options: NewPostOptions }
+  | { status: "has-history" }
+  | { status: "error" };
+
+export type UpdatePostResult =
+  | { status: "ok" }
+  | { status: "invalid"; errors: NewPostErrors }
+  | { status: "has-history" }
+  | { status: "error" };
+
 export type PhotoViewerPost = {
   postId: string;
   heading: string; // "Don Luis"
@@ -109,6 +137,7 @@ export type AttachPhotoInput = {
   path: string; // "{postId}/{position}.webp"
   width: number;
   height: number;
+  position: number;
 };
 
 // Publicación leída de la DB (con la sesión: la RLS ya filtró lo que el usuario no ve)

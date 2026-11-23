@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CommentIcon } from "@/shared/components/icons/CommentIcon";
 import { buildTeamPostSubtitle } from "../build-team-post-subtitle";
 import type { FeedPost } from "../types";
+import { EditPostButton } from "./EditPostButton";
 import { PhotoCarousel } from "./PhotoCarousel";
 import { PostAuthorAvatar } from "./PostAuthorAvatar";
 import { PostTypeBadge } from "./PostTypeBadge";
@@ -58,11 +59,7 @@ export function PostCard({ post }: PostCardProps) {
           {post.commentCount}
         </Link>
         <span className="flex-1" />
-        {post.publishedByMe && (
-          <Link href="/" className="text-sm font-extrabold text-coral-link">
-            Editar
-          </Link>
-        )}
+        {post.canEdit && <EditPostButton postId={post.id} />}
       </div>
     </article>
   );
